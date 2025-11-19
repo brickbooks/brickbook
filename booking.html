@@ -1,150 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Booking-Off – BrickBook</title>
+  <meta charset="UTF-8">
+  <title>Booking-Off – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-:root {
-  --blue:#1B73E8;
-  --charcoal:#2D2D2D;
-  --lightgrey:#F5F7FA;
-  --white:#FFFFFF;
-}
-body {
-  margin:0;
-  background:var(--lightgrey);
-  font-family:'Inter',Arial,sans-serif;
-  color:var(--charcoal);
-}
-header {
-  background:var(--white);
-  padding:18px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #E5EAF0;
-}
-.logo { font-size:20px; font-weight:700; }
-nav a {
-  margin-left:20px;
-  text-decoration:none;
-  color:var(--charcoal);
-  font-weight:600;
-}
-nav a:hover { color:var(--blue); }
+  <style>
+    :root {
+      --blue: #1B73E8;
+      --charcoal: #2D2D2D;
+      --lightgrey: #F5F7FA;
+      --white: #FFFFFF;
+    }
 
-.wrapper {
-  max-width:850px;
-  margin:30px auto;
-  padding:20px;
-  background:white;
-  border-radius:12px;
-  box-shadow:0px 6px 20px rgba(0,0,0,0.06);
-}
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--white);
+      color: var(--charcoal);
+    }
 
-h1 { margin-bottom:10px; }
-.section-title { font-size:20px; margin:20px 0 10px; font-weight:700; }
+    header {
+      background: var(--white);
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #E5EAF0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-.item-box {
-  padding:18px;
-  background:#f9fbfe;
-  border-radius:8px;
-  border:1px solid #d9e2ef;
-  margin-bottom:20px;
-}
+    .logo { font-size: 20px; font-weight: 700; }
 
-input, select {
-  width:100%;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #D8DFE8;
-  margin-bottom:14px;
-  font-size:15px;
-}
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: var(--charcoal);
+      font-weight: 600;
+    }
+    nav a:hover { color: var(--blue); }
 
-.btn-add {
-  background:#e8f0ff;
-  color:var(--blue);
-  padding:14px;
-  width:100%;
-  border-radius:8px;
-  border:1px dashed var(--blue);
-  font-weight:600;
-  margin-bottom:20px;
-  cursor:pointer;
-}
-.btn-add:hover { opacity:0.85; }
+    .wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+    }
 
-.total-line {
-  font-size:18px;
-  font-weight:700;
-  padding:10px 0;
-}
+    h1 {
+      font-size: 26px;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
 
-.btn-submit {
-  background:var(--blue);
-  color:white;
-  padding:14px;
-  width:100%;
-  text-align:center;
-  border-radius:8px;
-  font-size:18px;
-  margin-top:25px;
-  cursor:pointer;
-  font-weight:700;
-}
-.btn-submit:hover { opacity:0.9; }
-</style>
+    .subtitle {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
 
-<script>
-let itemIndex = 1;
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-function updateItemTotal(i) {
-  const qty  = parseFloat(document.getElementById(`qty_${i}`).value) || 0;
-  const rate = parseFloat(document.getElementById(`rate_${i}`).value) || 0;
-  const total = qty * rate;
-  document.getElementById(`total_${i}`).innerText = "£" + total.toFixed(2);
-  updateGrandTotal();
-}
+    .meta-row input {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #D8DFE8;
+      font-size: 14px;
+    }
 
-function addItem() {
-  itemIndex++;
-  const container = document.getElementById("items");
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
 
-  const html = `
-    <div class="item-box" id="item_${itemIndex}">
-      <label>Work Type</label>
-      <input id="type_${itemIndex}" placeholder="Brickwork / Blockwork">
+    thead {
+      background: var(--blue);
+      color: white;
+    }
 
-      <label>Measurement Type</label>
-      <input id="mtype_${itemIndex}" placeholder="m² / 1000 bricks">
+    th, td {
+      border: 1px solid #D8DFE8;
+      padding: 8px 6px;
+      text-align: left;
+    }
 
-      <label>Quantity</label>
-      <input id="qty_${itemIndex}" type="number" oninput="updateItemTotal(${itemIndex})">
+    th { font-weight: 600; }
 
-      <label>Rate (£)</label>
-      <input id="rate_${itemIndex}" type="number" oninput="updateItemTotal(${itemIndex})">
+    tbody tr:nth-child(even) {
+      background: #F7F9FC;
+    }
 
-      <div class="total-line">Item Total: <span id="total_${itemIndex}">£0.00</span></div>
-    </div>
-  `;
+    tbody input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+    }
 
-  container.insertAdjacentHTML("beforeend", html);
-}
+    tfoot td {
+      font-weight: 700;
+      background: #F0F4FB;
+    }
 
-function updateGrandTotal() {
-  let grand = 0;
-  for (let i = 1; i <= itemIndex; i++) {
-    const qty  = parseFloat(document.getElementById(`qty_${i}`)?.value) || 0;
-    const rate = parseFloat(document.getElementById(`rate_${i}`)?.value) || 0;
-    grand += qty * rate;
-  }
-  document.getElementById("grand_total").innerText = "£" + grand.toFixed(2);
-}
-</script>
+    .btn-row {
+      margin: 16px 0 30px;
+    }
 
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-add {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 3px 8px rgba(27,115,232,0.25);
+    }
+
+    .btn-add:hover { opacity: .9; }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 32px 0 12px;
+    }
+
+    .squad-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .squad-table th, .squad-table td {
+      border: 1px solid #D8DFE8;
+      padding: 8px 6px;
+      text-align: left;
+    }
+
+    .squad-table input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .grand-total {
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .wrapper { padding: 20px 10px 40px; }
+      table, .squad-table { font-size: 13px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -153,57 +177,156 @@ function updateGrandTotal() {
   <div class="logo">BrickBook</div>
   <nav>
     <a href="index.html">Home</a>
-    <a href="contractor_dashboard.html">Dashboard</a>
+    <a href="dashboard.html">Dashboard</a>
     <a href="login.html">Logout</a>
   </nav>
 </header>
 
 <div class="wrapper">
-  
-  <h1>Booking-Off Form</h1>
 
-  <label>Plot Number</label>
-  <input id="plot_number" placeholder="e.g. Plot 12">
+  <h1>Booking-Off</h1>
+  <div class="subtitle">Enter today’s measurements for this site and squad.</div>
 
-  <label>Site Location</label>
-  <input id="site_location" placeholder="e.g. Redwood Estate">
-
-  <div class="section-title">Work Items</div>
-
-  <div id="items">
-    <div class="item-box" id="item_1">
-      <label>Work Type</label>
-      <input id="type_1" placeholder="Brickwork / Blockwork">
-
-      <label>Measurement Type</label>
-      <input id="mtype_1" placeholder="m² / 1000 bricks">
-
-      <label>Quantity</label>
-      <input id="qty_1" type="number" oninput="updateItemTotal(1)">
-
-      <label>Rate (£)</label>
-      <input id="rate_1" type="number" oninput="updateItemTotal(1)">
-
-      <div class="total-line">Item Total: <span id="total_1">£0.00</span></div>
-    </div>
+  <!-- Basic info row -->
+  <div class="meta-row">
+    <input id="site_name" type="text" placeholder="Site / Project name">
+    <input id="plot_group" type="text" placeholder="Plot(s) e.g. 44–48">
+    <input id="date" type="date">
   </div>
 
-  <button class="btn-add" onclick="addItem()">+ Add Another Item</button>
+  <!-- Booking lines table -->
+  <table id="bookingTable">
+    <thead>
+      <tr>
+        <th>Plot</th>
+        <th>Measurement Type</th>
+        <th>Quantity</th>
+        <th>Rate (£ per unit)</th>
+        <th>Total Cost (£)</th>
+      </tr>
+    </thead>
+    <tbody id="bookingBody">
+      <tr class="booking-row">
+        <td><input class="plot-input" type="text" placeholder="Plot 44"></td>
+        <td><input class="type-input" type="text" placeholder="Bricks / Trench / etc."></td>
+        <td><input class="qty-input" type="number" step="0.01" oninput="updateRow(this)"></td>
+        <td><input class="rate-input" type="number" step="0.01" oninput="updateRow(this)"></td>
+        <td>£<span class="row-total">0.00</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align:right;">Grand Total (£):</td>
+        <td>£<span id="grandTotal" class="grand-total">0.00</span></td>
+      </tr>
+    </tfoot>
+  </table>
 
-  <div class="section-title">Squad Members</div>
+  <div class="btn-row">
+    <button class="btn btn-add" onclick="addRow()">+ Add another line</button>
+  </div>
 
-  <input placeholder="Squad Member 1">
-  <input placeholder="Squad Member 2">
-  <input placeholder="Squad Member 3">
-  <input placeholder="Squad Member 4">
-  <input placeholder="Squad Member 5">
-  <input placeholder="Squad Member 6">
+  <!-- Squad split section -->
+  <div class="section-title">Squad Split (Manual %)</div>
+  <p style="font-size:13px; color:#555; margin-bottom:8px;">
+    Enter up to 6 squad members and their percentage share. Values will update automatically from the grand total.
+  </p>
 
-  <h2 style="margin-top:20px;">Grand Total: <span id="grand_total">£0.00</span></h2>
-
-  <div class="btn-submit">Submit Booking-Off</div>
+  <table class="squad-table">
+    <thead>
+      <tr>
+        <th>Squad Member</th>
+        <th>Share %</th>
+        <th>Value (£)</th>
+      </tr>
+    </thead>
+    <tbody id="squadBody">
+      <!-- 6 rows -->
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 1"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 2"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 3"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 4"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 5"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+      <tr class="squad-row">
+        <td><input class="squad-name" type="text" placeholder="Name 6"></td>
+        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
+        <td>£<span class="squad-value">0.00</span></td>
+      </tr>
+    </tbody>
+  </table>
 
 </div>
+
+<script>
+  // Recalculate a single row and then the grand total
+  function updateRow(inputEl) {
+    const row = inputEl.closest('.booking-row');
+    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
+    const total = qty * rate;
+    row.querySelector('.row-total').textContent = total.toFixed(2);
+    updateGrandTotal();
+  }
+
+  // Sum all row totals
+  function updateGrandTotal() {
+    let grand = 0;
+    document.querySelectorAll('.row-total').forEach(span => {
+      grand += parseFloat(span.textContent) || 0;
+    });
+    document.getElementById('grandTotal').textContent = grand.toFixed(2);
+    updateSquadTotals();
+  }
+
+  // Add a new booking line
+  function addRow() {
+    const body = document.getElementById('bookingBody');
+    const firstRow = body.querySelector('.booking-row');
+    const newRow = firstRow.cloneNode(true);
+
+    // Clear values
+    newRow.querySelectorAll('input').forEach(inp => inp.value = '');
+    newRow.querySelector('.row-total').textContent = '0.00';
+
+    // Rebind events
+    newRow.querySelector('.qty-input').oninput = function () { updateRow(this); };
+    newRow.querySelector('.rate-input').oninput = function () { updateRow(this); };
+
+    body.appendChild(newRow);
+  }
+
+  // Update squad £ splits based on percentages and grand total
+  function updateSquadTotals() {
+    const grand = parseFloat(document.getElementById('grandTotal').textContent) || 0;
+    const rows = document.querySelectorAll('.squad-row');
+
+    rows.forEach(row => {
+      const pct = parseFloat(row.querySelector('.squad-percent').value) || 0;
+      const share = grand * (pct / 100);
+      row.querySelector('.squad-value').textContent = share.toFixed(2);
+    });
+  }
+</script>
 
 </body>
 </html>
