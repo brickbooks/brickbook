@@ -4,152 +4,332 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrickBook – Digital Booking-Off System</title>
+
   <style>
     :root {
       --blue: #1B73E8;
+      --dark: #1F1F1F;
       --charcoal: #2D2D2D;
       --lightgrey: #F5F7FA;
-      --white: #FFFFFF;
+      --white: #ffffff;
+      --fade: 0.4s ease;
     }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      margin:0;
-      font-family:'Inter',Arial,sans-serif;
+      font-family: "Inter", Arial, sans-serif;
       background: var(--white);
       color: var(--charcoal);
+      overflow-x: hidden;
     }
+
+    /* HEADER */
     header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:20px 50px;
-      background: var(--white);
-      border-bottom:1px solid #E5EAF0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid #EEE;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 999;
     }
+
     .logo {
-      font-size:24px;
-      font-weight:700;
-      color: var(--charcoal);
+      font-size: 24px;
+      font-weight: 800;
     }
+
+    nav {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+    }
+
     nav a {
-      margin-left:30px;
-      text-decoration:none;
+      font-weight: 600;
+      text-decoration: none;
       color: var(--charcoal);
-      font-weight:500;
     }
-    nav a:hover {
-      color: var(--blue);
+    nav a:hover { color: var(--blue); }
+
+    /* MOBILE NAV */
+    .hamburger {
+      display: none;
+      font-size: 26px;
+      cursor: pointer;
     }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: white;
+      padding: 14px;
+      border-bottom: 1px solid #ddd;
+      animation: fadeIn var(--fade);
+    }
+
+    .mobile-menu a {
+      padding: 10px 0;
+      font-size: 17px;
+      border-bottom: 1px solid #eee;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HERO SECTION */
     .hero {
-      text-align:center;
-      padding:120px 20px;
+      padding: 100px 20px;
+      text-align: center;
+      max-width: 900px;
+      margin: auto;
+      animation: fadeIn var(--fade);
     }
+
     .hero h1 {
-      font-size:52px;
-      font-weight:800;
-      margin-bottom:20px;
-      letter-spacing:-1px;
+      font-size: 50px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
     }
+
     .hero p {
-      font-size:20px;
-      max-width:650px;
-      margin:0 auto 40px;
-      color:#555;
+      font-size: 20px;
+      max-width: 600px;
+      margin: 0 auto 28px auto;
+      color: #555;
     }
+
     .btn-primary {
       background: var(--blue);
       color: white;
-      padding:16px 34px;
-      border-radius:8px;
-      font-size:17px;
-      font-weight:600;
-      text-decoration:none;
-      box-shadow:0px 4px 12px rgba(27,115,232,0.3);
-      margin-right:12px;
+      padding: 15px 34px;
+      font-size: 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      margin-right: 10px;
+      display: inline-block;
+      box-shadow: 0px 7px 20px rgba(27,115,232,0.25);
+      transition: 0.2s;
     }
-    .btn-primary:hover {
-      opacity:0.9;
-    }
+    .btn-primary:hover { opacity: 0.9; }
+
     .btn-outline {
-      border:2px solid var(--charcoal);
-      padding:14px 30px;
-      border-radius:8px;
-      text-decoration:none;
+      border: 2px solid var(--charcoal);
+      padding: 13px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 700;
       color: var(--charcoal);
-      font-size:17px;
-      font-weight:600;
     }
     .btn-outline:hover {
       background: var(--charcoal);
       color: white;
     }
-    .section {
-      padding:80px 20px;
-      text-align:center;
-      max-width:1200px;
-      margin:0 auto;
+
+    /* FEATURE GRID */
+    .features {
+      padding: 70px 20px;
+      max-width: 1100px;
+      margin: auto;
     }
-    .section h2 {
-      font-size:36px;
-      margin-bottom:20px;
-      font-weight:700;
+
+    .features h2 {
+      font-size: 38px;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
     }
-    .section p {
-      font-size:18px;
-      color:#555;
-      line-height:1.5;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
     }
+
+    .feature-box {
+      padding: 24px;
+      background: var(--lightgrey);
+      border-radius: 16px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.04);
+      animation: fadeIn var(--fade);
+    }
+
+    .feature-box h3 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-box p {
+      font-size: 16px;
+      color: #555;
+    }
+
+    /* BLUE SECTION */
+    .blue-section {
+      background: var(--blue);
+      padding: 80px 20px;
+      text-align: center;
+      color: white;
+    }
+    .blue-section h2 { font-size: 36px; margin-bottom: 10px; }
+    .blue-section p { font-size: 18px; margin-bottom: 20px; }
+
+    .btn-white {
+      background: white;
+      color: var(--blue);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* PRICING SECTION */
+    .pricing {
+      padding: 80px 20px;
+      text-align: center;
+    }
+    .pricing h2 { font-size: 36px; margin-bottom: 14px; }
+    .pricing p { font-size: 18px; margin-bottom: 20px; }
+
+    /* FOOTER */
     .footer {
-      padding:40px 20px;
-      text-align:center;
+      padding: 40px 20px;
+      text-align: center;
       background: var(--charcoal);
-      color:white;
+      color: white;
+      font-size: 14px;
     }
-    @media(max-width:768px) {
-      header { padding:20px 30px; }
-      .hero h1 { font-size:42px; }
-      .section { padding:60px 20px; }
+
+    /* MOBILE RULES */
+    @media(max-width: 768px) {
+      nav { display: none; }
+      .hamburger { display: block; }
+
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 17px; }
+
+      .btn-primary,
+      .btn-outline {
+        display: block;
+        margin: 10px auto;
+        width: 100%;
+        max-width: 340px;
+      }
+
+      .blue-section h2 { font-size: 30px; }
+      .pricing h2 { font-size: 30px; }
     }
   </style>
 </head>
+
 <body>
 
+<!-- HEADER -->
 <header>
   <div class="logo">BrickBook</div>
+
   <nav>
     <a href="index.html">Home</a>
     <a href="signup.html">Get Started</a>
     <a href="login.html">Login</a>
   </nav>
+
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
-<div class="hero">
-  <h1>Booking-Off & Measure System for Bricklaying Squads</h1>
-  <p>Go from site to system in seconds. Simple. Accurate. Photographic evidence. Instant totals. Approved by your contractor.</p>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Home</a>
+  <a href="signup.html">Get Started</a>
+  <a href="login.html">Login</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Digital Booking-Off for Bricklaying Squads</h1>
+  <p>Instant totals. Photos. Approvals. Squad splits. Everything your contractor needs in one place.</p>
+
   <a class="btn-primary" href="signup.html">Start Free Trial</a>
   <a class="btn-outline" href="booking.html">See Booking Form</a>
-</div>
+</section>
 
-<div class="section" id="features">
-  <h2>How It Works</h2>
-  <p>1. Sub-squad logs their daily work via mobile form. 2. Contractor receives approval, instant totals and pay calculations. 3. Data, photos, plots and reports all in one place.</p>
-</div>
+<!-- FEATURES -->
+<section class="features">
+  <h2>Why BrickBook</h2>
 
-<div class="section" id="benefits" style="background:var(--blue); color:white;">
-  <h2>Key Benefits</h2>
-  <p>No paper sheets · Faster approvals · Accurate pay · Mobile-first · Plot-by-plot tracking</p>
-  <a class="btn-outline" style="border-color:white;color:white;" href="signup.html">Try It On Your Site</a>
-</div>
+  <div class="grid">
 
-<div class="section" id="pricing">
-  <h2>Transparent Pricing</h2>
-  <p>Monthly subscription starting from £99 per gang. Add usage-based bookings for extra value.</p>
+    <div class="feature-box">
+      <h3>📱 Mobile-First</h3>
+      <p>Designed for gangs on site. Fast and simple booking-off from any phone.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>📸 Photo Evidence</h3>
+      <p>Attach photos per plot to prove hours, progress and quality instantly.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>⚡ Instant Totals</h3>
+      <p>Rates × measurements = instant totals for every plot and squad.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>🧱 Plot Tracking</h3>
+      <p>Contractors see remaining bricks, progress and weekly activity clearly.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>💷 Squad Splits</h3>
+      <p>Built-in split %, wages and CIS deductions done automatically.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>✔ Contractor Approvals</h3>
+      <p>Instant approve/reject workflow for clean communication.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- BLUE SECTION -->
+<section class="blue-section">
+  <h2>Faster Approvals. Better Records.</h2>
+  <p>Everything logged. Nothing lost. Full transparency for both contractor and squad.</p>
+  <a class="btn-white" href="signup.html">Try BrickBook Now</a>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <h2>Simple, Clear Pricing</h2>
+  <p>From £149 per month. Cancel anytime.</p>
   <a class="btn-primary" href="pricing.html">View Pricing</a>
-</div>
+</section>
 
+<!-- FOOTER -->
 <div class="footer">
   © 2025 BrickBook – All Rights Reserved
 </div>
 
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+</script>
+
 </body>
 </html>
-
