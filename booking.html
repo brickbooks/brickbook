@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking-Off – BrickBook</title>
+
+<style>
+:root {
+  --blue:#1B73E8;
+  --charcoal:#2D2D2D;
+  --lightgrey:#F5F7FA;
+  --white:#FFFFFF;
+}
+body {
+  margin:0;
+  background:var(--lightgrey);
+  font-family:'Inter',Arial,sans-serif;
+  color:var(--charcoal);
+}
+header {
+  background:var(--white);
+  padding:18px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #E5EAF0;
+}
+.logo { font-size:20px; font-weight:700; }
+nav a {
+  margin-left:20px;
+  text-decoration:none;
+  color:var(--charcoal);
+  font-weight:600;
+}
+nav a:hover { color:var(--blue); }
+
+.wrapper {
+  max-width:850px;
+  margin:30px auto;
+  padding:20px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0px 6px 20px rgba(0,0,0,0.06);
+}
+
+h1 { margin-bottom:10px; }
+.section-title { font-size:20px; margin:20px 0 10px; font-weight:700; }
+
+.item-box {
+  padding:18px;
+  background:#f9fbfe;
+  border-radius:8px;
+  border:1px solid #d9e2ef;
+  margin-bottom:20px;
+}
+
+input, select {
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #D8DFE8;
+  margin-bottom:14px;
+  font-size:15px;
+}
+
+.btn-add {
+  background:#e8f0ff;
+  color:var(--blue);
+  padding:14px;
+  width:100%;
+  border-radius:8px;
+  border:1px dashed var(--blue);
+  font-weight:600;
+  margin-bottom:20px;
+  cursor:pointer;
+}
+.btn-add:hover { opacity:0.85; }
+
+.total-line {
+  font-size:18px;
+  font-weight:700;
+  padding:10px 0;
+}
+
+.btn-submit {
+  background:var(--blue);
+  color:white;
+  padding:14px;
+  width:100%;
+  text-align:center;
+  border-radius:8px;
+  font-size:18px;
+  margin-top:25px;
+  cursor:pointer;
+  font-weight:700;
+}
+.btn-submit:hover { opacity:0.9; }
+</style>
+
+<script>
+let itemIndex = 1;
+
+function updateItemTotal(i) {
+  const qty  = parseFloat(document.getElementById(`qty_${i}`).value) || 0;
+  const rate = parseFloat(document.getElementById(`rate_${i}`).value) || 0;
+  const total = qty * rate;
+  document.getElementById(`total_${i}`).innerText = "£" + total.toFixed(2);
+  updateGrandTotal();
+}
+
+function addItem() {
+  itemIndex++;
+  const container = document.getElementById("items");
+
+  const html = `
+    <div class="item-box" id="item_${itemIndex}">
+      <label>Work Type</label>
+      <input id="type_${itemIndex}" placeholder="Brickwork / Blockwork">
+
+      <label>Measurement Type</label>
+      <input id="mtype_${itemIndex}" placeholder="m² / 1000 bricks">
+
+      <label>Quantity</label>
+      <input id="qty_${itemIndex}" type="number" oninput="updateItemTotal(${itemIndex})">
+
+      <label>Rate (£)</label>
+      <input id="rate_${itemIndex}" type="number" oninput="updateItemTotal(${itemIndex})">
+
+      <div class="total-line">Item Total: <span id="total_${itemIndex}">£0.00</span></div>
+    </div>
+  `;
+
+  container.insertAdjacentHTML("beforeend", html);
+}
+
+function updateGrandTotal() {
+  let grand = 0;
+  for (let i = 1; i <= itemIndex; i++) {
+    const qty  = parseFloat(document.getElementById(`qty_${i}`)?.value) || 0;
+    const rate = parseFloat(document.getElementById(`rate_${i}`)?.value) || 0;
+    grand += qty * rate;
+  }
+  document.getElementById("grand_total").innerText = "£" + grand.toFixed(2);
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="contractor_dashboard.html">Dashboard</a>
+    <a href="login.html">Logout</a>
+  </nav>
+</header>
+
+<div class="wrapper">
+  
+  <h1>Booking-Off Form</h1>
+
+  <label>Plot Number</label>
+  <input id="plot_number" placeholder="e.g. Plot 12">
+
+  <label>Site Location</label>
+  <input id="site_location" placeholder="e.g. Redwood Estate">
+
+  <div class="section-title">Work Items</div>
+
+  <div id="items">
+    <div class="item-box" id="item_1">
+      <label>Work Type</label>
+      <input id="type_1" placeholder="Brickwork / Blockwork">
+
+      <label>Measurement Type</label>
+      <input id="mtype_1" placeholder="m² / 1000 bricks">
+
+      <label>Quantity</label>
+      <input id="qty_1" type="number" oninput="updateItemTotal(1)">
+
+      <label>Rate (£)</label>
+      <input id="rate_1" type="number" oninput="updateItemTotal(1)">
+
+      <div class="total-line">Item Total: <span id="total_1">£0.00</span></div>
+    </div>
+  </div>
+
+  <button class="btn-add" onclick="addItem()">+ Add Another Item</button>
+
+  <div class="section-title">Squad Members</div>
+
+  <input placeholder="Squad Member 1">
+  <input placeholder="Squad Member 2">
+  <input placeholder="Squad Member 3">
+  <input placeholder="Squad Member 4">
+  <input placeholder="Squad Member 5">
+  <input placeholder="Squad Member 6">
+
+  <h2 style="margin-top:20px;">Grand Total: <span id="grand_total">£0.00</span></h2>
+
+  <div class="btn-submit">Submit Booking-Off</div>
+
+</div>
+
+</body>
+</html>
