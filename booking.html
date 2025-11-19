@@ -1,331 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Booking-Off – BrickBook</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking-Off – BrickBook</title>
 
-  <style>
-    :root {
-      --blue: #1B73E8;
-      --charcoal: #2D2D2D;
-      --lightgrey: #F5F7FA;
-      --white: #FFFFFF;
-    }
+    <style>
+        :root {
+            --blue: #1B73E8;
+            --charcoal: #2D2D2D;
+            --lightgrey: #F5F7FA;
+            --white: #FFFFFF;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Inter', Arial, sans-serif;
-      background: var(--white);
-      color: var(--charcoal);
-    }
+        body {
+            margin: 0;
+            background: var(--lightgrey);
+            font-family: 'Inter', Arial, sans-serif;
+            color: var(--charcoal);
+        }
 
-    header {
-      background: var(--white);
-      padding: 18px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #E5EAF0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+        /* HEADER */
+        header {
+            background: var(--white);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E5EAF0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
 
-    .logo { font-size: 20px; font-weight: 700; }
+        .logo { font-size: 20px; font-weight: 700; }
 
-    nav a {
-      margin-left: 20px;
-      text-decoration: none;
-      color: var(--charcoal);
-      font-weight: 600;
-    }
-    nav a:hover { color: var(--blue); }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: var(--charcoal);
+            font-weight: 600;
+        }
+        nav a:hover { color: var(--blue); }
 
-    .wrapper {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 30px 16px 60px;
-    }
+        /* WRAPPER */
+        .wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
 
-    h1 {
-      font-size: 26px;
-      margin-bottom: 6px;
-      font-weight: 800;
-    }
+        h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
 
-    .subtitle {
-      color: #666;
-      font-size: 15px;
-      margin-bottom: 24px;
-    }
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
 
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+        /* CARD / TABLE CONTAINERS */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
 
-    .meta-row input {
-      padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #D8DFE8;
-      font-size: 14px;
-    }
+        .card h2 {
+            font-size: 18px;
+            margin: 0 0 16px;
+            font-weight: 700;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 14px;
-    }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #FAFBFF;
+        }
 
-    thead {
-      background: var(--blue);
-      color: white;
-    }
+        thead {
+            background: #E5EEFF;
+        }
 
-    th, td {
-      border: 1px solid #D8DFE8;
-      padding: 8px 6px;
-      text-align: left;
-    }
+        th, td {
+            padding: 10px 12px;
+            font-size: 14px;
+            text-align: left;
+            border-bottom: 1px solid #E1E6F0;
+        }
 
-    th { font-weight: 600; }
+        thead th {
+            font-weight: 700;
+        }
 
-    tbody tr:nth-child(even) {
-      background: #F7F9FC;
-    }
+        tr:last-child td {
+            border-bottom: none;
+        }
 
-    tbody input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      font-size: 14px;
-      outline: none;
-    }
+        tbody tr:nth-child(even) {
+            background: #F7F9FC;
+        }
 
-    tfoot td {
-      font-weight: 700;
-      background: #F0F4FB;
-    }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #D2D8E3;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
 
-    .btn-row {
-      margin: 16px 0 30px;
-    }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
-    .btn {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-    }
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 14px;
+        }
 
-    .btn-add {
-      background: var(--blue);
-      color: white;
-      box-shadow: 0 3px 8px rgba(27,115,232,0.25);
-    }
+        .btn-secondary,
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-    .btn-add:hover { opacity: .9; }
+        .btn-secondary {
+            background: #EEF2FF;
+            color: var(--blue);
+            border: 1px solid #C5D4FF;
+        }
 
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin: 32px 0 12px;
-    }
+        .btn-secondary:hover {
+            background: #E0E7FF;
+        }
 
-    .squad-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+        .btn-primary {
+            background: var(--blue);
+            color: var(--white);
+            border: none;
+            box-shadow: 0 4px 12px rgba(27,115,232,0.25);
+        }
 
-    .squad-table th, .squad-table td {
-      border: 1px solid #D8DFE8;
-      padding: 8px 6px;
-      text-align: left;
-    }
+        .btn-primary:hover { opacity: 0.9; }
 
-    .squad-table input {
-      width: 100%;
-      border: none;
-      background: transparent;
-      outline: none;
-      font-size: 14px;
-    }
+        /* SQUAD SPLIT */
+        .squad-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
 
-    .grand-total {
-      font-weight: 700;
-    }
+        .squad-row {
+            display: contents;
+        }
 
-    @media (max-width: 768px) {
-      .wrapper { padding: 20px 10px 40px; }
-      table, .squad-table { font-size: 13px; }
-    }
-  </style>
+        .total-percent {
+            text-align: right;
+            font-size: 14px;
+            margin-top: 8px;
+            color: #555;
+        }
+
+        .total-percent span {
+            font-weight: 700;
+        }
+
+        .actions-row {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        @media(max-width: 768px) {
+            .wrapper { padding: 20px; }
+            h1 { font-size: 22px; }
+            .card { padding: 16px; }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">BrickBook</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="login.html">Logout</a>
-  </nav>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="login.html">Logout</a>
+    </nav>
 </header>
 
 <div class="wrapper">
 
-  <h1>Booking-Off</h1>
-  <div class="subtitle">Enter today’s measurements for this site and squad.</div>
+    <h1>Booking-Off</h1>
+    <div class="subtitle">Enter today’s work by plot, then split totals between squad members.</div>
 
-  <!-- Basic info row -->
-  <div class="meta-row">
-    <input id="site_name" type="text" placeholder="Site / Project name">
-    <input id="plot_group" type="text" placeholder="Plot(s) e.g. 44–48">
-    <input id="date" type="date">
-  </div>
+    <!-- PLOTS / WORK TABLE -->
+    <div class="card">
+        <h2>Plots & Work Done</h2>
 
-  <!-- Booking lines table -->
-  <table id="bookingTable">
-    <thead>
-      <tr>
-        <th>Plot</th>
-        <th>Measurement Type</th>
-        <th>Quantity</th>
-        <th>Rate (£ per unit)</th>
-        <th>Total Cost (£)</th>
-      </tr>
-    </thead>
-    <tbody id="bookingBody">
-      <tr class="booking-row">
-        <td><input class="plot-input" type="text" placeholder="Plot 44"></td>
-        <td><input class="type-input" type="text" placeholder="Bricks / Trench / etc."></td>
-        <td><input class="qty-input" type="number" step="0.01" oninput="updateRow(this)"></td>
-        <td><input class="rate-input" type="number" step="0.01" oninput="updateRow(this)"></td>
-        <td>£<span class="row-total">0.00</span></td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="4" style="text-align:right;">Grand Total (£):</td>
-        <td>£<span id="grandTotal" class="grand-total">0.00</span></td>
-      </tr>
-    </tfoot>
-  </table>
+        <table id="plots-table">
+            <thead>
+                <tr>
+                    <th>Plot</th>
+                    <th>Bricks</th>
+                    <th>100mm</th>
+                    <th>Commons</th>
+                    <th>Squad Hours</th>
+                    <th>Trench</th>
+                </tr>
+            </thead>
+            <tbody id="plots-body">
+                <!-- First row -->
+                <tr class="plot-row">
+                    <td><input type="text" name="plot_number" placeholder="e.g. 12"></td>
+                    <td><input type="number" name="bricks" min="0" step="1"></td>
+                    <td><input type="number" name="mm100" min="0" step="1"></td>
+                    <td><input type="number" name="commons" min="0" step="1"></td>
+                    <td><input type="number" name="squad_hours" min="0" step="0.25"></td>
+                    <td><input type="number" name="trench" min="0" step="1"></td>
+                </tr>
+            </tbody>
+        </table>
 
-  <div class="btn-row">
-    <button class="btn btn-add" onclick="addRow()">+ Add another line</button>
-  </div>
+        <div class="table-footer">
+            <button class="btn-secondary" type="button" onclick="addPlotRow()">+ Add another plot</button>
+            <!-- You can show totals here later if you like -->
+        </div>
+    </div>
 
-  <!-- Squad split section -->
-  <div class="section-title">Squad Split (Manual %)</div>
-  <p style="font-size:13px; color:#555; margin-bottom:8px;">
-    Enter up to 6 squad members and their percentage share. Values will update automatically from the grand total.
-  </p>
+    <!-- SQUAD SPLIT -->
+    <div class="card">
+        <h2>Squad Split (Manual %)</h2>
+        <p style="font-size:13px; margin-top:-4px; margin-bottom:12px; color:#555;">
+            Enter each squad member’s name and their percentage. Total should be 100% (we’ll just show it — you control the split).
+        </p>
 
-  <table class="squad-table">
-    <thead>
-      <tr>
-        <th>Squad Member</th>
-        <th>Share %</th>
-        <th>Value (£)</th>
-      </tr>
-    </thead>
-    <tbody id="squadBody">
-      <!-- 6 rows -->
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 1"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 2"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 3"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 4"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 5"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-      <tr class="squad-row">
-        <td><input class="squad-name" type="text" placeholder="Name 6"></td>
-        <td><input class="squad-percent" type="number" step="0.01" oninput="updateSquadTotals()">%</td>
-        <td>£<span class="squad-value">0.00</span></td>
-      </tr>
-    </tbody>
-  </table>
+        <div class="squad-grid">
+            <!-- 6 manual rows -->
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 1" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 2" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 3" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 4" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 5" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+            <div class="squad-row">
+                <input type="text" placeholder="Squad member 6" class="squad-name">
+                <input type="number" class="squad-percent" placeholder="%" min="0" max="100" step="1" oninput="updatePercentTotal()">
+            </div>
+        </div>
+
+        <div class="total-percent">
+            Total: <span id="percent-total">0</span>%
+        </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="actions-row">
+        <button class="btn-primary" type="button" onclick="submitBooking()">Submit Booking-Off</button>
+    </div>
 
 </div>
 
 <script>
-  // Recalculate a single row and then the grand total
-  function updateRow(inputEl) {
-    const row = inputEl.closest('.booking-row');
-    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-    const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
-    const total = qty * rate;
-    row.querySelector('.row-total').textContent = total.toFixed(2);
-    updateGrandTotal();
-  }
+    // Add another plot row
+    function addPlotRow() {
+        const tbody = document.getElementById("plots-body");
+        const firstRow = tbody.querySelector(".plot-row");
+        const newRow = firstRow.cloneNode(true);
 
-  // Sum all row totals
-  function updateGrandTotal() {
-    let grand = 0;
-    document.querySelectorAll('.row-total').forEach(span => {
-      grand += parseFloat(span.textContent) || 0;
-    });
-    document.getElementById('grandTotal').textContent = grand.toFixed(2);
-    updateSquadTotals();
-  }
+        // Clear values
+        newRow.querySelectorAll("input").forEach(input => input.value = "");
 
-  // Add a new booking line
-  function addRow() {
-    const body = document.getElementById('bookingBody');
-    const firstRow = body.querySelector('.booking-row');
-    const newRow = firstRow.cloneNode(true);
+        tbody.appendChild(newRow);
+    }
 
-    // Clear values
-    newRow.querySelectorAll('input').forEach(inp => inp.value = '');
-    newRow.querySelector('.row-total').textContent = '0.00';
+    // Update total % display for squad split (manual entry, just showing total)
+    function updatePercentTotal() {
+        const percents = document.querySelectorAll(".squad-percent");
+        let total = 0;
+        percents.forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            total += val;
+        });
+        document.getElementById("percent-total").innerText = total.toFixed(0);
+    }
 
-    // Rebind events
-    newRow.querySelector('.qty-input').oninput = function () { updateRow(this); };
-    newRow.querySelector('.rate-input').oninput = function () { updateRow(this); };
-
-    body.appendChild(newRow);
-  }
-
-  // Update squad £ splits based on percentages and grand total
-  function updateSquadTotals() {
-    const grand = parseFloat(document.getElementById('grandTotal').textContent) || 0;
-    const rows = document.querySelectorAll('.squad-row');
-
-    rows.forEach(row => {
-      const pct = parseFloat(row.querySelector('.squad-percent').value) || 0;
-      const share = grand * (pct / 100);
-      row.querySelector('.squad-value').textContent = share.toFixed(2);
-    });
-  }
+    // Placeholder submit – this is where you’ll later hook into your backend/API
+    function submitBooking() {
+        alert("Booking-Off captured on the front end. Next step is wiring this up to your backend/API.");
+    }
 </script>
 
 </body>
