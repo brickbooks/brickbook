@@ -1,32 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BrickBook – Simple Booking-Off System</title>
-
-<link rel="stylesheet" href="assets/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrickBook – Digital Booking-Off System</title>
+  <style>
+    :root {
+      --blue: #1B73E8;
+      --charcoal: #2D2D2D;
+      --lightgrey: #F5F7FA;
+      --white: #FFFFFF;
+    }
+    body {
+      margin:0;
+      font-family:'Inter',Arial,sans-serif;
+      background: var(--white);
+      color: var(--charcoal);
+    }
+    header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:20px 50px;
+      background: var(--white);
+      border-bottom:1px solid #E5EAF0;
+    }
+    .logo {
+      font-size:24px;
+      font-weight:700;
+      color: var(--charcoal);
+    }
+    nav a {
+      margin-left:30px;
+      text-decoration:none;
+      color: var(--charcoal);
+      font-weight:500;
+    }
+    nav a:hover {
+      color: var(--blue);
+    }
+    .hero {
+      text-align:center;
+      padding:120px 20px;
+    }
+    .hero h1 {
+      font-size:52px;
+      font-weight:800;
+      margin-bottom:20px;
+      letter-spacing:-1px;
+    }
+    .hero p {
+      font-size:20px;
+      max-width:650px;
+      margin:0 auto 40px;
+      color:#555;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+      padding:16px 34px;
+      border-radius:8px;
+      font-size:17px;
+      font-weight:600;
+      text-decoration:none;
+      box-shadow:0px 4px 12px rgba(27,115,232,0.3);
+      margin-right:12px;
+    }
+    .btn-primary:hover {
+      opacity:0.9;
+    }
+    .btn-outline {
+      border:2px solid var(--charcoal);
+      padding:14px 30px;
+      border-radius:8px;
+      text-decoration:none;
+      color: var(--charcoal);
+      font-size:17px;
+      font-weight:600;
+    }
+    .btn-outline:hover {
+      background: var(--charcoal);
+      color: white;
+    }
+    .section {
+      padding:80px 20px;
+      text-align:center;
+      max-width:1200px;
+      margin:0 auto;
+    }
+    .section h2 {
+      font-size:36px;
+      margin-bottom:20px;
+      font-weight:700;
+    }
+    .section p {
+      font-size:18px;
+      color:#555;
+      line-height:1.5;
+    }
+    .footer {
+      padding:40px 20px;
+      text-align:center;
+      background: var(--charcoal);
+      color:white;
+    }
+    @media(max-width:768px) {
+      header { padding:20px 30px; }
+      .hero h1 { font-size:42px; }
+      .section { padding:60px 20px; }
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
-    <div class="logo">BrickBook</div>
-    <nav>
-        <a href="login_contractor.html">Contractor Login</a>
-        <a href="login_squad.html">Squad Login</a>
-    </nav>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="signup.html">Get Started</a>
+    <a href="login.html">Login</a>
+  </nav>
 </header>
 
-<section class="hero">
-    <h1>Fast, Accurate Booking-Off for Bricklaying Squads</h1>
-    <p>Submit measurements, attach photos, and track site progress with ZERO paperwork.</p>
+<div class="hero">
+  <h1>Booking-Off & Measure System for Bricklaying Squads</h1>
+  <p>Go from site to system in seconds. Simple. Accurate. Photographic evidence. Instant totals. Approved by your contractor.</p>
+  <a class="btn-primary" href="signup.html">Start Free Trial</a>
+  <a class="btn-outline" href="booking.html">See Booking Form</a>
+</div>
 
-    <div class="cta-buttons">
-        <a class="btn" href="login_contractor.html">Contractor Login</a>
-        <a class="btn-outline" href="login_squad.html">Squad Login</a>
-    </div>
-</section>
+<div class="section" id="features">
+  <h2>How It Works</h2>
+  <p>1. Sub-squad logs their daily work via mobile form. 2. Contractor receives approval, instant totals and pay calculations. 3. Data, photos, plots and reports all in one place.</p>
+</div>
+
+<div class="section" id="benefits" style="background:var(--blue); color:white;">
+  <h2>Key Benefits</h2>
+  <p>No paper sheets · Faster approvals · Accurate pay · Mobile-first · Plot-by-plot tracking</p>
+  <a class="btn-outline" style="border-color:white;color:white;" href="signup.html">Try It On Your Site</a>
+</div>
+
+<div class="section" id="pricing">
+  <h2>Transparent Pricing</h2>
+  <p>Monthly subscription starting from £99 per gang. Add usage-based bookings for extra value.</p>
+  <a class="btn-primary" href="pricing.html">View Pricing</a>
+</div>
+
+<div class="footer">
+  © 2025 BrickBook – All Rights Reserved
+</div>
 
 </body>
 </html>
+
