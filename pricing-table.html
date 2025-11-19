@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Table – BrickBook</title>
+
+    <style>
+        :root {
+            --blue: #1B73E8;
+            --charcoal: #2D2D2D;
+            --lightgrey: #F5F7FA;
+            --white: #FFFFFF;
+            --success: #2ECC71;
+            --danger: #E74C3C;
+        }
+
+        body {
+            margin: 0;
+            background: var(--lightgrey);
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--white);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E5EAF0;
+        }
+        .logo { font-size: 20px; font-weight: 700; }
+        nav a { margin-left: 20px; text-decoration: none; color: var(--charcoal); font-weight: 600; }
+        nav a:hover { color: var(--blue); }
+
+        .wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 80px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FAFBFF;
+            margin-bottom: 20px;
+        }
+        thead { background: #E7EEFF; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid #E1E6F0; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #D7DCE5;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(27,115,232,0.25);
+        }
+        .btn-secondary {
+            background: #eef2ff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid #c5d4ff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            th, td { padding: 8px; font-size: 12px; }
+            .btn-primary, .btn-secondary, .btn-danger { width: 100%; margin-bottom: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+    /* LOGIN PROTECTION */
+    if (!sessionStorage.getItem("loggedIn")) {
+        window.location.href = "contractor-login.html";
+    }
+</script>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+
+    <h1>Pricing Table</h1>
+    <div class="subtitle">Manage contractor rates used in booking-off calculations.</div>
+
+    <div class="card">
+
+        <table id="pricing-table">
+            <thead>
+                <tr>
+                    <th>Measurement Type</th>
+                    <th>Rate (£)</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody id="pricing-body">
+                <!-- Rows injected by JavaScript -->
+            </tbody>
+        </table>
+
+        <button class="btn-secondary" onclick="addRow()">+ Add New Measurement</button>
+        <button class="btn-danger" onclick="resetDefaults()">Reset to Defaults</button>
+        <button class="btn-primary" onclick="saveRates()">Save Rates</button>
+
+    </div>
+</div>
+
+<script>
+    function logout() {
+        sessionStorage.removeItem("loggedIn");
+        window.location.href = "contractor-login.html";
+    }
+
+    /* DEFAULT RATES */
+    const defaultRates = [
+        { name: "Bricks", rate: 0.60 },
+        { name: "100mm", rate: 16 },
+        { name: "Commons", rate: 0.35 },
+        { name: "Trench", rate: 25 },
+        { name: "Squad Hours", rate: 50 },
+        { name: "Lintel", rate: 2 }
+    ];
+
+    /* Load rates from storage or defaults */
+    function loadRates() {
+        const saved = JSON.parse(localStorage.getItem("brickbook_rates"));
+        const rates = saved || defaultRates;
+
+        const tbody = document.getElementById("pricing-body");
+        tbody.innerHTML = "";
+
+        rates.forEach(r => addRow(r.name, r.rate));
+    }
+
+    /* Add a row dynamically */
+    function addRow(name = "", rate = "") {
+        const tbody = document.getElementById("pricing-body");
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><input type="text" class="rate-name" value="${name}" placeholder="Measurement"></td>
+            <td><input type="number" class="rate-value" value="${rate}" step="0.01"></td>
+            <td><button class="btn-danger" onclick="this.closest('tr').remove()">X</button></td>
+        `;
+
+        tbody.appendChild(tr);
+    }
+
+    /* Save rates to localStorage */
+    function saveRates() {
+        const names = document.querySelectorAll(".rate-name");
+        const values = document.querySelectorAll(".rate-value");
+
+        let rates = [];
+
+        for (let i = 0; i < names.length; i++) {
+            const name = names[i].value.trim();
+            const rate = parseFloat(values[i].value);
+
+            if (name && !isNaN(rate)) {
+                rates.push({ name, rate });
+            }
+        }
+
+        localStorage.setItem("brickbook_rates", JSON.stringify(rates));
+        alert("Rates saved successfully!");
+    }
+
+    /* Reset to defaults */
+    function resetDefaults() {
+        if (confirm("Reset all rates to default?")) {
+            localStorage.removeItem("brickbook_rates");
+            loadRates();
+        }
+    }
+
+    loadRates();
+</script>
+
+</body>
+</html>
