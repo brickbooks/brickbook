@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contractor Login – BrickBook</title>
+
+    <style>
+        :root {
+            --blue: #1B73E8;
+            --charcoal: #2D2D2D;
+            --lightgrey: #F5F7FA;
+            --white: #FFFFFF;
+            --danger: #E53935;
+        }
+
+        body {
+            margin: 0;
+            background: var(--lightgrey);
+            font-family: 'Inter', Arial, sans-serif;
+            color: var(--charcoal);
+        }
+
+        /* HEADER (same style as booking-off page) */
+        header {
+            background: var(--white);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E5EAF0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: var(--charcoal);
+            font-weight: 600;
+        }
+        nav a:hover { color: var(--blue); }
+
+        /* PAGE LAYOUT */
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 28px 26px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid #D2D8E3;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(27,115,232,0.1);
+        }
+
+        .forgot {
+            text-align: right;
+            margin-top: 4px;
+            margin-bottom: 14px;
+        }
+        .forgot a {
+            font-size: 12px;
+            color: var(--blue);
+            text-decoration: none;
+        }
+        .forgot a:hover { text-decoration: underline; }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--blue);
+            color: var(--white);
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(27,115,232,0.25);
+            margin-top: 4px;
+        }
+        .btn-primary:hover { opacity: 0.95; }
+
+        .extra-info {
+            font-size: 12px;
+            color: #777;
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .extra-info a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .extra-info a:hover { text-decoration: underline; }
+
+        .error-msg {
+            font-size: 13px;
+            color: var(--danger);
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 24px 16px 40px;
+            }
+            .login-card {
+                padding: 24px 20px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            }
+            .login-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+    <div class="login-card">
+        <div class="login-title">Contractor Login</div>
+        <div class="login-subtitle">
+            Sign in to manage rates, approve bookings, and track plots & balances.
+        </div>
+
+        <div id="login-error" class="error-msg">
+            Please enter a valid email and password.
+        </div>
+
+        <div class="form-group">
+            <label for="contractor-email">Email</label>
+            <input type="email" id="contractor-email" placeholder="you@contractor.co.uk">
+        </div>
+
+        <div class="form-group">
+            <label for="contractor-id">Contractor / Company Name (optional)</label>
+            <input type="text" id="contractor-id" placeholder="e.g. Redrow, Persimmon">
+        </div>
+
+        <div class="form-group">
+            <label for="contractor-password">Password</label>
+            <input type="password" id="contractor-password" placeholder="Enter your password">
+            <div class="forgot">
+                <a href="#">Forgot password?</a>
+            </div>
+        </div>
+
+        <div class="remember-row">
+            <input type="checkbox" id="remember-me">
+            <label for="remember-me" style="margin:0; font-weight:400;">Remember me on this device</label>
+        </div>
+
+        <button class="btn-primary" onclick="handleLogin()">Login</button>
+
+        <div class="extra-info">
+            Don’t have a contractor login yet? <a href="#">Request access</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleLogin() {
+        const email = document.getElementById('contractor-email').value.trim();
+        const password = document.getElementById('contractor-password').value.trim();
+        const errorBox = document.getElementById('login-error');
+
+        // Simple front-end validation
+        if (!email || !password || !validateEmail(email)) {
+            errorBox.textContent = "Please enter a valid email and password.";
+            errorBox.style.display = "block";
+            return;
+        }
+
+        errorBox.style.display = "none";
+
+        // 🔐 TODO: Replace this with real backend authentication
+        // e.g. send email/password to your API, handle JWT/session, etc.
+        //
+        // fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) ... })
+
+        // For now, just simulate success and redirect:
+        window.location.href = "dashboard.html";
+    }
+
+    function validateEmail(email) {
+        // Basic email format check
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email.toLowerCase());
+    }
+</script>
+
+</body>
+</html>
