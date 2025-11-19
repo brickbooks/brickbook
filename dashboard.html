@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contractor Dashboard – BrickBook</title>
+
+    <style>
+        :root {
+            --blue: #1B73E8;
+            --charcoal: #2D2D2D;
+            --lightgrey: #F5F7FA;
+            --white: #FFFFFF;
+            --success: #2ECC71;
+            --pending: #F1C40F;
+            --danger: #E74C3C;
+        }
+
+        body {
+            margin: 0;
+            background: var(--lightgrey);
+            font-family: 'Inter', Arial, sans-serif;
+            color: var(--charcoal);
+        }
+
+        /* HEADER */
+        header {
+            background: var(--white);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E5EAF0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: var(--charcoal);
+            font-weight: 600;
+        }
+        nav a:hover { color: var(--blue); }
+
+        .wrapper {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 30px 20px 80px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        /* TOP BUTTONS */
+        .top-actions {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .top-btn {
+            background: var(--white);
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: 1px solid #D7DCE5;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--charcoal);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            transition: 0.2s;
+        }
+        .top-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        /* BOOKINGS TABLE */
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FAFBFF;
+        }
+
+        thead {
+            background: #E7EEFF;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            font-size: 14px;
+            border-bottom: 1px solid #E1E6F0;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* STATUS LABELS */
+        .status {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            text-align: center;
+            display: inline-block;
+            color: white;
+        }
+        .pending { background: var(--pending); }
+        .approved { background: var(--success); }
+        .rejected { background: var(--danger); }
+
+        .view-btn {
+            background: var(--blue);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(27,115,232,0.25);
+        }
+        .view-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .top-actions {
+                flex-direction: column;
+            }
+            th, td { font-size: 12px; padding: 8px; }
+            .view-btn { padding: 6px 10px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="contractor-login.html">Logout</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+
+    <h1>Contractor Dashboard</h1>
+    <div class="subtitle">Review today's Booking-Off submissions, approve work, and manage rates.</div>
+
+    <!-- TOP NAV BUTTONS -->
+    <div class="top-actions">
+        <a class="top-btn" href="pricing-table.html">Pricing Table</a>
+        <a class="top-btn" href="approvals.html">Pending Approvals</a>
+        <a class="top-btn" href="reports.html">Reports</a>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="card">
+        <h2 style="margin-top:0; margin-bottom:16px;">Today’s Booking-Off Submissions</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Squad</th>
+                    <th>Plots</th>
+                    <th>Total (£)</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+
+            <tbody id="booking-table-body">
+                <!-- JS will populate -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    /* Dummy data – replace with API later */
+    const demoBookings = [
+        {
+            squad: "Team A",
+            plots: 3,
+            total: 1420.50,
+            submitted: "09:15 AM",
+            status: "pending",
+            link: "approvals.html"
+        },
+        {
+            squad: "Team B",
+            plots: 2,
+            total: 980.00,
+            submitted: "11:43 AM",
+            status: "approved",
+            link: "approvals.html"
+        },
+        {
+            squad: "Team C",
+            plots: 1,
+            total: 430.00,
+            submitted: "12:08 PM",
+            status: "rejected",
+            link: "approvals.html"
+        }
+    ];
+
+    function loadBookings() {
+        const tbody = document.getElementById("booking-table-body");
+
+        demoBookings.forEach(b => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${b.squad}</td>
+                <td>${b.plots}</td>
+                <td>£${b.total.toFixed(2)}</td>
+                <td>${b.submitted}</td>
+                <td><span class="status ${b.status}">${b.status.toUpperCase()}</span></td>
+                <td><a class="view-btn" href="${b.link}">View</a></td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    loadBookings();
+</script>
+
+</body>
+</html>
