@@ -1,353 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking-Off Approval – BrickBook</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Approvals – BrickBook</title>
 
-    <style>
-        :root {
-            --blue: #1B73E8;
-            --charcoal: #2D2D2D;
-            --white: #FFFFFF;
-            --lightgrey: #F5F7FA;
-            --success: #2ECC71;
-            --danger: #E74C3C;
-            --pending: #F1C40F;
-        }
+<style>
+:root {
+    --blue: #1B73E8;
+    --charcoal: #2D2D2D;
+    --lightgrey: #F5F7FA;
+    --white: #FFFFFF;
+    --green: #2ECC71;
+    --danger: #E74C3C;
+    --pending: #F1C40F;
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
 
-        body {
-            margin: 0;
-            background: var(--lightgrey);
-            font-family: 'Inter', Arial, sans-serif;
-        }
+/* BASIC */
+body {
+    margin: 0;
+    background: var(--lightgrey);
+    font-family: 'Inter', Arial, sans-serif;
+}
 
-        /* HEADER */
-        header {
-            background: var(--white);
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #E5EAF0;
-        }
-        .logo { font-size: 20px; font-weight: 700; }
-        nav a { margin-left: 20px; text-decoration: none; color: var(--charcoal); font-weight: 600; }
-        nav a:hover { color: var(--blue); }
+header {
+    background: var(--white);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E5EAF0;
+}
+.logo { font-size: 22px; font-weight: 800; }
 
-        .wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 30px 20px 80px;
-        }
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: var(--charcoal);
+    font-weight: 600;
+}
+nav a:hover { color: var(--blue); }
 
-        h1 { font-size: 28px; font-weight: 800; }
-        .subtitle { color: #666; margin-bottom: 22px; }
+.wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 20px 80px;
+}
 
-        .status-banner {
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: white;
-            text-align: center;
-        }
-        .pending { background: var(--pending); }
-        .approved { background: var(--success); }
-        .rejected { background: var(--danger); }
+h1 { font-size: 28px; font-weight: 800; }
+.subtitle { color: #555; margin-bottom: 24px; }
 
-        .card {
-            background: white;
-            padding: 18px;
-            border-radius: 14px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            margin-bottom: 22px;
-        }
-        .card h2 { margin: 0 0 10px; font-size: 20px; }
+.card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
 
-        .plot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-        .plot-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
+/* FILTER BUTTONS */
+.filter-btns {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.filter-btns button {
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+.filter-btns button.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
 
-        .toggle {
-            font-size: 24px;
-            font-weight: bold;
-        }
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+thead {
+    background: #E7EEFF;
+}
+th, td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #E1E6F0;
+    font-size: 14px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #FAFBFF;
-            margin-top: 12px;
-        }
-        th, td {
-            padding: 8px;
-            border-bottom: 1px solid #E1E6F0;
-            font-size: 14px;
-        }
-        thead { background: #E7EEFF; }
+.status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: white;
+    font-size: 12px;
+}
+.approved { background: var(--green); }
+.rejected { background: var(--danger); }
+.pending { background: var(--pending); }
 
-        .photo-preview {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        .photo-preview img {
-            width: 90px;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
+.view-btn {
+    background: var(--blue);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
 
-        .split-row {
-            display: grid;
-            grid-template-columns: 1fr 80px 100px 120px;
-            gap: 8px;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        .btn-approve {
-            background: var(--success);
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            width: 49%;
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .btn-reject {
-            background: var(--danger);
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            width: 49%;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .split-row {
-                grid-template-columns: 1fr 60px 80px 90px;
-            }
-        }
-    </style>
+/* MOBILE */
+@media(max-width: 768px) {
+    th, td { font-size: 12px; padding: 8px; }
+    .filter-btns { flex-wrap: wrap; }
+}
+</style>
 </head>
 
 <body>
 
+<!-- LOGIN CHECK -->
 <script>
-    /* LOGIN BLOCKER */
-    if (!sessionStorage.getItem("loggedIn")) {
-        window.location.href = "contractor-login.html";
-    }
-
-    function logout() {
-        sessionStorage.removeItem("loggedIn");
-        window.location.href = "contractor-login.html";
-    }
+if (!sessionStorage.getItem("loggedIn")) {
+    window.location.href = "contractor-login.html";
+}
+function logout() {
+    sessionStorage.removeItem("loggedIn");
+    window.location.href = "contractor-login.html";
+}
 </script>
 
 <header>
     <div class="logo">BrickBook</div>
     <nav>
-        <a href="dashboard.html">Dashboard</a>
+        <a href="contractor-dashboard.html">Dashboard</a>
+        <a href="contractor-review.html">Review Overview</a>
         <a href="#" onclick="logout()">Logout</a>
     </nav>
 </header>
 
 <div class="wrapper">
 
-    <h1>Booking-Off Approval</h1>
-    <div class="subtitle">Review all plots, notes, photos and wage splits.</div>
+    <h1>Booking-Off Approvals</h1>
+    <div class="subtitle">Filter all submissions and review individual jobs.</div>
 
-    <div id="status" class="status-banner pending">PENDING APPROVAL</div>
+    <!-- FILTER BUTTONS -->
+    <div class="filter-btns">
+        <button class="active" onclick="setFilter('all', this)">All</button>
+        <button onclick="setFilter('pending', this)">Pending</button>
+        <button onclick="setFilter('approved', this)">Approved</button>
+        <button onclick="setFilter('rejected', this)">Rejected</button>
+    </div>
 
-    <!-- PLOTS WILL LOAD HERE -->
-    <div id="plots-container"></div>
-
-    <!-- Squad Split Summary -->
+    <!-- SUBMISSIONS TABLE -->
     <div class="card">
-        <h2>Squad Split Summary</h2>
-
-        <div class="split-row" style="font-weight:700;">
-            <div>Name</div>
-            <div>%</div>
-            <div>Wages</div>
-            <div>After CIS</div>
-        </div>
-
-        <div id="split-summary"></div>
-
-        <h3 style="text-align:right; margin-top:12px;">
-            Total After CIS: £<span id="split-total">0.00</span>
-        </h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Squad</th>
+                    <th>Plots</th>
+                    <th>Total (£)</th>
+                    <th>Status</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody id="approvalsBody"></tbody>
+        </table>
     </div>
-
-    <div class="action-row">
-        <button class="btn-approve" onclick="approve()">Approve</button>
-        <button class="btn-reject" onclick="reject()">Reject</button>
-    </div>
-
 </div>
 
 <script>
-/* DEMO BOOKING DATA — replace with backend later */
-const demoBooking = {
-    plots: [
-        {
-            plot: "44",
-            measurements: [
-                { type: "Bricks", qty: 1200, rate: 0.60 },
-                { type: "100mm", qty: 8, rate: 16 },
-                { type: "Commons", qty: 300, rate: 0.35 },
-                { type: "Squad Hours", qty: 12, rate: 50 }
-            ],
-            notes: "Rain delay for 1 hour. Scaffolders late.",
-            photos: [
-                "https://via.placeholder.com/150",
-                "https://via.placeholder.com/150"
-            ]
-        },
-        {
-            plot: "45",
-            measurements: [
-                { type: "Bricks", qty: 800, rate: 0.60 },
-                { type: "Lintel", qty: 4, rate: 2 }
-            ],
-            notes: "Lintels installed on rear elevation.",
-            photos: []
-        }
-    ],
+/* DEMO DATA – Replace with backend later */
+let submissions = [
+    { date: "2025-02-16", squad: "Team A", plots: 3, total: 1400, status: "pending" },
+    { date: "2025-02-15", squad: "Team B", plots: 1, total: 460, status: "approved" },
+    { date: "2025-02-15", squad: "Team A", plots: 2, total: 820, status: "rejected" },
+    { date: "2025-02-14", squad: "Team C", plots: 4, total: 2100, status: "approved" }
+];
 
-    split: [
-        { name: "Bricklayer 1", percent: 40, wages: 800, cis: 640 },
-        { name: "Bricklayer 2", percent: 30, wages: 600, cis: 480 },
-        { name: "Bricklayer 3", percent: 20, wages: 400, cis: 320 },
-        { name: "Bricklayer 4", percent: 10, wages: 200, cis: 160 }
-    ]
-};
+let activeFilter = "all";
 
-function loadPlots() {
-    const container = document.getElementById("plots-container");
+/* LOAD TABLE */
+function loadTable() {
+    let tbody = document.getElementById("approvalsBody");
+    tbody.innerHTML = "";
 
-    demoBooking.plots.forEach(plot => {
-        const total = plot.measurements.reduce((s, m) => s + m.qty * m.rate, 0);
+    submissions
+        .filter(s => activeFilter === "all" || s.status === activeFilter)
+        .forEach(s => {
+            let row = document.createElement("tr");
 
-        let html = `
-            <div class="card">
-                <div class="plot-header" onclick="togglePlot(this)">
-                    <h3>Plot ${plot.plot}</h3>
-                    <div class="toggle">+</div>
-                </div>
-
-                <div class="plot-details" style="display:none; margin-top:12px;">
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Measurement</th>
-                                <th>Qty</th>
-                                <th>Rate</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${plot.measurements.map(m => `
-                                <tr>
-                                    <td>${m.type}</td>
-                                    <td>${m.qty}</td>
-                                    <td>£${m.rate}</td>
-                                    <td>£${(m.qty * m.rate).toFixed(2)}</td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-
-                    <h3 style="margin-top:12px;">Notes</h3>
-                    <p>${plot.notes || "None"}</p>
-
-                    <h3>Photos</h3>
-                    <div class="photo-preview">
-                        ${plot.photos.map(p => `<img src="${p}">`).join("") || "No photos"}
-                    </div>
-
-                    <h3 style="text-align:right; margin-top:14px;">
-                        Plot Total: £${total.toFixed(2)}
-                    </h3>
-                </div>
-            </div>
-        `;
-
-        container.innerHTML += html;
-    });
+            row.innerHTML = `
+                <td>${s.date}</td>
+                <td>${s.squad}</td>
+                <td>${s.plots}</td>
+                <td>£${s.total.toFixed(2)}</td>
+                <td><span class="status ${s.status}">${s.status.toUpperCase()}</span></td>
+                <td><a class="view-btn" href="contractor-review-squad.html">View</a></td>
+            `;
+            tbody.appendChild(row);
+        });
 }
 
-function togglePlot(header) {
-    const details = header.nextElementSibling;
-    const toggle = header.querySelector(".toggle");
-
-    if (details.style.display === "none") {
-        details.style.display = "block";
-        toggle.textContent = "–";
-    } else {
-        details.style.display = "none";
-        toggle.textContent = "+";
-    }
+function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll(".filter-btns button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    loadTable();
 }
 
-function loadSplit() {
-    const container = document.getElementById("split-summary");
-    let totalCIS = 0;
-
-    demoBooking.split.forEach(row => {
-        totalCIS += row.cis;
-
-        container.innerHTML += `
-            <div class="split-row">
-                <div>${row.name}</div>
-                <div>${row.percent}%</div>
-                <div>£${row.wages.toFixed(2)}</div>
-                <div>£${row.cis.toFixed(2)}</div>
-            </div>
-        `;
-    });
-
-    document.getElementById("split-total").textContent = totalCIS.toFixed(2);
-}
-
-function approve() {
-    const status = document.getElementById("status");
-    status.textContent = "APPROVED";
-    status.className = "status-banner approved";
-    alert("Booking-Off Approved.");
-}
-
-function reject() {
-    const status = document.getElementById("status");
-    status.textContent = "REJECTED";
-    status.className = "status-banner rejected";
-    alert("Booking-Off Rejected.");
-}
-
-loadPlots();
-loadSplit();
+loadTable();
 </script>
 
 </body>
