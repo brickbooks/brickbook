@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad Dashboard – BrickBook</title>
+
+<style>
+:root {
+    --blue: #1B73E8;
+    --charcoal: #2D2D2D;
+    --lightgrey: #F5F7FA;
+    --white: #FFFFFF;
+    --green: #2ECC71;
+    --danger: #E74C3C;
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* GENERAL */
+body {
+    margin: 0;
+    background: var(--lightgrey);
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--charcoal);
+}
+
+/* HEADER */
+header {
+    background: var(--white);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E5EAF0;
+}
+.logo { font-size: 22px; font-weight: 800; }
+
+nav { display: flex; gap: 24px; }
+nav a { text-decoration: none; font-weight: 600; color: var(--charcoal); }
+nav a:hover { color: var(--blue); }
+
+.hamburger {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: white;
+    padding: 14px;
+    border-bottom: 1px solid #ddd;
+}
+
+.mobile-menu a {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--charcoal);
+}
+
+/* WRAPPER */
+.wrapper {
+    max-width: 1100px;
+    margin: auto;
+    padding: 30px 20px 70px;
+}
+
+/* TITLES */
+h1 { font-size: 28px; font-weight: 800; }
+.subtitle { font-size: 15px; color: #666; margin-bottom: 22px; }
+
+/* ACTION BUTTONS */
+.btn-primary {
+    padding: 14px 22px;
+    background: var(--blue);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 14px rgba(27,115,232,0.25);
+}
+
+.card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.history-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.small {
+    font-size: 14px;
+    color: #555;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+}
+
+.pending { background: #F1C40F; }
+.approved { background: #2ECC71; }
+.rejected { background: #E74C3C; }
+
+.progress-area {
+    margin-top: 12px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 14px;
+    border-radius: 8px;
+    background: #ddd;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 14px;
+    background: var(--blue);
+    width: 0%;
+}
+
+@media(max-width: 768px) {
+    nav { display: none; }
+    .hamburger { display: block; }
+}
+</style>
+</head>
+
+<body>
+
+<script>
+/* CHECK LOGIN */
+if (!sessionStorage.getItem("squadLoggedIn")) {
+    window.location.href = "squad-login.html";
+}
+
+function logoutSquad() {
+    sessionStorage.removeItem("squadLoggedIn");
+    window.location.href = "squad-login.html";
+}
+</script>
+
+<header>
+    <div class="logo">BrickBook</div>
+
+    <nav>
+        <a href="squad-dashboard.html">Dashboard</a>
+        <a href="#" onclick="logoutSquad()">Logout</a>
+    </nav>
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="squad-dashboard.html">Dashboard</a>
+    <a href="#" onclick="logoutSquad()">Logout</a>
+</div>
+
+<div class="wrapper">
+
+    <h1>Squad Dashboard</h1>
+    <div class="subtitle">Welcome, <span id="squadName">your squad</span>.</div>
+
+    <a href="booking.html" class="btn-primary">+ Start New Booking-Off</a>
+
+    <!-- Earnings summary -->
+    <div class="card">
+        <div class="card-title">This Week’s Earnings</div>
+
+        <div style="font-size:24px; font-weight:700;">
+            £<span id="weeklyTotal">0.00</span>
+        </div>
+
+        <div class="progress-area">
+            <div class="small">Progress toward £3000 weekly target</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent bookings -->
+    <div class="card">
+        <div class="card-title">Recent Booking-Offs</div>
+
+        <div id="historyContainer"></div>
+    </div>
+
+</div>
+
+<script>
+/* Mobile menu toggle */
+function toggleMenu() {
+    const menu = document.getElementById("mobileMenu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+}
+
+/* Get squad name */
+document.getElementById("squadName").textContent =
+    sessionStorage.getItem("squadLoggedIn");
+
+/* TEMP DATA (replace with real data later) */
+let recent = [
+    { plot: "44, 45, 46", total: 1400, status: "approved", date: "Today" },
+    { plot: "32", total: 620, status: "pending", date: "Yesterday" },
+    { plot: "28, 29", total: 980, status: "approved", date: "Mon" }
+];
+
+let weeklyEarnings = recent.reduce((a, b) => a + b.total, 0);
+
+/* Apply data */
+document.getElementById("weeklyTotal").textContent = weeklyEarnings.toFixed(2);
+
+/* Progress bar fill */
+let progress = Math.min((weeklyEarnings / 3000) * 100, 100);
+document.getElementById("progressFill").style.width = progress + "%";
+
+/* Booking-Off history */
+let historyHTML = "";
+recent.forEach(r => {
+    historyHTML += `
+        <div class="history-item">
+            <div>
+                <div><strong>Plots:</strong> ${r.plot}</div>
+                <div class="small">${r.date}</div>
+            </div>
+            <div>
+                £${r.total}
+                <div class="badge ${r.status}">
+                    ${r.status.toUpperCase()}
+                </div>
+            </div>
+        </div>
+    `;
+});
+document.getElementById("historyContainer").innerHTML = historyHTML;
+</script>
+
+</body>
+</html>
