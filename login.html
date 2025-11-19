@@ -106,7 +106,6 @@
 </div>
 
 <script>
-    /* SIMPLE BUILT-IN LOGIN */
     const VALID_EMAIL = "contractor@brickbook.co.uk";
     const VALID_PASSWORD = "brick123";
 
@@ -117,12 +116,13 @@
 
         if (email === VALID_EMAIL && password === VALID_PASSWORD) {
             sessionStorage.setItem("loggedIn", "true");
-            window.location.href = "dashboard.html"; // success
+            window.location.href = "contractor-dashboard.html"; // <-- FIXED
         } else {
             errorBox.style.display = "block";
         }
     }
 </script>
+
 
 </body>
 </html>
