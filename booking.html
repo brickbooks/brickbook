@@ -310,42 +310,44 @@
                 Plot <input type="text" placeholder="e.g. 44" class="plot-number">
             </div>
 
-            <!-- Notes -->
-            <label>Notes for this plot:</label>
-            <textarea class="plot-notes" placeholder="Progress, issues, weather, missing materials etc..."></textarea>
+           <!-- Work table FIRST -->
+<table>
+    <thead>
+        <tr>
+            <th>Measurement</th>
+            <th>Qty</th>
+            <th>Rate (£)</th>
+            <th>Total (£)</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${measurementTypes.map(m => `
+            <tr>
+                <td>${m.name}</td>
+                <td><input type="number" class="qty" oninput="calcRow(this); calcPlot(this)"></td>
+                <td><input type="number" class="rate" value="${m.rate}" readonly></td>
+                <td><input type="number" class="total" readonly></td>
+            </tr>
+        `).join("")}
+    </tbody>
+</table>
 
-            <!-- Photo Upload -->
-            <label>Upload Photos:</label>
-            <input type="file" accept="image/*" onchange="previewPhoto(this, '${id}')">
-            <button class="btn-secondary" style="margin-top:10px;" onclick="addPhotoField(this, '${id}')">+ Add Photo</button>
+<!-- Notes NOW below measurements -->
+<label>Notes for this plot:</label>
+<textarea class="plot-notes" placeholder="Progress, issues, weather, missing materials etc..."></textarea>
 
-            <div class="photo-preview" id="preview-${id}"></div>
+<!-- Photo Upload below notes -->
+<label>Upload Photos:</label>
+<input type="file" accept="image/*" onchange="previewPhoto(this, '${id}')">
+<button class="btn-secondary" style="margin-top:10px;" onclick="addPhotoField(this, '${id}')">+ Add Photo</button>
 
-            <!-- Work table -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>Measurement</th>
-                        <th>Qty</th>
-                        <th>Rate (£)</th>
-                        <th>Total (£)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${measurementTypes.map(m => `
-                        <tr>
-                            <td>${m.name}</td>
-                            <td><input type="number" class="qty" oninput="calcRow(this); calcPlot(this)"></td>
-                            <td><input type="number" class="rate" value="${m.rate}" readonly></td>
-                            <td><input type="number" class="total" readonly></td>
-                        </tr>
-                    `).join("")}
-                </tbody>
-            </table>
+<div class="photo-preview" id="preview-${id}"></div>
 
-            <div class="plot-total-box">
-                Plot Total: £<span class="plot-total">0.00</span>
-            </div>
+<!-- Total at the bottom -->
+<div class="plot-total-box">
+    Plot Total: £<span class="plot-total">0.00</span>
+</div>
+
         `;
 
         container.appendChild(card);
