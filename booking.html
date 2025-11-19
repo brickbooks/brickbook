@@ -21,7 +21,7 @@
             color: var(--charcoal);
         }
 
-        /* HEADER RESTORED EXACTLY */
+        /* HEADER (restored) */
         header {
             background: var(--white);
             padding: 18px 24px;
@@ -62,7 +62,6 @@
             position: relative;
         }
 
-        /* Delete button */
         .delete-btn {
             position: absolute;
             top: 10px;
@@ -74,7 +73,18 @@
             font-size: 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            height: 70px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            resize: vertical;
+            margin-top: 6px;
+            margin-bottom: 12px;
         }
 
         .plot-title input {
@@ -94,7 +104,7 @@
         th, td { padding: 6px 8px; border-bottom: 1px solid #e3e3e3; }
 
         /* Inputs & remove spinner */
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], input[type="file"] {
             width: 100%;
             padding: 6px;
             border-radius: 6px;
@@ -105,7 +115,21 @@
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
         input[type="number"] { -moz-appearance: textfield; }
 
-        /* Totals */
+        /* Photo preview thumbnails */
+        .photo-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .photo-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
         .plot-total-box {
             text-align: right;
             font-size: 16px;
@@ -120,7 +144,6 @@
             margin: 40px 0;
         }
 
-        /* Buttons */
         .btn-secondary {
             padding: 10px 18px;
             background: #eef2ff;
@@ -173,101 +196,43 @@
             font-weight: 800;
             margin-top: 20px;
         }
-/* -----------------------------------------
-   MOBILE VERSION IMPROVEMENTS (≤ 768px)
------------------------------------------ */
-@media (max-width: 768px) {
 
-    .wrapper {
-        padding: 15px;
-    }
+        /* MOBILE VERSION */
+        @media (max-width: 768px) {
 
-    /* HEADER */
-    header {
-        padding: 14px 16px;
-    }
-    nav a {
-        margin-left: 12px;
-        font-size: 14px;
-    }
+            .wrapper { padding: 15px; }
 
-    /* PLOT CARD */
-    .plot-card {
-        padding: 14px;
-        margin-bottom: 18px;
-        max-width: 100%;
-    }
+            header { padding: 14px 16px; }
+            nav a { margin-left: 12px; font-size: 14px; }
 
-    .plot-title {
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .plot-title input {
-        width: 70px;
-        padding: 4px 6px;
-        font-size: 14px;
-    }
+            .plot-card { max-width: 100%; padding: 14px; }
 
-    table {
-        font-size: 13px;
-    }
-    th, td {
-        padding: 6px 5px;
-    }
+            .plot-title { font-size: 16px; }
+            .plot-title input { width: 70px; }
 
-    /* Delete button */
-    .delete-btn {
-        top: 8px;
-        right: 8px;
-        padding: 3px 8px;
-        font-size: 11px;
-    }
+            .delete-btn { padding: 3px 8px; font-size: 11px; }
 
-    /* Split section */
-    .split-card {
-        padding: 16px;
-        max-width: 100%;
-    }
+            table { font-size: 13px; }
+            th, td { padding: 6px 5px; }
 
-    .split-row {
-        grid-template-columns: 1fr 70px 90px 90px; /* narrower columns */
-        gap: 6px;
-    }
+            .split-card { max-width: 100%; padding: 16px; }
 
-    .split-row input {
-        padding: 5px;
-        font-size: 13px;
-    }
+            .split-row {
+                grid-template-columns: 1fr 70px 90px 90px;
+                gap: 6px;
+            }
 
-    .split-header {
-        font-size: 18px;
-    }
+            .btn-secondary,
+            .btn-primary {
+                width: 100%;
+                float: none;
+                margin-top: 12px;
+            }
 
-    /* Buttons */
-    .btn-secondary,
-    .btn-primary {
-        width: 100%;
-        text-align: center;
-        padding: 12px;
-        font-size: 15px;
-        margin-bottom: 12px;
-    }
-
-    .btn-primary {
-        float: none;
-        margin-top: 12px;
-    }
-
-    /* Totals */
-    .plot-total-box,
-    .grand-total-box,
-    .final-split-total {
-        font-size: 16px;
-    }
-}
-
+            .plot-total-box,
+            .grand-total-box,
+            .final-split-total { font-size: 16px; }
+        }
     </style>
 </head>
 
@@ -285,7 +250,7 @@
 <div class="wrapper">
 
     <h1>Booking-Off</h1>
-    <div class="subtitle">Add your plots and split the wages below.</div>
+    <div class="subtitle">Add your plots, notes, photos and wage splits below.</div>
 
     <button class="btn-secondary" onclick="addPlot()">+ Add Plot</button>
 
@@ -301,9 +266,9 @@
 
         <div class="split-row" style="font-weight:700;">
             <div>Name</div>
-            <div>% Split</div>
-            <div>Wages £</div>
-            <div>After CIS (80%)</div>
+            <div>%</div>
+            <div>Wages (£)</div>
+            <div>After CIS</div>
         </div>
 
         <div id="split-container"></div>
@@ -318,13 +283,14 @@
 </div>
 
 <script>
-    /* CORRECTED CONTRACTOR RATES */
+
+    /* RATES */
     const measurementTypes = [
-        { name: "Bricks", rate: 0.6 },     // £600 per 1000
+        { name: "Bricks", rate: 0.6 },
         { name: "Trench", rate: 25 },
-        { name: "100mm", rate: 16 },       // £16 per m2
-        { name: "Commons", rate: 0.35 },   // £350 per 1000
-        { name: "Squad Hours", rate: 50 }, // £50
+        { name: "100mm", rate: 16 },
+        { name: "Commons", rate: 0.35 },
+        { name: "Squad Hours", rate: 50 },
         { name: "Lintel", rate: 2 }
     ];
 
@@ -335,6 +301,8 @@
         const card = document.createElement("div");
         card.className = "plot-card";
 
+        const id = Date.now(); // unique ID for photo preview
+
         card.innerHTML = `
             <button class="delete-btn" onclick="deletePlot(this)">X</button>
 
@@ -342,6 +310,18 @@
                 Plot <input type="text" placeholder="e.g. 44" class="plot-number">
             </div>
 
+            <!-- Notes -->
+            <label>Notes for this plot:</label>
+            <textarea class="plot-notes" placeholder="Progress, issues, weather, missing materials etc..."></textarea>
+
+            <!-- Photo Upload -->
+            <label>Upload Photos:</label>
+            <input type="file" accept="image/*" onchange="previewPhoto(this, '${id}')">
+            <button class="btn-secondary" style="margin-top:10px;" onclick="addPhotoField(this, '${id}')">+ Add Photo</button>
+
+            <div class="photo-preview" id="preview-${id}"></div>
+
+            <!-- Work table -->
             <table>
                 <thead>
                     <tr>
@@ -371,13 +351,30 @@
         container.appendChild(card);
     }
 
+    function addPhotoField(btn, id) {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = () => previewPhoto(input, id);
+        btn.insertAdjacentElement("beforebegin", input);
+    }
+
+    function previewPhoto(input, id) {
+        const container = document.getElementById("preview-" + id);
+        if (!input.files || !input.files[0]) return;
+
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(input.files[0]);
+        container.appendChild(img);
+    }
+
     function deletePlot(btn) {
         btn.closest(".plot-card").remove();
         calcGrandTotal();
         calcSplitTotals();
     }
 
-    /* CALC ROW */
+    /* CALCS */
     function calcRow(input) {
         const row = input.closest("tr");
         const qty = parseFloat(input.value) || 0;
@@ -385,7 +382,6 @@
         row.querySelector(".total").value = (qty * rate).toFixed(2);
     }
 
-    /* CALCULATE EACH PLOT */
     function calcPlot(input) {
         const card = input.closest(".plot-card");
         let total = 0;
@@ -395,7 +391,6 @@
         calcSplitTotals();
     }
 
-    /* GRAND TOTAL */
     function calcGrandTotal() {
         let sum = 0;
         document.querySelectorAll(".plot-total").forEach(t => sum += parseFloat(t.textContent) || 0);
@@ -409,6 +404,7 @@
     function addSplitRow() {
         const row = document.createElement("div");
         row.className = "split-row";
+
         row.innerHTML = `
             <input type="text" class="split-name">
             <input type="number" class="split-percent" oninput="percentChanged(this)">
@@ -418,20 +414,18 @@
         splitContainer.appendChild(row);
     }
 
-    /* % changed */
     function percentChanged(input) {
         const row = input.closest(".split-row");
         const percent = parseFloat(input.value) || 0;
         const grand = parseFloat(document.getElementById("grand-total").textContent) || 0;
 
-        const wages = (grand * percent / 100);
+        const wages = grand * (percent / 100);
         row.querySelector(".split-wages").value = wages.toFixed(2);
         row.querySelector(".split-cis").value = (wages * 0.8).toFixed(2);
 
         calcSplitTotals();
     }
 
-    /* Wages changed */
     function wagesChanged(input) {
         const row = input.closest(".split-row");
         const wages = parseFloat(input.value) || 0;
@@ -458,5 +452,3 @@
 
 </body>
 </html>
-
-
