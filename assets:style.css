@@ -1,0 +1,80 @@
+:root {
+    --blue: #1B73E8;
+    --charcoal: #2D2D2D;
+    --lightgrey: #F5F7FA;
+    --white: #FFFFFF;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    background: var(--lightgrey);
+    color: var(--charcoal);
+}
+
+/* Header */
+header {
+    background: var(--white);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E5EAF0;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: var(--charcoal);
+    font-weight: 600;
+}
+
+nav a:hover {
+    color: var(--blue);
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 70px 20px;
+}
+
+.hero h1 {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.hero p {
+    margin-top: 10px;
+    font-size: 17px;
+    color: #555;
+}
+
+.cta-buttons {
+    margin-top: 30px;
+}
+
+.btn, .btn-outline {
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-size: 17px;
+    margin: 10px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn {
+    background: var(--blue);
+    color: var(--white);
+    box-shadow: 0px 4px 12px rgba(27,115,232,0.3);
+}
+
+.btn-outline {
+    border: 2px solid var(--blue);
+    color: var(--blue);
+}
