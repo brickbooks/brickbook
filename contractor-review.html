@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contractor Review – BrickBook</title>
+
+<style>
+/* Base theme */
+:root {
+    --blue: #1B73E8;
+    --charcoal: #2D2D2D;
+    --lightgrey: #F5F7FA;
+    --white: #FFFFFF;
+    --green: #22bb55;
+    --red: #e64545;
+    --yellow: #f7c948;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+body {
+    margin: 0;
+    background: var(--lightgrey);
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--charcoal);
+}
+
+/* Header */
+header {
+    background: var(--white);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E5EAF0;
+    position: sticky;
+    top: 0;
+    z-index: 300;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+nav {
+    display: flex;
+    gap: 24px;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--charcoal);
+    font-weight: 600;
+}
+nav a:hover { color: var(--blue); }
+
+/* Mobile menu */
+.hamburger {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+}
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: white;
+    padding: 16px;
+    border-bottom: 1px solid #ddd;
+}
+.mobile-menu a {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: var(--charcoal);
+    font-weight: 600;
+}
+
+/* Wrapper */
+.wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 20px 80px;
+}
+
+/* Page title */
+h1 {
+    font-size: 32px;
+    font-weight: 800;
+}
+.subtitle {
+    color: #666;
+    margin-bottom: 24px;
+}
+
+/* Dashboard cards */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.card {
+    padding: 20px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+.card-value {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+/* Squad list */
+.squad-card {
+    padding: 18px;
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+}
+
+.squad-header {
+    font-size: 18px;
+    font-weight: 700;
+}
+.squad-totals {
+    margin-top: 8px;
+    color: #555;
+}
+.squad-members {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.review-btn {
+    margin-top: 12px;
+    padding: 10px 18px;
+    background: var(--blue);
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-buttons {
+    margin: 14px 0 22px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-buttons button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+.filter-buttons button.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* Mobile */
+@media(max-width: 768px) {
+    nav { display: none; }
+    .hamburger { display: block; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">BrickBook</div>
+
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="contractor-review.html">Review</a>
+        <a href="contractor-login.html">Logout</a>
+    </nav>
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="contractor-review.html">Review</a>
+    <a href="contractor-login.html">Logout</a>
+</div>
+
+<div class="wrapper">
+
+    <h1>Review Squads</h1>
+    <div class="subtitle">Weekly, monthly & yearly totals for each squad and worker.</div>
+
+    <!-- Filter buttons -->
+    <div class="filter-buttons">
+        <button class="active" onclick="setFilter('week', this)">Weekly</button>
+        <button onclick="setFilter('month', this)">Monthly</button>
+        <button onclick="setFilter('year', this)">Yearly</button>
+    </div>
+
+    <!-- Dash totals -->
+    <div class="grid-3">
+        <div class="card">
+            <div class="card-title">Total Payments This Period</div>
+            <div class="card-value">£<span id="total-pay-period">0.00</span></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Total CIS Deductions</div>
+            <div class="card-value">£<span id="total-cis-period">0.00</span></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Total Squads</div>
+            <div class="card-value"><span id="total-squads">0</span></div>
+        </div>
+    </div>
+
+    <!-- Squad list -->
+    <div id="squad-list"></div>
+
+</div>
+
+<script>
+function toggleMenu() {
+    const m = document.getElementById("mobileMenu");
+    m.style.display = m.style.display === "flex" ? "none" : "flex";
+}
+
+/* Sample data (replace with backend later) */
+let squads = [
+    {
+        name: "Squad A",
+        weeklyTotal: 1600,
+        monthlyTotal: 5200,
+        yearlyTotal: 64000,
+        people: [
+            { name: "John", week: 500, month: 1600, year: 20000 },
+            { name: "Ryan", week: 400, month: 1400, year: 17000 },
+            { name: "Sam",  week: 700, month: 2200, year: 27000 }
+        ]
+    },
+    {
+        name: "Squad B",
+        weeklyTotal: 1200,
+        monthlyTotal: 4800,
+        yearlyTotal: 59000,
+        people: [
+            { name: "Mike", week: 600, month: 2000, year: 24000 },
+            { name: "Steve", week: 600, month: 2800, year: 35000 }
+        ]
+    }
+];
+
+let activeFilter = "week";
+renderPage();
+
+/* Apply filter (week/month/year) */
+function setFilter(filter, btn) {
+    activeFilter = filter;
+
+    document.querySelectorAll(".filter-buttons button")
+        .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    renderPage();
+}
+
+function renderPage() {
+    const list = document.getElementById("squad-list");
+    list.innerHTML = "";
+
+    let totalPay = 0;
+    let totalCIS = 0;
+
+    squads.forEach(squad => {
+        let total = squad[activeFilter + "Total"];
+
+        totalPay += total;
+        totalCIS += total * 0.2; // CIS 20%
+
+        const div = document.createElement("div");
+        div.className = "squad-card";
+
+        div.innerHTML = `
+            <div class="squad-header">${squad.name}</div>
+            <div class="squad-totals">Total: £${total.toFixed(2)}</div>
+            <div class="squad-members">
+                ${squad.people.map(p => `
+                    <div>- ${p.name}: £${p[activeFilter].toFixed(2)}</div>
+                `).join("")}
+            </div>
+            <button class="review-btn" onclick="openReview('${squad.name}')">Review Submissions</button>
+        `;
+
+        list.appendChild(div);
+    });
+
+    document.getElementById("total-pay-period").textContent = totalPay.toFixed(2);
+    document.getElementById("total-cis-period").textContent = totalCIS.toFixed(2);
+    document.getElementById("total-squads").textContent = squads.length;
+}
+
+/* Contractor opens squad submissions */
+function openReview(name) {
+    alert("Open detailed review for: " + name);
+    // redirect later to contractor-review-squad.html
+}
+</script>
+
+</body>
+</html>
