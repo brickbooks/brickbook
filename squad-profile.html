@@ -1,41 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Squad Profile – BrickBook</title>
 
 <style>
-/* -----------------------------------
-   ROOT VARIABLES
------------------------------------ */
+/* -------------------------------------------------
+   BASE THEME – LIGHT MODE ONLY
+------------------------------------------------- */
 :root {
     --blue: #1B73E8;
     --bg: #F5F7FA;
     --text: #1F1F1F;
+    --light-text: #6b7280;
     --card: #FFFFFF;
     --border: #E5EAF0;
     --danger: #E74C3C;
 }
 
-/* AUTO DARK MODE */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #111;
-        --text: #F2F2F2;
-        --card: #1A1A1A;
-        --border: #333;
-    }
-}
-
 body {
     margin: 0;
     background: var(--bg);
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: "Inter", Arial, sans-serif;
     color: var(--text);
 }
 
-/* HEADER */
+/* -------------------------------------------------
+   HEADER
+------------------------------------------------- */
 header {
     background: var(--card);
     padding: 16px 22px;
@@ -45,94 +38,109 @@ header {
     align-items: center;
 }
 
-.logo { font-size: 22px; font-weight: 800; }
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+}
 
 nav a {
-    margin-left: 18px;
-    text-decoration: none;
+    margin-left: 20px;
     color: var(--text);
     font-weight: 600;
+    text-decoration: none;
 }
-nav a:hover { color: var(--blue); }
+nav a:hover {
+    color: var(--blue);
+}
 
-/* -----------------------------------
-   PAGE STRUCTURE
------------------------------------ */
+/* -------------------------------------------------
+   PAGE WRAPPER
+------------------------------------------------- */
 .wrapper {
     max-width: 680px;
-    margin: auto;
-    padding: 26px;
+    margin: 30px auto;
+    padding: 20px;
 }
 
-/* AVATAR */
+/* -------------------------------------------------
+   PROFILE PHOTO + NAME
+------------------------------------------------- */
 .profile-photo-wrapper {
     text-align: center;
     margin-top: 10px;
 }
 
 .profile-photo {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     border: 4px solid var(--blue);
     object-fit: cover;
     margin-bottom: 12px;
 }
 
-/* NAME + EMAIL */
 .profile-name {
-    text-align: center;
     font-size: 26px;
     font-weight: 800;
+    text-align: center;
 }
 
 .profile-email {
     text-align: center;
-    color: #888;
+    color: var(--light-text);
     margin-bottom: 28px;
 }
 
-/* CARDS */
+/* -------------------------------------------------
+   CARDS
+------------------------------------------------- */
 .section-card {
     background: var(--card);
-    padding: 20px;
-    border-radius: 18px;
-    margin-bottom: 26px;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 28px;
     border: 1px solid var(--border);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
 
 .section-title {
     font-size: 18px;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
-/* INPUTS */
-input {
+/* -------------------------------------------------
+   INPUTS
+------------------------------------------------- */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="file"] {
     width: 100%;
     padding: 12px;
-    margin-bottom: 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid var(--border);
+    margin-bottom: 14px;
     background: var(--card);
-    color: var(--text);
     font-size: 15px;
 }
 
-/* BUTTONS */
+/* -------------------------------------------------
+   BUTTONS
+------------------------------------------------- */
 .btn-primary {
     width: 100%;
     padding: 14px;
     background: var(--blue);
-    color: white;
+    color: #fff;
+    border: none;
     border-radius: 12px;
     font-weight: 700;
-    border: none;
     cursor: pointer;
-    margin-top: 8px;
+    margin-top: 6px;
+    transition: 0.2s;
 }
-.btn-primary:hover { opacity: 0.92; }
+.btn-primary:hover { opacity: 0.9; }
 
 .btn-outline {
     width: 100%;
@@ -147,21 +155,23 @@ input {
 }
 .btn-outline:hover {
     background: var(--blue);
-    color: white;
+    color: #fff;
 }
 
-/* ERROR + SUCCESS */
+/* -------------------------------------------------
+   ERROR / SUCCESS FEEDBACK
+------------------------------------------------- */
 .error-msg {
-    background: #ffdddd;
+    background: #ffe1e1;
     padding: 10px;
     border-radius: 8px;
-    color: #a10000;
+    color: #c40000;
     margin-bottom: 10px;
     display: none;
 }
 
 .success-msg {
-    background: #d9ffe5;
+    background: #dbffe9;
     padding: 10px;
     border-radius: 8px;
     color: #0f7a32;
@@ -169,14 +179,11 @@ input {
     display: none;
 }
 
-/* DATE RANGE */
 .date-row {
     display: flex;
     gap: 12px;
 }
-.date-row input {
-    flex: 1;
-}
+.date-row input { flex: 1; }
 
 </style>
 </head>
@@ -194,42 +201,41 @@ input {
 
 <div class="wrapper">
 
-    <!-- Avatar + Name -->
+    <!-- Profile -->
     <div class="profile-photo-wrapper">
-        <img id="profilePhoto" class="profile-photo" src="" alt="Profile Photo">
+        <img id="profilePhoto" class="profile-photo" src="" alt="">
     </div>
 
     <div class="profile-name" id="profileName">Squad Member</div>
     <div class="profile-email" id="profileEmail"></div>
 
-    <!-- Update Info -->
+    <!-- Update Profile -->
     <div class="section-card">
         <div class="section-title">Update Profile</div>
 
-        <div class="success-msg" id="saveSuccess">Saved successfully!</div>
+        <div id="saveSuccess" class="success-msg">Profile updated successfully.</div>
 
-        <label>Change Name</label>
+        <label>Name</label>
         <input type="text" id="newName" placeholder="Enter new name">
 
-        <label>Upload New Profile Picture</label>
-        <input type="file" accept="image/*" id="photoUpload">
+        <label>Profile Photo</label>
+        <input type="file" id="photoUpload" accept="image/*">
 
         <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
     </div>
 
-    <!-- Password -->
+    <!-- Password Reset -->
     <div class="section-card">
         <div class="section-title">Reset Password</div>
+        <div id="passError" class="error-msg">Passwords do not match.</div>
 
-        <div class="error-msg" id="passError">Passwords do not match.</div>
-
-        <input type="password" id="newPass" placeholder="New Password">
-        <input type="password" id="confirmPass" placeholder="Confirm Password">
+        <input type="password" id="newPass" placeholder="New password">
+        <input type="password" id="confirmPass" placeholder="Confirm password">
 
         <button class="btn-outline" onclick="savePassword()">Update Password</button>
     </div>
 
-    <!-- Payslip Section -->
+    <!-- Payslip -->
     <div class="section-card">
         <div class="section-title">Payslip Generator</div>
 
@@ -239,105 +245,101 @@ input {
         </div>
 
         <button class="btn-primary" onclick="generatePayslip()">Download Payslip (PDF)</button>
-        <button class="btn-outline" onclick="downloadCSV()">Download as CSV</button>
+        <button class="btn-outline" onclick="downloadCSV()">Download CSV</button>
     </div>
 
 </div>
 
 <script>
-/* -----------------------------------
-   GET USER DATA
------------------------------------ */
-const userEmail = sessionStorage.getItem("squadUser");
-if (!userEmail) window.location.href = "squad-login.html";
+/* -----------------------------------------
+   USER LOAD
+----------------------------------------- */
+const email = sessionStorage.getItem("squadUser");
+if (!email) window.location.href = "squad-login.html";
 
-document.getElementById("profileEmail").textContent = userEmail;
+document.getElementById("profileEmail").textContent = email;
 
-// Load stored data
-let userData = JSON.parse(localStorage.getItem("squad_" + userEmail)) || {
-    name: "Unnamed Squad Member",
+// Load user store
+let userData = JSON.parse(localStorage.getItem("squad_" + email)) || {
+    name: "Unnamed",
     photo: "",
     earnings: []
 };
 
-document.getElementById("profileName").textContent = userData.name || "Unnamed Squad Member";
-document.getElementById("profilePhoto").src = userData.photo || "https://via.placeholder.com/120";
+document.getElementById("profileName").textContent = userData.name;
+document.getElementById("profilePhoto").src = userData.photo || "https://via.placeholder.com/130";
 
-/* -----------------------------------
-   SAVE PROFILE INFO
------------------------------------ */
+/* -----------------------------------------
+   SAVE PROFILE
+----------------------------------------- */
 function saveProfile() {
-    let newName = document.getElementById("newName").value.trim();
-    let photoInput = document.getElementById("photoUpload").files[0];
+    let name = document.getElementById("newName").value.trim();
+    let file = document.getElementById("photoUpload").files[0];
 
-    if (newName) userData.name = newName;
+    if (name) userData.name = name;
 
-    // Photo upload (convert to Base64)
-    if (photoInput) {
+    if (file) {
         let reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = e => {
             userData.photo = e.target.result;
-            finalizeSave();
+            finishSave();
         };
-        reader.readAsDataURL(photoInput);
+        reader.readAsDataURL(file);
     } else {
-        finalizeSave();
+        finishSave();
     }
 }
 
-function finalizeSave() {
-    localStorage.setItem("squad_" + userEmail, JSON.stringify(userData));
+function finishSave() {
+    localStorage.setItem("squad_" + email, JSON.stringify(userData));
+
     document.getElementById("profileName").textContent = userData.name;
     document.getElementById("profilePhoto").src = userData.photo;
 
-    document.getElementById("saveSuccess").style.display = "block";
-    setTimeout(() => document.getElementById("saveSuccess").style.display = "none", 2000);
+    let box = document.getElementById("saveSuccess");
+    box.style.display = "block";
+    setTimeout(() => box.style.display = "none", 2000);
 }
 
-/* -----------------------------------
-   SAVE PASSWORD
------------------------------------ */
+/* -----------------------------------------
+   PASSWORD UPDATE
+----------------------------------------- */
 function savePassword() {
-    const pass1 = document.getElementById("newPass").value;
-    const pass2 = document.getElementById("confirmPass").value;
+    const p1 = document.getElementById("newPass").value;
+    const p2 = document.getElementById("confirmPass").value;
 
-    if (pass1 !== pass2 || pass1.length < 4) {
+    if (p1 !== p2 || p1.length < 4) {
         document.getElementById("passError").style.display = "block";
         return;
     }
 
     document.getElementById("passError").style.display = "none";
 
-    // Update in USERS store (temp login)
-    let allUsers = JSON.parse(localStorage.getItem("squadUsers")) || {};
-    allUsers[userEmail] = pass1;
-    localStorage.setItem("squadUsers", JSON.stringify(allUsers));
+    let users = JSON.parse(localStorage.getItem("squadUsers")) || {};
+    users[email] = p1;
+    localStorage.setItem("squadUsers", JSON.stringify(users));
 
-    alert("Password updated successfully.");
+    alert("Password updated.");
 }
 
-/* -----------------------------------
-   PAYSLIP GENERATOR (PDF)
------------------------------------ */
+/* -----------------------------------------
+   PAYSLIP EXPORT PLACEHOLDERS
+----------------------------------------- */
 function generatePayslip() {
-    alert("PDF Generator coming next — ready to activate when you want it connected.");
+    alert("PDF payslip generator will be ready when you want it activated.");
 }
-
-/* -----------------------------------
-   CSV GENERATOR
------------------------------------ */
 function downloadCSV() {
-    alert("CSV export wired — will activate once earnings structure is final.");
+    alert("CSV export connected — waiting for final earnings structure.");
 }
 
-/* -----------------------------------
+/* -----------------------------------------
    LOGOUT
------------------------------------ */
+----------------------------------------- */
 function logout() {
     sessionStorage.removeItem("squadUser");
     window.location.href = "squad-login.html";
 }
-
 </script>
+
 </body>
 </html>
