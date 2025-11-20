@@ -6,104 +6,140 @@
 <title>Booking-Off – BrickBook</title>
 
 <style>
-/* -------------------------------
-   THEME VARIABLES
----------------------------------- */
+/* ---------------------------------------
+   LIGHT MODE VARIABLES (DEFAULT)
+---------------------------------------- */
 :root {
-  --primary1: #2563eb; /* Blue */
-  --primary2: #06b6d4; /* Teal */
-  --glass: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.25);
-  --bg: #f3f7fa;
-  --card-bg: var(--glass);
-  --text-main: #1e293b;
-  --text-light: #64748b;
-  --border: rgba(0,0,0,0.08);
-  --shadow: 0 8px 24px rgba(0,0,0,0.08);
+  --bg: #f5f7fb;
+  --card-bg: rgba(255,255,255,0.7);
+  --card-border: rgba(0,0,0,0.06);
+  --text-main: #1f2937;
+  --text-light: #6b7280;
+  --primary: #1b73e8;
+  --primary-hover: #155ac2;
+  --shadow: 0 8px 28px rgba(0,0,0,0.07);
+  --glass-blur: blur(18px);
 }
 
-/* DARK MODE */
+/* ---------------------------------------
+   DARK MODE VARIABLES
+---------------------------------------- */
 body.dark {
-  --bg: #020617;
-  --card-bg: rgba(15, 23, 42, 0.55);
-  --glass-border: rgba(148,163,184,0.12);
-  --text-main: #e2e8f0;
-  --text-light: #94a3b8;
-  --border: rgba(148,163,184,0.2);
-  --shadow: 0 8px 28px rgba(0,0,0,0.65);
+  --bg: #0b1220;
+  --card-bg: rgba(15,23,42,0.65);
+  --card-border: rgba(255,255,255,0.09);
+  --text-main: #e5e7eb;
+  --text-light: #9ca3af;
+  --primary: #3ba4ff;
+  --primary-hover: #1d8fe6;
+  --shadow: 0 8px 40px rgba(0,0,0,0.6);
 }
 
-/* -------------------------------
-   GLOBAL STYLES
----------------------------------- */
+/* ---------------------------------------
+   GLOBAL RESET
+---------------------------------------- */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(6,182,212,0.12)), var(--bg);
+  background: var(--bg);
   font-family: "Inter", Arial, sans-serif;
   color: var(--text-main);
+  transition: background 0.3s ease;
 }
 
-h1 {
-  font-size: 32px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  background: linear-gradient(90deg, var(--primary1), var(--primary2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  color: var(--text-light);
-  margin-bottom: 20px;
-}
-
-/* -------------------------------
-   HEADER
----------------------------------- */
+/* ---------------------------------------
+   HEADER – GLASS + ANIMATED GRADIENT LINE
+---------------------------------------- */
 header {
-  backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.25);
-  border-bottom: 1px solid var(--glass-border);
-  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: var(--glass-blur);
+  background: rgba(255,255,255,0.35);
+  border-bottom: 1px solid var(--card-border);
+  padding: 16px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 body.dark header {
-  background: rgba(15,23,42,0.25);
+  background: rgba(15,23,42,0.45);
+}
+
+header::after {
+  /* animated gradient underline */
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    #1b73e8,
+    #06b6d4,
+    #3ba4ff,
+    #1b73e8
+  );
+  background-size: 300% 100%;
+  animation: headerLine 6s linear infinite;
+}
+@keyframes headerLine {
+  0% { background-position: 0%; }
+  100% { background-position: 300%; }
 }
 
 .logo {
   font-size: 22px;
   font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 nav {
   display: flex;
-  gap: 20px;
+  gap: 24px;
+  align-items: center;
 }
 nav a {
-  text-decoration: none;
   color: var(--text-main);
   font-weight: 600;
-  font-size: 14px;
+  text-decoration: none;
 }
 nav a:hover {
-  color: var(--primary1);
+  color: var(--primary);
 }
 
-/* Hamburger */
+/* Dark mode toggle */
+.toggle {
+  width: 44px;
+  height: 24px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 999px;
+  padding: 3px;
+  cursor: pointer;
+}
+.toggle-thumb {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+body.dark .toggle {
+  background: rgba(255,255,255,0.18);
+}
+body.dark .toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* MOBILE NAV */
 .hamburger {
   display: none;
-  font-size: 28px;
+  font-size: 30px;
   cursor: pointer;
 }
 
@@ -111,270 +147,211 @@ nav a:hover {
   display: none;
   flex-direction: column;
   background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  padding: 16px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: var(--glass-blur);
+  padding: 14px;
 }
 .mobile-menu a {
   padding: 10px 0;
   text-decoration: none;
   color: var(--text-main);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--card-border);
 }
 
-/* DARK MODE TOGGLE */
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.toggle {
-  width: 44px;
-  height: 24px;
-  background: #cbd5e1;
-  border-radius: 999px;
-  padding: 3px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-body.dark .toggle {
-  background: #0f172a;
-}
-.toggle-thumb {
-  height: 18px;
-  width: 18px;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.35);
-  transition: transform 0.22s ease;
-}
-body.dark .toggle-thumb {
-  transform: translateX(20px);
-}
-
-/* -------------------------------
-   WRAPPER
----------------------------------- */
+/* ---------------------------------------
+   PAGE WRAPPER
+---------------------------------------- */
 .wrapper {
   max-width: 900px;
-  margin: 0 auto;
-  padding: 26px 16px 70px;
+  margin: auto;
+  padding: 30px 18px 80px;
 }
 
-/* -------------------------------
-   GLASS CARD
----------------------------------- */
-.card {
+h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.subtitle {
+  color: var(--text-light);
+  margin-bottom: 22px;
+}
+
+/* ---------------------------------------
+   CARDS (Glass Theme)
+---------------------------------------- */
+.card,
+.plot-card,
+.split-card {
   background: var(--card-bg);
-  backdrop-filter: blur(18px);
-  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
   border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 20px;
+  padding: 20px;
+  margin-bottom: 22px;
   box-shadow: var(--shadow);
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* -------------------------------
-   SELECT BOXES
----------------------------------- */
-.select-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
+/* ---------------------------------------
+   SELECTS
+---------------------------------------- */
 select {
   width: 100%;
   padding: 12px;
-  background: rgba(255,255,255,0.6);
-  border-radius: 10px;
-  border: 1px solid var(--border);
   font-size: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: rgba(255,255,255,0.6);
   color: var(--text-main);
 }
 body.dark select {
   background: rgba(255,255,255,0.08);
 }
 
-/* -------------------------------
-   PLOT CARD
----------------------------------- */
-.plot-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(18px);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 26px;
-  box-shadow: var(--shadow);
-  position: relative;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: rgba(239,68,68,0.15);
-  color: #ef4444;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid rgba(239,68,68,0.25);
-}
-
-/* -------------------------------
-   TABLE
----------------------------------- */
+/* ---------------------------------------
+   TABLE (Measurements)
+---------------------------------------- */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 thead {
   background: rgba(255,255,255,0.25);
 }
-thead th {
-  text-align: left;
-  font-size: 13px;
+th, td {
   padding: 8px;
-  color: var(--text-main);
+  font-size: 14px;
+  border-bottom: 1px solid var(--card-border);
 }
-tbody td {
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
-}
-input[type="number"], input[type="text"] {
+input[type="number"],
+input[type="text"] {
   width: 100%;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.45);
-  font-size: 14px;
+  border: 1px solid var(--card-border);
+  background: rgba(255,255,255,0.6);
 }
 body.dark input[type="number"],
 body.dark input[type="text"] {
-  background: rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.1);
 }
 
-/* -------------------------------
-   NOTES + PHOTOS
----------------------------------- */
+/* ---------------------------------------
+   NOTES / PHOTOS
+---------------------------------------- */
 textarea {
   width: 100%;
   height: 80px;
-  padding: 10px;
+  padding: 12px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.45);
-  margin-top: 10px;
-}
-.photo-preview {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  border: 1px solid var(--card-border);
+  background: rgba(255,255,255,0.6);
 }
 .photo-preview img {
-  width: 90px;
-  height: 90px;
-  border-radius: 12px;
+  width: 85px;
+  height: 85px;
+  border-radius: 10px;
   object-fit: cover;
-  border: 1px solid var(--border);
+  border: 1px solid var(--card-border);
 }
 
-/* -------------------------------
+/* ---------------------------------------
    BUTTONS
----------------------------------- */
+---------------------------------------- */
 .btn {
-  border-radius: 12px;
   padding: 12px 20px;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 700;
   font-size: 15px;
+  font-weight: 700;
+  border: none;
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, var(--primary1), var(--primary2));
+  background: var(--primary);
   color: white;
-  box-shadow: 0 6px 20px rgba(37,99,235,0.3);
+  box-shadow: 0 6px 20px rgba(27,115,232,0.35);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.5);
-  border: 1px solid var(--border);
-  color: var(--primary1);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid var(--card-border);
+  color: var(--primary);
+}
+body.dark .btn-secondary {
+  background: rgba(255,255,255,0.1);
 }
 
-/* -------------------------------
-   TOTAL BOXES
----------------------------------- */
-.grand-total-box {
-  margin: 30px 0 20px;
-  font-size: 22px;
-  font-weight: 800;
-  text-align: right;
-}
-
-/* -------------------------------
-   SQUAD SPLIT
----------------------------------- */
-.split-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(18px);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 20px;
-  margin-top: 40px;
-}
+/* ---------------------------------------
+   SPLIT ROW
+---------------------------------------- */
 .split-row {
   display: grid;
-  grid-template-columns: 1fr 90px 120px 120px;
+  grid-template-columns: 1fr 70px 100px 120px;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-/* -------------------------------
+/* ---------------------------------------
+   TOTALS
+---------------------------------------- */
+.grand-total-box {
+  text-align: right;
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 25px;
+}
+
+/* ---------------------------------------
    MOBILE
----------------------------------- */
+---------------------------------------- */
 @media(max-width: 768px) {
   nav { display: none; }
   .hamburger { display: block; }
-  .select-row { grid-template-columns: 1fr; }
-  .split-row { grid-template-columns: 1fr 70px 90px 90px; }
-  .btn-primary, .btn-secondary { width: 100%; margin-top: 12px; }
+  .split-row {
+    grid-template-columns: 1fr 60px 90px 90px;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    margin-top: 10px;
+  }
 }
 </style>
 </head>
-
 <body>
 
 <script>
 /* -------------------------------
-   LOGIN GUARD
----------------------------------- */
+   SQUAD LOGIN PROTECT
+-------------------------------- */
 if (!sessionStorage.getItem("squadLoggedIn")) {
   window.location.href = "squad-login.html";
 }
 </script>
 
-<!-- -------------------------------
-     HEADER (SQUAD VERSION)
----------------------------------- -->
+<!-- ----------------------------------
+     HEADER
+----------------------------------- -->
 <header>
   <div class="logo">BrickBook</div>
 
   <nav>
     <a href="booking.html">Booking-Off</a>
-    <a href="squad-dashboard.html">My Dashboard</a>
-    <a href="squad-history.html">Work History</a>
+    <a href="squad-dashboard.html">Dashboard</a>
+    <a href="squad-history.html">History</a>
     <a href="#" onclick="logout()">Logout</a>
 
-    <div class="toggle-wrap">
-      <div class="toggle" onclick="toggleDarkMode()">
-        <div class="toggle-thumb"></div>
-      </div>
+    <div class="toggle" onclick="toggleDark()">
+      <div class="toggle-thumb"></div>
     </div>
   </nav>
 
@@ -383,33 +360,40 @@ if (!sessionStorage.getItem("squadLoggedIn")) {
 
 <div class="mobile-menu" id="mobileMenu">
   <a href="booking.html">Booking-Off</a>
-  <a href="squad-dashboard.html">My Dashboard</a>
-  <a href="squad-history.html">Work History</a>
+  <a href="squad-dashboard.html">Dashboard</a>
+  <a href="squad-history.html">History</a>
   <a href="#" onclick="logout()">Logout</a>
 </div>
 
 <script>
-function toggleMenu() {
-  const menu = document.getElementById("mobileMenu");
-  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+function toggleMenu(){
+  const m=document.getElementById("mobileMenu");
+  m.style.display=m.style.display==="flex"?"none":"flex";
 }
-function logout() {
+function logout(){
   sessionStorage.removeItem("squadLoggedIn");
-  window.location.href = "squad-login.html";
+  window.location.href="squad-login.html";
+}
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
+}
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark");
 }
 </script>
 
-<!-- -------------------------------
+<!-- ----------------------------------
      MAIN WRAPPER
----------------------------------- -->
+----------------------------------- -->
 <div class="wrapper">
 
   <h1>Booking-Off</h1>
-  <div class="subtitle">Select Squad and Site to begin.</div>
+  <div class="subtitle">Select squad + site to load measurements.</div>
 
-  <!-- Squad & Site Select -->
+  <!-- Squad / Site Select -->
   <div class="card">
-    <div class="select-row">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div>
         <label>Squad</label>
         <select id="select-squad">
@@ -435,12 +419,12 @@ function logout() {
 
   <!-- Squad Split -->
   <div class="split-card">
-    <h2 style="margin-bottom:12px;">Squad Split</h2>
+    <h2 style="margin-bottom:14px;">Squad Split</h2>
 
     <div class="split-row" style="font-weight:700;">
       <div>Name</div>
       <div>%</div>
-      <div>Wages (£)</div>
+      <div>Wages</div>
       <div>After CIS</div>
     </div>
 
@@ -456,108 +440,84 @@ function logout() {
 </div>
 
 <script>
-/* -------------------------------
-   DARK MODE HANDLING
----------------------------------- */
-function toggleDarkMode() {
-  const isDark = document.body.classList.toggle("dark");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-}
-(function(){
-  const t = localStorage.getItem("theme");
-  if (t === "dark") document.body.classList.add("dark");
+/* ---------------------------------------
+   LOAD PRICING MANAGER DATA
+---------------------------------------- */
+const PRICING_KEY="brickbook_pricing_state";
+let pricing={squads:[],sites:[],profiles:[]};
+
+(function loadPricing(){
+  const saved=localStorage.getItem(PRICING_KEY);
+  if(saved){
+    try{pricing=JSON.parse(saved);}catch(e){}
+  }
 })();
 
-/* -------------------------------
-   LOAD PRICING STATE FROM MANAGER
----------------------------------- */
-const PRICING_KEY = "brickbook_pricing_state";
-let pricing = { squads: [], sites: [], profiles: [] };
+/* Fill dropdowns */
+(function fill(){
+  const s1=document.getElementById("select-squad");
+  const s2=document.getElementById("select-site");
 
-function loadPricing() {
-  const raw = localStorage.getItem(PRICING_KEY);
-  if (!raw) return;
-  try { pricing = JSON.parse(raw); }
-  catch(e){ console.error(e); }
-}
-loadPricing();
-
-/* Populate dropdowns */
-function populateDropdowns() {
-  const s1 = document.getElementById("select-squad");
-  const s2 = document.getElementById("select-site");
-
-  pricing.squads.forEach(s => {
-    let o = document.createElement("option");
-    o.value = s; o.textContent = s;
+  pricing.squads.forEach(x=>{
+    let o=document.createElement("option");
+    o.value=x;o.textContent=x;
     s1.appendChild(o);
   });
 
-  pricing.sites.forEach(s => {
-    let o = document.createElement("option");
-    o.value = s; o.textContent = s;
+  pricing.sites.forEach(x=>{
+    let o=document.createElement("option");
+    o.value=x;o.textContent=x;
     s2.appendChild(o);
   });
-}
-populateDropdowns();
+})();
 
-/* Get fields for selected squad+site */
-function getActiveFields() {
-  const squad = document.getElementById("select-squad").value;
-  const site = document.getElementById("select-site").value;
-  if (!squad || !site) return [];
-
-  return pricing.profiles.find(p => p.squad === squad && p.site === site)?.fields || [];
+function getActiveFields(){
+  const squad=document.getElementById("select-squad").value;
+  const site=document.getElementById("select-site").value;
+  return pricing.profiles.find(p=>p.squad===squad && p.site===site)?.fields || [];
 }
 
-/* -------------------------------
+/* ---------------------------------------
    ADD PLOT
----------------------------------- */
-function addPlot() {
-  const fields = getActiveFields();
-  if (!fields.length) {
-    alert("Select Squad + Site first. No pricing loaded.");
+---------------------------------------- */
+function addPlot(){
+  const fields=getActiveFields();
+  if(!fields.length){
+    alert("Select a squad + site with pricing profile first.");
     return;
   }
 
-  const container = document.getElementById("plots-container");
-  const card = document.createElement("div");
-  const id = Date.now();
+  const id=Date.now();
+  const card=document.createElement("div");
+  card.className="plot-card";
 
-  card.className = "plot-card";
+  card.innerHTML=`
+    <button class="delete-btn" onclick="this.closest('.plot-card').remove();calcGrandTotal();calcSplitTotals();">Delete</button>
 
-  card.innerHTML = `
-    <button class="delete-btn" onclick="deletePlot(this)">Delete</button>
-
-    <div style="font-weight:600; margin-bottom:6px;">
+    <div style="font-weight:600;margin-bottom:6px;">
       Plot <input type="text" class="plot-number" placeholder="e.g. 12A">
     </div>
 
     <table>
-      <thead>
-        <tr><th>Measurement</th><th>Qty</th><th>Rate</th><th>Total</th></tr>
-      </thead>
+      <thead><tr><th>Measurement</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
       <tbody>
-        ${fields.map(f => `
+        ${fields.map(f=>`
           <tr>
             <td>${f.name}</td>
-            <td><input type="number" class="qty" oninput="calcRow(this); calcPlot(this)"></td>
+            <td><input type="number" class="qty" oninput="calcRow(this);calcPlot(this)"></td>
             <td><input type="number" class="rate" value="${f.rate}" readonly></td>
             <td><input type="number" class="total" readonly></td>
-          </tr>
-        `).join("")}
+          </tr>`).join("")}
       </tbody>
     </table>
 
-    <label style="margin-top:8px;">Notes</label>
-    <textarea class="plot-notes" placeholder="Progress, issues, materials..."></textarea>
+    <label style="margin-top:10px;">Notes</label>
+    <textarea class="plot-notes" placeholder="Progress, issues, materials…"></textarea>
 
-    <label style="margin-top:12px;">Upload Photos</label>
-    <input type="file" accept="image/*" onchange="previewPhoto(this, '${id}')">
+    <label style="margin-top:10px;">Upload Photos</label>
+    <input type="file" accept="image/*" onchange="previewPhoto(this,'${id}')">
 
-    <button class="btn btn-secondary" onclick="addPhotoField(this, '${id}')" style="margin-top:8px;">
-      + Add Photo
-    </button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="addPhotoField(this,'${id}')">+ Add Photo</button>
 
     <div class="photo-preview" id="preview-${id}"></div>
 
@@ -566,115 +526,94 @@ function addPlot() {
     </div>
   `;
 
-  container.appendChild(card);
+  document.getElementById("plots-container").appendChild(card);
 }
 
-function deletePlot(btn) {
-  btn.closest(".plot-card").remove();
-  calcGrandTotal();
-  calcSplitTotals();
+function previewPhoto(input,id){
+  if(!input.files||!input.files[0])return;
+  const img=document.createElement("img");
+  img.src=URL.createObjectURL(input.files[0]);
+  document.getElementById("preview-"+id).appendChild(img);
+}
+function addPhotoField(btn,id){
+  const input=document.createElement("input");
+  input.type="file";input.accept="image/*";
+  input.onchange=()=>previewPhoto(input,id);
+  btn.insertAdjacentElement("beforebegin",input);
 }
 
-/* -------------------------------
-   PHOTO UPLOAD
----------------------------------- */
-function addPhotoField(btn, id) {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.onchange = () => previewPhoto(input, id);
-  btn.insertAdjacentElement("beforebegin", input);
-}
-
-function previewPhoto(input, id) {
-  if (!input.files || !input.files[0]) return;
-  const img = document.createElement("img");
-  img.src = URL.createObjectURL(input.files[0]);
-  document.getElementById("preview-" + id).appendChild(img);
-}
-
-/* -------------------------------
+/* ---------------------------------------
    CALCULATIONS
----------------------------------- */
-function calcRow(input) {
-  const tr = input.closest("tr");
-  const qty = parseFloat(input.value) || 0;
-  const rate = parseFloat(tr.querySelector(".rate").value) || 0;
-  tr.querySelector(".total").value = (qty * rate).toFixed(2);
+---------------------------------------- */
+function calcRow(el){
+  const tr=el.closest("tr");
+  const qty=parseFloat(el.value)||0;
+  const rate=parseFloat(tr.querySelector(".rate").value)||0;
+  tr.querySelector(".total").value=(qty*rate).toFixed(2);
 }
-
-function calcPlot(input) {
-  const card = input.closest(".plot-card");
-  let total = 0;
-  card.querySelectorAll(".total").forEach(t => {
-    total += parseFloat(t.value) || 0;
-  });
-  card.querySelector(".plot-total").textContent = total.toFixed(2);
+function calcPlot(el){
+  const card=el.closest(".plot-card");
+  let sum=0;
+  card.querySelectorAll(".total").forEach(x=>sum+=parseFloat(x.value)||0);
+  card.querySelector(".plot-total").textContent=sum.toFixed(2);
   calcGrandTotal();
   calcSplitTotals();
 }
-
-function calcGrandTotal() {
-  let sum = 0;
-  document.querySelectorAll(".plot-total").forEach(t => {
-    sum += parseFloat(t.textContent) || 0;
-  });
-  document.getElementById("grand-total").textContent = sum.toFixed(2);
+function calcGrandTotal(){
+  let sum=0;
+  document.querySelectorAll(".plot-total").forEach(x=>sum+=parseFloat(x.textContent)||0);
+  document.getElementById("grand-total").textContent=sum.toFixed(2);
 }
 
-/* -------------------------------
+/* ---------------------------------------
    SQUAD SPLIT
----------------------------------- */
-const splitContainer = document.getElementById("split-container");
-for (let i = 0; i < 5; i++) addSplitRow();
+---------------------------------------- */
+const splitContainer=document.getElementById("split-container");
+for(let i=0;i<5;i++) addSplitRow();
 
-function addSplitRow() {
-  const row = document.createElement("div");
-  row.className = "split-row";
-
-  row.innerHTML = `
-    <input type="text" class="split-name" placeholder="Name">
+function addSplitRow(){
+  const r=document.createElement("div");
+  r.className="split-row";
+  r.innerHTML=`
+    <input type="text" class="split-name" placeholder="Person">
     <input type="number" class="split-percent" oninput="percentChanged(this)">
     <input type="number" class="split-wages" oninput="wagesChanged(this)">
     <input type="number" class="split-cis" readonly>
   `;
-  splitContainer.appendChild(row);
+  splitContainer.appendChild(r);
 }
 
-function percentChanged(input) {
-  const row = input.closest(".split-row");
-  const pct = parseFloat(input.value) || 0;
-  const grand = parseFloat(document.getElementById("grand-total").textContent) || 0;
-  const wages = grand * (pct / 100);
-  row.querySelector(".split-wages").value = wages.toFixed(2);
-  row.querySelector(".split-cis").value = (wages * 0.8).toFixed(2);
+function percentChanged(el){
+  const r=el.closest(".split-row");
+  const pct=parseFloat(el.value)||0;
+  const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
+  const wages=grand*(pct/100);
+  r.querySelector(".split-wages").value=wages.toFixed(2);
+  r.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
   calcSplitTotals();
 }
-
-function wagesChanged(input) {
-  const row = input.closest(".split-row");
-  const wages = parseFloat(input.value) || 0;
-  const grand = parseFloat(document.getElementById("grand-total").textContent) || 0;
-  if (grand > 0) {
-    row.querySelector(".split-percent").value = ((wages / grand) * 100).toFixed(2);
+function wagesChanged(el){
+  const r=el.closest(".split-row");
+  const wages=parseFloat(el.value)||0;
+  const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
+  if(grand>0){
+    r.querySelector(".split-percent").value=((wages/grand)*100).toFixed(2);
   }
-  row.querySelector(".split-cis").value = (wages * 0.8).toFixed(2);
+  r.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
   calcSplitTotals();
 }
 
-function calcSplitTotals() {
-  let sum = 0;
-  document.querySelectorAll(".split-cis").forEach(c => {
-    sum += parseFloat(c.value) || 0;
-  });
-  document.getElementById("final-total-cis").textContent = sum.toFixed(2);
+function calcSplitTotals(){
+  let s=0;
+  document.querySelectorAll(".split-cis").forEach(x=>s+=parseFloat(x.value)||0);
+  document.getElementById("final-total-cis").textContent=s.toFixed(2);
 }
 
-/* -------------------------------
-   SUBMIT
----------------------------------- */
-function submitBooking() {
-  alert("Booking-Off submitted successfully!");
+/* ---------------------------------------
+   SUBMIT ACTION
+---------------------------------------- */
+function submitBooking(){
+  alert("Booking-Off Submitted!");
 }
 </script>
 
