@@ -1,264 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Squad Dashboard – BrickBook</title>
 
 <style>
+/* -------------------------------------------------------
+   THEME + DARK MODE SUPPORT
+------------------------------------------------------- */
 :root {
-    --blue: #1B73E8;
-    --charcoal: #2D2D2D;
-    --lightgrey: #F5F7FA;
-    --white: #FFFFFF;
-    --green: #2ECC71;
-    --danger: #E74C3C;
-    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --blue: #1b73e8;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #1f1f1f;
+  --subtext: #666;
+  --glass: rgba(255, 255, 255, 0.55);
+  --shadow: rgba(0, 0, 0, 0.1);
 }
 
-/* GENERAL */
+/* DARK MODE THEME */
+.dark {
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --text: #f2f2f2;
+  --subtext: #bbb;
+  --glass: rgba(20, 20, 20, 0.55);
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
 body {
-    margin: 0;
-    background: var(--lightgrey);
-    font-family: 'Inter', Arial, sans-serif;
-    color: var(--charcoal);
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', Arial, sans-serif;
+  transition: 0.3s;
 }
 
-/* HEADER */
+/* -------------------------------------------------------
+   HEADER
+------------------------------------------------------- */
 header {
-    background: var(--white);
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #E5EAF0;
-}
-.logo { font-size: 22px; font-weight: 800; }
-
-nav { display: flex; gap: 24px; }
-nav a { text-decoration: none; font-weight: 600; color: var(--charcoal); }
-nav a:hover { color: var(--blue); }
-
-.hamburger {
-    display: none;
-    font-size: 28px;
-    cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  background: var(--card);
+  border-bottom: 1px solid #e2e2e2;
+  position: sticky;
+  top: 0;
+  z-index: 99;
 }
 
-.mobile-menu {
-    display: none;
-    flex-direction: column;
-    background: white;
-    padding: 14px;
-    border-bottom: 1px solid #ddd;
+.logo {
+  font-weight: 800;
+  font-size: 22px;
 }
 
-.mobile-menu a {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    text-decoration: none;
-    font-weight: 600;
-    color: var(--charcoal);
+.nav-buttons {
+  display: flex;
+  gap: 16px;
 }
 
-/* WRAPPER */
+.nav-buttons button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.nav-buttons button:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* -------------------------------------------------------
+   WRAPPER
+------------------------------------------------------- */
 .wrapper {
-    max-width: 1100px;
-    margin: auto;
-    padding: 30px 20px 70px;
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 20px;
 }
 
-/* TITLES */
-h1 { font-size: 28px; font-weight: 800; }
-.subtitle { font-size: 15px; color: #666; margin-bottom: 22px; }
-
-/* ACTION BUTTONS */
-.btn-primary {
-    padding: 14px 22px;
-    background: var(--blue);
-    color: white;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: none;
-    margin-bottom: 18px;
-    box-shadow: 0 5px 14px rgba(27,115,232,0.25);
+/* -------------------------------------------------------
+   HERO CARD (WEEKLY EARNINGS)
+------------------------------------------------------- */
+.hero-card {
+  background: var(--glass);
+  padding: 26px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px var(--shadow);
+  backdrop-filter: blur(18px);
+  text-align: center;
+  margin-bottom: 28px;
 }
 
-.card {
-    background: var(--white);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
+.hero-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--subtext);
 }
 
-.card-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
+.hero-earning {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(45deg, var(--blue), #00b7ff);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-top: 6px;
 }
 
-.history-item {
-    padding: 14px 0;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
+/* -------------------------------------------------------
+   THREE SUMMARY CARDS
+------------------------------------------------------- */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
 }
 
-.small {
-    font-size: 14px;
-    color: #555;
+.summary-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px var(--shadow);
 }
 
-.badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 13px;
-    color: white;
+.summary-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--subtext);
 }
 
-.pending { background: #F1C40F; }
-.approved { background: #2ECC71; }
-.rejected { background: #E74C3C; }
-
-.progress-area {
-    margin-top: 12px;
+.summary-value {
+  font-size: 32px;
+  font-weight: 800;
+  margin-top: 6px;
 }
 
-.progress-bar {
-    width: 100%;
-    height: 14px;
-    border-radius: 8px;
-    background: #ddd;
-    overflow: hidden;
+/* STATUS COLORS */
+.status-approved { color: #2ecc71; font-weight: 700; }
+.status-pending { color: #f1c40f; font-weight: 700; }
+.status-rejected { color: #e74c3c; font-weight: 700; }
+
+/* -------------------------------------------------------
+   BOOKING TABLE
+------------------------------------------------------- */
+.table-card {
+  margin-top: 40px;
+  background: var(--card);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px var(--shadow);
 }
 
-.progress-fill {
-    height: 14px;
-    background: var(--blue);
-    width: 0%;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-@media(max-width: 768px) {
-    nav { display: none; }
-    .hamburger { display: block; }
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(150, 150, 150, 0.2);
+}
+
+thead {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.view-btn {
+  padding: 6px 12px;
+  background: var(--blue);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   QUICK ACTIONS
+------------------------------------------------------- */
+.quick-actions {
+  margin-top: 40px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 14px 22px;
+  background: var(--blue);
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(27,115,232,0.35);
+}
+
+.quick-btn:hover {
+  opacity: 0.9;
+}
+
+/* -------------------------------------------------------
+   DARK MODE TOGGLE
+------------------------------------------------------- */
+.dark-toggle {
+  padding: 8px 12px;
+  background: #222;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* MOBILE */
+@media(max-width: 600px) {
+  .hero-earning { font-size: 38px; }
 }
 </style>
 </head>
 
 <body>
 
-<script>
-/* CHECK LOGIN */
-if (!sessionStorage.getItem("squadLoggedIn")) {
-    window.location.href = "squad-login.html";
-}
-
-function logoutSquad() {
-    sessionStorage.removeItem("squadLoggedIn");
-    window.location.href = "squad-login.html";
-}
-</script>
-
 <header>
-    <div class="logo">BrickBook</div>
+  <div class="logo">BrickBook</div>
 
-    <nav>
-        <a href="squad-dashboard.html">Dashboard</a>
-        <a href="#" onclick="logoutSquad()">Logout</a>
-    </nav>
-
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="nav-buttons">
+    <button onclick="window.location.href='index.html'">Home</button>
+    <button onclick="toggleDark()">Dark Mode</button>
+    <button onclick="logout()">Logout</button>
+  </div>
 </header>
-
-<div class="mobile-menu" id="mobileMenu">
-    <a href="squad-dashboard.html">Dashboard</a>
-    <a href="#" onclick="logoutSquad()">Logout</a>
-</div>
 
 <div class="wrapper">
 
-    <h1>Squad Dashboard</h1>
-    <div class="subtitle">Welcome, <span id="squadName">your squad</span>.</div>
+  <!-- WEEKLY EARNINGS HERO -->
+  <div class="hero-card">
+    <div class="hero-title">Weekly Earnings (After CIS)</div>
+    <div class="hero-earning">£<span id="weeklyTotal">0.00</span></div>
+  </div>
 
-    <a href="booking.html" class="btn-primary">+ Start New Booking-Off</a>
-
-    <!-- Earnings summary -->
-    <div class="card">
-        <div class="card-title">This Week’s Earnings</div>
-
-        <div style="font-size:24px; font-weight:700;">
-            £<span id="weeklyTotal">0.00</span>
-        </div>
-
-        <div class="progress-area">
-            <div class="small">Progress toward £3000 weekly target</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-        </div>
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-title">Monthly Earnings</div>
+      <div class="summary-value">£<span id="monthlyTotal">0.00</span></div>
     </div>
 
-    <!-- Recent bookings -->
-    <div class="card">
-        <div class="card-title">Recent Booking-Offs</div>
-
-        <div id="historyContainer"></div>
+    <div class="summary-card">
+      <div class="summary-title">Yearly Earnings</div>
+      <div class="summary-value">£<span id="yearlyTotal">0.00</span></div>
     </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Recent Booking Status</div>
+      <div class="summary-value" id="recentStatus">No Data</div>
+    </div>
+  </div>
+
+  <!-- BOOKING HISTORY TABLE -->
+  <div class="table-card">
+    <h2>Your Booking-Offs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Plot</th>
+          <th>Your Share (£)</th>
+          <th>CIS (£)</th>
+          <th>Status</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody id="bookingTable">
+      </tbody>
+    </table>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+    <a class="quick-btn" href="index.html">Home</a>
+    <a class="quick-btn" href="booking.html">New Booking-Off</a>
+    <a class="quick-btn" href="squad-history.html">View History</a>
+    <a class="quick-btn" onclick="logout()">Logout</a>
+  </div>
 
 </div>
 
 <script>
-/* Mobile menu toggle */
-function toggleMenu() {
-    const menu = document.getElementById("mobileMenu");
-    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+/* DARK MODE */
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkmode", document.body.classList.contains("dark"));
 }
 
-/* Get squad name */
-document.getElementById("squadName").textContent =
-    sessionStorage.getItem("squadLoggedIn");
+if (localStorage.getItem("darkmode") === "true") {
+  document.body.classList.add("dark");
+}
 
-/* TEMP DATA (replace with real data later) */
-let recent = [
-    { plot: "44, 45, 46", total: 1400, status: "approved", date: "Today" },
-    { plot: "32", total: 620, status: "pending", date: "Yesterday" },
-    { plot: "28, 29", total: 980, status: "approved", date: "Mon" }
-];
+/* LOGIN CHECK */
+const user = sessionStorage.getItem("squadUser");
+if (!user) window.location.href = "squad-login.html";
 
-let weeklyEarnings = recent.reduce((a, b) => a + b.total, 0);
+/* LOAD USER DATA */
+let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
+  earnings: [],
+  bookings: []
+};
 
-/* Apply data */
-document.getElementById("weeklyTotal").textContent = weeklyEarnings.toFixed(2);
+/* CALCULATE TOTALS */
+function loadTotals() {
+  let weekly = 0, monthly = 0, yearly = 0;
+  const today = new Date();
+  const weekStart = new Date(); weekStart.setDate(today.getDate() - today.getDay());
 
-/* Progress bar fill */
-let progress = Math.min((weeklyEarnings / 3000) * 100, 100);
-document.getElementById("progressFill").style.width = progress + "%";
+  userData.earnings.forEach(e => {
+    const d = new Date(e.date);
 
-/* Booking-Off history */
-let historyHTML = "";
-recent.forEach(r => {
-    historyHTML += `
-        <div class="history-item">
-            <div>
-                <div><strong>Plots:</strong> ${r.plot}</div>
-                <div class="small">${r.date}</div>
-            </div>
-            <div>
-                £${r.total}
-                <div class="badge ${r.status}">
-                    ${r.status.toUpperCase()}
-                </div>
-            </div>
-        </div>
+    if (d >= weekStart) weekly += e.afterCIS;
+    if (d.getMonth() === today.getMonth()) monthly += e.afterCIS;
+    if (d.getFullYear() === today.getFullYear()) yearly += e.afterCIS;
+  });
+
+  document.getElementById("weeklyTotal").textContent = weekly.toFixed(2);
+  document.getElementById("monthlyTotal").textContent = monthly.toFixed(2);
+  document.getElementById("yearlyTotal").textContent = yearly.toFixed(2);
+}
+
+/* LOAD BOOKINGS TABLE */
+function loadBookings() {
+  const table = document.getElementById("bookingTable");
+  table.innerHTML = "";
+
+  if (userData.bookings.length === 0) {
+    table.innerHTML = "<tr><td colspan='6'>No bookings yet.</td></tr>";
+    return;
+  }
+
+  userData.bookings.forEach(b => {
+    let statusClass =
+      b.status === "Approved" ? "status-approved" :
+      b.status === "Pending" ? "status-pending" : "status-rejected";
+
+    const row = `
+      <tr>
+        <td>${b.date}</td>
+        <td>${b.plot}</td>
+        <td>£${b.wage.toFixed(2)}</td>
+        <td>£${b.afterCIS.toFixed(2)}</td>
+        <td class="${statusClass}">${b.status}</td>
+        <td><a class="view-btn" href="booking.html">Open</a></td>
+      </tr>
     `;
-});
-document.getElementById("historyContainer").innerHTML = historyHTML;
+    table.innerHTML += row;
+  });
+
+  document.getElementById("recentStatus").textContent =
+    userData.bookings[userData.bookings.length - 1].status;
+}
+
+/* LOGOUT */
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+
+/* INIT */
+loadTotals();
+loadBookings();
 </script>
 
 </body>
