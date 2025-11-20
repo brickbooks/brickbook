@@ -3,259 +3,266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squad Work History – BrickBook</title>
+<title>Squad History – BrickBook</title>
 
 <style>
+/* -------------------------------------------------------
+   THEME (LIGHT + DARK)
+------------------------------------------------------- */
 :root {
-    --blue:#1B73E8;
-    --charcoal:#2D2D2D;
-    --white:#fff;
-    --lightgrey:#F5F7FA;
-    --green:#2ECC71;
-    --danger:#E74C3C;
-    --pending:#F1C40F;
-    --shadow:0 4px 16px rgba(0,0,0,0.08);
+  --blue: #1b73e8;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #1f1f1f;
+  --subtext: #555;
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --text: #f1f1f1;
+  --subtext: #aaa;
+  --shadow: rgba(0, 0, 0, 0.6);
 }
 
 body {
-    margin:0;
-    background:var(--lightgrey);
-    font-family:'Inter',sans-serif;
+  margin: 0;
+  background: var(--bg);
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--text);
+  transition: 0.25s ease;
 }
 
-/* HEADER */
+/* -------------------------------------------------------
+   HEADER
+------------------------------------------------------- */
 header {
-    background:white;
-    padding:18px 24px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #E5EAF0;
-    position:sticky;
-    top:0;
-    z-index:100;
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(150,150,150,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 99;
 }
-.logo { font-size:20px;font-weight:800; }
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+}
+
 nav a {
-    margin-left:20px;
-    text-decoration:none;
-    font-weight:600;
-    color:var(--charcoal);
+  margin-left: 20px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
 }
-nav a:hover { color:var(--blue); }
 
-/* WRAPPER */
+nav a:hover {
+  color: var(--blue);
+}
+
+.dark-toggle {
+  padding: 8px 12px;
+  background: var(--blue);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   WRAPPER
+------------------------------------------------------- */
 .wrapper {
-    max-width:1150px;
-    margin:auto;
-    padding:30px 20px;
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 20px;
 }
 
+/* -------------------------------------------------------
+   TITLE
+------------------------------------------------------- */
 h1 {
-    font-size:28px;
-    font-weight:800;
-    margin-bottom:6px;
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 6px;
 }
+
 .subtitle {
-    color:#555;
-    margin-bottom:26px;
+  font-size: 15px;
+  color: var(--subtext);
+  margin-bottom: 30px;
 }
 
-.card {
-    background:white;
-    padding:20px;
-    border-radius:16px;
-    box-shadow:var(--shadow);
-    margin-bottom:24px;
+/* -------------------------------------------------------
+   TABLE CARD
+------------------------------------------------------- */
+.table-card {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px var(--shadow);
 }
 
-/* SUMMARY CARDS */
-.summary-row {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:16px;
-    margin-bottom:26px;
-}
-
-.summary-box {
-    background:#fff;
-    padding:18px;
-    border-radius:14px;
-    box-shadow:var(--shadow);
-    text-align:center;
-}
-.summary-title {
-    font-size:14px;
-    color:#555;
-}
-.summary-value {
-    font-size:24px;
-    font-weight:800;
-    margin-top:6px;
-    color:var(--blue);
-}
-
-/* TABLE */
 table {
-    width:100%;
-    border-collapse:collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(150,150,150,0.2);
+}
+
 thead {
-    background:#E7EEFF;
-}
-th,td {
-    padding:12px 10px;
-    border-bottom:1px solid #E1E6F0;
-    font-size:14px;
-}
-.status {
-    padding:6px 12px;
-    border-radius:8px;
-    font-weight:700;
-    color:white;
-    font-size:12px;
-}
-.approved{background:var(--green);}
-.rejected{background:var(--danger);}
-.pending{background:var(--pending);}
-
-.view-btn {
-    background:var(--blue);
-    color:white;
-    padding:8px 14px;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:600;
+  background: rgba(0,0,0,0.05);
 }
 
-/* MOBILE */
-@media(max-width:768px){
-    th,td{font-size:12px;padding:8px;}
+.status-approved { color: #2ecc71; font-weight: 700; }
+.status-pending { color: #f1c40f; font-weight: 700; }
+.status-rejected { color: #e74c3c; font-weight: 700; }
+
+/* -------------------------------------------------------
+   QUICK ACTIONS
+------------------------------------------------------- */
+.quick-actions {
+  margin-top: 40px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 14px 22px;
+  background: var(--blue);
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(27,115,232,0.35);
+}
+
+.quick-btn:hover {
+  opacity: 0.9;
+}
+
+@media(max-width: 700px) {
+  th, td { font-size: 14px; }
 }
 </style>
 </head>
 
 <body>
 
-<script>
-// LOGIN CHECK
-if(!sessionStorage.getItem("squadLoggedIn")){
-    window.location.href = "squad-login.html";
-}
-function logout(){
-    sessionStorage.removeItem("squadLoggedIn");
-    window.location.href = "squad-login.html";
-}
-</script>
-
 <header>
-    <div class="logo">BrickBook</div>
-    <nav>
-        <a href="squad-dashboard.html">Dashboard</a>
-        <a href="#" onclick="logout()">Logout</a>
-    </nav>
+  <div class="logo">BrickBook</div>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="squad-dashboard.html">Dashboard</a>
+  </nav>
+
+  <div class="dark-toggle" onclick="toggleDark()">Dark Mode</div>
 </header>
 
 <div class="wrapper">
 
-    <h1>Your Work History</h1>
-    <div class="subtitle">View all your plot bookings, totals and payment details.</div>
+  <h1>Work History</h1>
+  <div class="subtitle">All your Booking-Off entries and CIS deductions.</div>
 
-    <!-- SUMMARY CARDS -->
-    <div class="summary-row">
-        <div class="summary-box">
-            <div class="summary-title">This Week</div>
-            <div class="summary-value" id="week-total">£0.00</div>
-        </div>
-        <div class="summary-box">
-            <div class="summary-title">This Month</div>
-            <div class="summary-value" id="month-total">£0.00</div>
-        </div>
-        <div class="summary-box">
-            <div class="summary-title">This Year</div>
-            <div class="summary-value" id="year-total">£0.00</div>
-        </div>
-        <div class="summary-box">
-            <div class="summary-title">All Time</div>
-            <div class="summary-value" id="all-total">£0.00</div>
-        </div>
-    </div>
+  <div class="table-card">
+    <h2>Your Booking-Off Records</h2>
 
-    <div class="card">
-        <h2 style="margin-top:0;">Completed Bookings</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Plot</th>
+          <th>Your Share (£)</th>
+          <th>After CIS (£)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Plots</th>
-                    <th>Total (£)</th>
-                    <th>Status</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody id="history-body"></tbody>
-        </table>
-    </div>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+
+  <div class="quick-actions">
+    <a class="quick-btn" href="squad-dashboard.html">Back to Dashboard</a>
+    <a class="quick-btn" href="booking.html">New Booking-Off</a>
+    <a class="quick-btn" onclick="logout()">Logout</a>
+  </div>
 
 </div>
 
 <script>
-// TEMP DATA – Replace with backend later
-let history = [
-    { date:"2025-02-16", plots:3, total:1400, status:"approved" },
-    { date:"2025-02-15", plots:1, total:460, status:"pending" },
-    { date:"2025-02-14", plots:2, total:820, status:"approved" },
-    { date:"2025-02-10", plots:1, total:360, status:"rejected" },
-    { date:"2025-01-28", plots:4, total:2080, status:"approved" },
-];
-
-// LOAD TABLE
-function loadHistory(){
-    let tbody = document.getElementById("history-body");
-    let weekTotal = 0, monthTotal = 0, yearTotal = 0, allTotal = 0;
-
-    const now = new Date();
-    const currentWeek = now.getWeek();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    history.forEach(h=>{
-        let row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${h.date}</td>
-            <td>${h.plots}</td>
-            <td>£${h.total.toFixed(2)}</td>
-            <td><span class="status ${h.status}">${h.status.toUpperCase()}</span></td>
-            <td><a class="view-btn" href="contractor-review-squad.html">Open</a></td>
-        `;
-
-        tbody.appendChild(row);
-
-        // Totals
-        let d = new Date(h.date);
-        allTotal += h.total;
-        if(d.getFullYear() === currentYear) yearTotal += h.total;
-        if(d.getMonth() === currentMonth) monthTotal += h.total;
-        if(d.getWeek() === currentWeek) weekTotal += h.total;
-    });
-
-    document.getElementById("week-total").textContent = "£" + weekTotal.toFixed(2);
-    document.getElementById("month-total").textContent = "£" + monthTotal.toFixed(2);
-    document.getElementById("year-total").textContent = "£" + yearTotal.toFixed(2);
-    document.getElementById("all-total").textContent = "£" + allTotal.toFixed(2);
+/* -----------------------------
+   DARK MODE
+----------------------------- */
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("squadDarkMode", document.body.classList.contains("dark"));
 }
 
-// Helper for week number
-Date.prototype.getWeek = function(){
-    let date = new Date(this.getTime());
-    date.setHours(0,0,0,0);
-    date.setDate(date.getDate() + 3 - (date.getDay() + 6)%7);
-    let week1 = new Date(date.getFullYear(),0,4);
-    return 1 + Math.round(((date - week1)/86400000 - 3 + (week1.getDay() + 6)%7)/7);
+if (localStorage.getItem("squadDarkMode") === "true") {
+  document.body.classList.add("dark");
+}
+
+/* -----------------------------
+   LOGIN CHECK
+----------------------------- */
+const user = sessionStorage.getItem("squadUser");
+if (!user) window.location.href = "squad-login.html";
+
+/* -----------------------------
+   LOAD USER HISTORY
+----------------------------- */
+let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
+  bookings: []
 };
 
+function loadHistory() {
+  const table = document.getElementById("historyTable");
+  table.innerHTML = "";
+
+  if (!userData.bookings.length) {
+    table.innerHTML = `<tr><td colspan="5">No booking history yet.</td></tr>`;
+    return;
+  }
+
+  userData.bookings.forEach(rec => {
+    let statusClass =
+      rec.status === "Approved" ? "status-approved" :
+      rec.status === "Pending" ? "status-pending" : "status-rejected";
+
+    const row = `
+      <tr>
+        <td>${rec.date}</td>
+        <td>${rec.plot}</td>
+        <td>£${rec.wage.toFixed(2)}</td>
+        <td>£${rec.afterCIS.toFixed(2)}</td>
+        <td class="${statusClass}">${rec.status}</td>
+      </tr>
+    `;
+
+    table.innerHTML += row;
+  });
+}
+
+/* -----------------------------
+   LOGOUT
+----------------------------- */
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+
+/* INIT */
 loadHistory();
 </script>
 
