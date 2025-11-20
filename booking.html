@@ -38,316 +38,182 @@ body.dark {
 /* ---------------------------------------
    GLOBAL RESET
 ---------------------------------------- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   background: var(--bg);
   font-family: "Inter", Arial, sans-serif;
   color: var(--text-main);
-  transition: background 0.3s ease;
+  transition: 0.25s ease;
 }
-<script>
-// Correct login guard for squad
-if (!sessionStorage.getItem("squadUser")) {
-    window.location.href = "squad-login.html";
-}
-</script>
 
 /* ---------------------------------------
-   HEADER – GLASS + ANIMATED GRADIENT LINE
+   HEADER (glass)
 ---------------------------------------- */
 header {
   position: sticky;
   top: 0;
   z-index: 1000;
+  background: var(--card-bg);
   backdrop-filter: var(--glass-blur);
-  background: rgba(255,255,255,0.35);
-  border-bottom: 1px solid var(--card-border);
   padding: 16px 22px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-body.dark header {
-  background: rgba(15,23,42,0.45);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--card-border);
 }
 
-header::after {
-  /* animated gradient underline */
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    #1b73e8,
-    #06b6d4,
-    #3ba4ff,
-    #1b73e8
-  );
-  background-size: 300% 100%;
-  animation: headerLine 6s linear infinite;
-}
-@keyframes headerLine {
-  0% { background-position: 0%; }
-  100% { background-position: 300%; }
-}
+.logo { font-size:22px; font-weight:800; }
 
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-nav {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-}
+nav { display:flex; gap:22px; align-items:center; }
 nav a {
-  color: var(--text-main);
-  font-weight: 600;
-  text-decoration: none;
+  text-decoration:none;
+  color:var(--text-main);
+  font-weight:600;
 }
-nav a:hover {
-  color: var(--primary);
-}
+nav a:hover { color:var(--primary); }
 
-/* Dark mode toggle */
 .toggle {
-  width: 44px;
-  height: 24px;
-  background: rgba(0,0,0,0.15);
-  border-radius: 999px;
-  padding: 3px;
-  cursor: pointer;
+  width:44px; height:24px; border-radius:999px;
+  background:rgba(0,0,0,0.15);
+  padding:3px; cursor:pointer;
 }
 .toggle-thumb {
-  width: 18px;
-  height: 18px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.25s ease;
+  width:18px; height:18px;
+  background:white;
+  border-radius:50%;
+  transition:0.25s;
 }
-body.dark .toggle {
-  background: rgba(255,255,255,0.18);
-}
-body.dark .toggle-thumb {
-  transform: translateX(20px);
-}
+body.dark .toggle { background:rgba(255,255,255,0.3); }
+body.dark .toggle-thumb { transform:translateX(20px); }
 
-/* MOBILE NAV */
-.hamburger {
-  display: none;
-  font-size: 30px;
-  cursor: pointer;
-}
+.hamburger { display:none; font-size:30px; cursor:pointer; }
 
 .mobile-menu {
-  display: none;
-  flex-direction: column;
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--card-border);
-  backdrop-filter: var(--glass-blur);
-  padding: 14px;
+  display:none;
+  flex-direction:column;
+  background:var(--card-bg);
+  padding:14px;
+  border-bottom:1px solid var(--card-border);
 }
 .mobile-menu a {
-  padding: 10px 0;
-  text-decoration: none;
-  color: var(--text-main);
-  border-bottom: 1px solid var(--card-border);
+  padding:10px 0;
+  text-decoration:none;
+  color:var(--text-main);
+  border-bottom:1px solid var(--card-border);
 }
 
 /* ---------------------------------------
-   PAGE WRAPPER
+   WRAPPER
 ---------------------------------------- */
 .wrapper {
-  max-width: 900px;
-  margin: auto;
-  padding: 30px 18px 80px;
+  max-width:900px;
+  margin:auto;
+  padding:30px 18px 80px;
 }
 
-h1 {
-  font-size: 32px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-.subtitle {
-  color: var(--text-light);
-  margin-bottom: 22px;
-}
+h1 { font-size:32px; font-weight:800; }
+.subtitle { color:var(--text-light); margin-bottom:20px; }
 
 /* ---------------------------------------
-   CARDS (Glass Theme)
+   CARDS
 ---------------------------------------- */
 .card,
 .plot-card,
 .split-card {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border);
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 22px;
-  box-shadow: var(--shadow);
-  animation: fadeIn 0.4s ease;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:22px;
+  backdrop-filter:var(--glass-blur);
+  box-shadow:var(--shadow);
 }
 
-/* ---------------------------------------
-   SELECTS
----------------------------------------- */
-select {
-  width: 100%;
-  padding: 12px;
-  font-size: 15px;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  background: rgba(255,255,255,0.6);
-  color: var(--text-main);
-}
-body.dark select {
-  background: rgba(255,255,255,0.08);
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+thead { background:rgba(255,255,255,0.2); }
+
+th,td {
+  padding:8px;
+  border-bottom:1px solid var(--card-border);
+  font-size:14px;
 }
 
-/* ---------------------------------------
-   TABLE (Measurements)
----------------------------------------- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
+input, select, textarea {
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--card-border);
+  background:rgba(255,255,255,0.7);
 }
-thead {
-  background: rgba(255,255,255,0.25);
-}
-th, td {
-  padding: 8px;
-  font-size: 14px;
-  border-bottom: 1px solid var(--card-border);
-}
-input[type="number"],
-input[type="text"] {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--card-border);
-  background: rgba(255,255,255,0.6);
-}
-body.dark input[type="number"],
-body.dark input[type="text"] {
-  background: rgba(255,255,255,0.1);
+body.dark input, body.dark select, body.dark textarea {
+  background:rgba(255,255,255,0.1);
 }
 
-/* ---------------------------------------
-   NOTES / PHOTOS
----------------------------------------- */
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  background: rgba(255,255,255,0.6);
-}
+textarea { height:80px; }
+
+/* photo preview */
 .photo-preview img {
-  width: 85px;
-  height: 85px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid var(--card-border);
+  width:85px; height:85px;
+  border-radius:10px;
+  object-fit:cover;
+  margin-right:8px;
+  margin-top:8px;
+  border:1px solid var(--card-border);
 }
 
-/* ---------------------------------------
-   BUTTONS
----------------------------------------- */
+/* BUTTONS */
 .btn {
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 700;
-  border: none;
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+  border:none;
 }
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 6px 20px rgba(27,115,232,0.35);
-}
-.btn-primary:hover {
-  background: var(--primary-hover);
-}
-
+.btn-primary { background:var(--primary); color:white; }
+.btn-primary:hover { background:var(--primary-hover); }
 .btn-secondary {
-  background: rgba(255,255,255,0.55);
-  border: 1px solid var(--card-border);
-  color: var(--primary);
-}
-body.dark .btn-secondary {
-  background: rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.5);
+  border:1px solid var(--card-border);
+  color:var(--primary);
 }
 
-/* ---------------------------------------
-   SPLIT ROW
----------------------------------------- */
 .split-row {
-  display: grid;
-  grid-template-columns: 1fr 70px 100px 120px;
-  gap: 10px;
-  margin-bottom: 10px;
+  display:grid;
+  grid-template-columns:1fr 70px 100px 120px;
+  gap:12px;
+  margin-bottom:10px;
 }
 
-/* ---------------------------------------
-   TOTALS
----------------------------------------- */
 .grand-total-box {
-  text-align: right;
-  font-size: 22px;
-  font-weight: 800;
-  margin-top: 25px;
+  text-align:right;
+  font-weight:800;
+  font-size:22px;
+  margin-top:20px;
 }
 
-/* ---------------------------------------
-   MOBILE
----------------------------------------- */
-@media(max-width: 768px) {
-  nav { display: none; }
-  .hamburger { display: block; }
+@media(max-width:768px){
+  nav { display:none; }
+  .hamburger{ display:block; }
+  .btn-primary,.btn-secondary { width:100%; margin-top:10px; }
   .split-row {
-    grid-template-columns: 1fr 60px 90px 90px;
-  }
-  .btn-primary, .btn-secondary {
-    width: 100%;
-    margin-top: 10px;
+    grid-template-columns:1fr 60px 90px 90px;
   }
 }
 </style>
 </head>
+
 <body>
 
 <script>
-/* -------------------------------
-   SQUAD LOGIN PROTECT
--------------------------------- */
+/* ------------------------------------------------
+   FIXED LOGIN GUARD
+-------------------------------------------------- */
 if (!sessionStorage.getItem("squadUser")) {
-  window.location.href = "squad-login.html";
+    window.location.href = "squad-login.html";
 }
+</script>
 
-
-
-<!-- ----------------------------------
-     HEADER
------------------------------------ -->
 <header>
   <div class="logo">BrickBook</div>
 
@@ -365,7 +231,7 @@ if (!sessionStorage.getItem("squadUser")) {
   <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
-<div class="mobile-menu" id="mobileMenu">
+<div id="mobileMenu" class="mobile-menu">
   <a href="booking.html">Booking-Off</a>
   <a href="squad-dashboard.html">Dashboard</a>
   <a href="squad-history.html">History</a>
@@ -374,44 +240,40 @@ if (!sessionStorage.getItem("squadUser")) {
 
 <script>
 function toggleMenu(){
-  const m=document.getElementById("mobileMenu");
-  m.style.display=m.style.display==="flex"?"none":"flex";
+  let m=document.getElementById("mobileMenu");
+  m.style.display = m.style.display==="flex" ? "none" : "flex";
 }
+
 function logout(){
-  sessionStorage.removeItem("squadLoggedIn");
-  window.location.href="squad-login.html";
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
 }
+
 function toggleDark(){
   document.body.classList.toggle("dark");
-  localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
+  localStorage.setItem("theme",document.body.classList.contains("dark"));
 }
-if(localStorage.getItem("theme")==="dark"){
+
+if(localStorage.getItem("theme")==="true"){
   document.body.classList.add("dark");
 }
 </script>
 
-<!-- ----------------------------------
-     MAIN WRAPPER
------------------------------------ -->
 <div class="wrapper">
 
   <h1>Booking-Off</h1>
   <div class="subtitle">Select squad + site to load measurements.</div>
 
-  <!-- Squad / Site Select -->
+  <!-- Squad + Site Selector -->
   <div class="card">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div>
         <label>Squad</label>
-        <select id="select-squad">
-          <option value="">Select Squad…</option>
-        </select>
+        <select id="select-squad"><option value="">Select Squad…</option></select>
       </div>
       <div>
         <label>Site</label>
-        <select id="select-site">
-          <option value="">Select Site…</option>
-        </select>
+        <select id="select-site"><option value="">Select Site…</option></select>
       </div>
     </div>
   </div>
@@ -426,13 +288,10 @@ if(localStorage.getItem("theme")==="dark"){
 
   <!-- Squad Split -->
   <div class="split-card">
-    <h2 style="margin-bottom:14px;">Squad Split</h2>
+    <h2>Squad Split</h2>
 
     <div class="split-row" style="font-weight:700;">
-      <div>Name</div>
-      <div>%</div>
-      <div>Wages</div>
-      <div>After CIS</div>
+      <div>Name</div><div>%</div><div>Wages</div><div>After CIS</div>
     </div>
 
     <div id="split-container"></div>
@@ -447,62 +306,48 @@ if(localStorage.getItem("theme")==="dark"){
 </div>
 
 <script>
-/* ---------------------------------------
+/* ------------------------------------------------
    LOAD PRICING MANAGER DATA
----------------------------------------- */
+-------------------------------------------------- */
 const PRICING_KEY="brickbook_pricing_state";
 let pricing={squads:[],sites:[],profiles:[]};
 
-(function loadPricing(){
-  const saved=localStorage.getItem(PRICING_KEY);
-  if(saved){
-    try{pricing=JSON.parse(saved);}catch(e){}
-  }
-})();
-
-/* Fill dropdowns */
-(function fill(){
-  const s1=document.getElementById("select-squad");
-  const s2=document.getElementById("select-site");
-
-  pricing.squads.forEach(x=>{
-    let o=document.createElement("option");
-    o.value=x;o.textContent=x;
-    s1.appendChild(o);
-  });
-
-  pricing.sites.forEach(x=>{
-    let o=document.createElement("option");
-    o.value=x;o.textContent=x;
-    s2.appendChild(o);
-  });
-})();
-
-function getActiveFields(){
-  const squad=document.getElementById("select-squad").value;
-  const site=document.getElementById("select-site").value;
-  return pricing.profiles.find(p=>p.squad===squad && p.site===site)?.fields || [];
+if(localStorage.getItem(PRICING_KEY)){
+  pricing = JSON.parse(localStorage.getItem(PRICING_KEY));
 }
 
-/* ---------------------------------------
+/* populate squad + site selects */
+pricing.squads.forEach(s=>{
+  let o=document.createElement("option"); o.value=s; o.textContent=s;
+  document.getElementById("select-squad").appendChild(o);
+});
+pricing.sites.forEach(s=>{
+  let o=document.createElement("option"); o.value=s; o.textContent=s;
+  document.getElementById("select-site").appendChild(o);
+});
+
+function getActiveFields(){
+  let s=document.getElementById("select-squad").value;
+  let t=document.getElementById("select-site").value;
+  return pricing.profiles.find(p=>p.squad===s && p.site===t)?.fields || [];
+}
+
+/* ------------------------------------------------
    ADD PLOT
----------------------------------------- */
+-------------------------------------------------- */
 function addPlot(){
   const fields=getActiveFields();
-  if(!fields.length){
-    alert("Select a squad + site with pricing profile first.");
-    return;
-  }
+  if(!fields.length){ alert("Select squad + site first."); return; }
 
   const id=Date.now();
   const card=document.createElement("div");
   card.className="plot-card";
 
   card.innerHTML=`
-    <button class="delete-btn" onclick="this.closest('.plot-card').remove();calcGrandTotal();calcSplitTotals();">Delete</button>
+    <button class="btn btn-secondary" onclick="this.closest('.plot-card').remove();calcGrandTotal();calcSplitTotals();">Delete Plot</button>
 
-    <div style="font-weight:600;margin-bottom:6px;">
-      Plot <input type="text" class="plot-number" placeholder="e.g. 12A">
+    <div style="margin-top:10px;font-weight:600;">
+      Plot <input type="text" class="plot-number" placeholder="e.g. 24A">
     </div>
 
     <table>
@@ -514,17 +359,17 @@ function addPlot(){
             <td><input type="number" class="qty" oninput="calcRow(this);calcPlot(this)"></td>
             <td><input type="number" class="rate" value="${f.rate}" readonly></td>
             <td><input type="number" class="total" readonly></td>
-          </tr>`).join("")}
+          </tr>
+        `).join("")}
       </tbody>
     </table>
 
     <label style="margin-top:10px;">Notes</label>
-    <textarea class="plot-notes" placeholder="Progress, issues, materials…"></textarea>
+    <textarea class="plot-notes"></textarea>
 
-    <label style="margin-top:10px;">Upload Photos</label>
+    <label style="margin-top:10px;">Photos</label>
     <input type="file" accept="image/*" onchange="previewPhoto(this,'${id}')">
-
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="addPhotoField(this,'${id}')">+ Add Photo</button>
+    <button class="btn btn-secondary" style="margin-top:6px;" onclick="addPhotoField(this,'${id}')">+ Add Photo</button>
 
     <div class="photo-preview" id="preview-${id}"></div>
 
@@ -537,52 +382,56 @@ function addPlot(){
 }
 
 function previewPhoto(input,id){
-  if(!input.files||!input.files[0])return;
-  const img=document.createElement("img");
+  if(!input.files[0]) return;
+  let img=document.createElement("img");
   img.src=URL.createObjectURL(input.files[0]);
   document.getElementById("preview-"+id).appendChild(img);
 }
+
 function addPhotoField(btn,id){
-  const input=document.createElement("input");
-  input.type="file";input.accept="image/*";
-  input.onchange=()=>previewPhoto(input,id);
-  btn.insertAdjacentElement("beforebegin",input);
+  let i=document.createElement("input");
+  i.type="file";
+  i.accept="image/*";
+  i.onchange = ()=>previewPhoto(i,id);
+  btn.insertAdjacentElement("beforebegin",i);
 }
 
-/* ---------------------------------------
+/* ------------------------------------------------
    CALCULATIONS
----------------------------------------- */
+-------------------------------------------------- */
 function calcRow(el){
-  const tr=el.closest("tr");
-  const qty=parseFloat(el.value)||0;
-  const rate=parseFloat(tr.querySelector(".rate").value)||0;
+  let tr=el.closest("tr");
+  let qty=parseFloat(el.value)||0;
+  let rate=parseFloat(tr.querySelector(".rate").value)||0;
   tr.querySelector(".total").value=(qty*rate).toFixed(2);
 }
+
 function calcPlot(el){
-  const card=el.closest(".plot-card");
+  let card=el.closest(".plot-card");
   let sum=0;
-  card.querySelectorAll(".total").forEach(x=>sum+=parseFloat(x.value)||0);
+  card.querySelectorAll(".total").forEach(t=>sum+=parseFloat(t.value)||0);
   card.querySelector(".plot-total").textContent=sum.toFixed(2);
   calcGrandTotal();
   calcSplitTotals();
 }
+
 function calcGrandTotal(){
-  let sum=0;
-  document.querySelectorAll(".plot-total").forEach(x=>sum+=parseFloat(x.textContent)||0);
-  document.getElementById("grand-total").textContent=sum.toFixed(2);
+  let g=0;
+  document.querySelectorAll(".plot-total").forEach(c=>g+=parseFloat(c.textContent)||0);
+  document.getElementById("grand-total").textContent=g.toFixed(2);
 }
 
-/* ---------------------------------------
+/* ------------------------------------------------
    SQUAD SPLIT
----------------------------------------- */
+-------------------------------------------------- */
 const splitContainer=document.getElementById("split-container");
 for(let i=0;i<5;i++) addSplitRow();
 
 function addSplitRow(){
-  const r=document.createElement("div");
+  let r=document.createElement("div");
   r.className="split-row";
   r.innerHTML=`
-    <input type="text" class="split-name" placeholder="Person">
+    <input type="text" class="split-name">
     <input type="number" class="split-percent" oninput="percentChanged(this)">
     <input type="number" class="split-wages" oninput="wagesChanged(this)">
     <input type="number" class="split-cis" readonly>
@@ -591,36 +440,38 @@ function addSplitRow(){
 }
 
 function percentChanged(el){
-  const r=el.closest(".split-row");
+  const row=el.closest(".split-row");
   const pct=parseFloat(el.value)||0;
   const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
   const wages=grand*(pct/100);
-  r.querySelector(".split-wages").value=wages.toFixed(2);
-  r.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
+  row.querySelector(".split-wages").value=wages.toFixed(2);
+  row.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
   calcSplitTotals();
 }
+
 function wagesChanged(el){
-  const r=el.closest(".split-row");
+  const row=el.closest(".split-row");
   const wages=parseFloat(el.value)||0;
   const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
+
   if(grand>0){
-    r.querySelector(".split-percent").value=((wages/grand)*100).toFixed(2);
+    row.querySelector(".split-percent").value=((wages/grand)*100).toFixed(2);
   }
-  r.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
+  row.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
   calcSplitTotals();
 }
 
 function calcSplitTotals(){
-  let s=0;
-  document.querySelectorAll(".split-cis").forEach(x=>s+=parseFloat(x.value)||0);
-  document.getElementById("final-total-cis").textContent=s.toFixed(2);
+  let total=0;
+  document.querySelectorAll(".split-cis").forEach(c=>total+=parseFloat(c.value)||0);
+  document.getElementById("final-total-cis").textContent=total.toFixed(2);
 }
 
-/* ---------------------------------------
-   SUBMIT ACTION
----------------------------------------- */
+/* ------------------------------------------------
+   SUBMIT
+-------------------------------------------------- */
 function submitBooking(){
-  alert("Booking-Off Submitted!");
+  alert("Booking-Off submitted successfully!");
 }
 </script>
 
