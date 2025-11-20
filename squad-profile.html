@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Squad Profile – BrickBook</title>
+
+<style>
+/* -------------------------------------------------------
+   THEME VARIABLES (LIGHT + DARK MODE)
+------------------------------------------------------- */
+:root {
+  --blue: #1b73e8;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #1f1f1f;
+  --subtext: #555;
+  --shadow: rgba(0,0,0,0.1);
+  --danger: #e74c3c;
+}
+
+.dark {
+  --bg: #0f0f0f;
+  --card: #1a1a1a;
+  --text: #f1f1f1;
+  --subtext: #aaa;
+  --shadow: rgba(0,0,0,0.6);
+}
+
+/* -------------------------------------------------------
+   BASE STYLE
+------------------------------------------------------- */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', Arial, sans-serif;
+  transition: 0.25s ease;
+}
+
+/* -------------------------------------------------------
+   HEADER
+------------------------------------------------------- */
+header {
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(150,150,150,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+}
+nav a:hover { color: var(--blue); }
+
+.dark-toggle {
+  padding: 8px 12px;
+  background: var(--blue);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   WRAPPER
+------------------------------------------------------- */
+.wrapper {
+  max-width: 900px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+/* -------------------------------------------------------
+   PROFILE CARD
+------------------------------------------------------- */
+.profile-card {
+  background: var(--card);
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px var(--shadow);
+  margin-bottom: 40px;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: var(--subtext);
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+/* FORM INPUTS */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(150,150,150,0.3);
+  background: var(--card);
+  color: var(--text);
+  margin-bottom: 18px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* BUTTONS */
+.btn-primary {
+  padding: 14px;
+  width: 100%;
+  background: var(--blue);
+  color: white;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(27,115,232,0.35);
+  margin-top: 4px;
+}
+
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-danger {
+  padding: 12px;
+  width: 100%;
+  background: var(--danger);
+  color: white;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 14px;
+  box-shadow: 0 4px 14px rgba(231,76,60,0.35);
+}
+.btn-danger:hover { opacity: 0.9; }
+
+/* LIFETIME CARD */
+.lifetime {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px var(--shadow);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.lifetime h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--subtext);
+}
+
+.lifetime-value {
+  font-size: 44px;
+  font-weight: 900;
+  background: linear-gradient(45deg, var(--blue), #00b7ff);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-top: 6px;
+}
+
+/* QUICK ACTIONS */
+.quick-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.quick-btn {
+  padding: 14px 22px;
+  background: var(--blue);
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(27,115,232,0.4);
+}
+
+.quick-btn:hover { opacity: 0.9; }
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">BrickBook</div>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="squad-dashboard.html">Dashboard</a>
+  </nav>
+
+  <div class="dark-toggle" onclick="toggleDark()">Dark Mode</div>
+</header>
+
+<div class="wrapper">
+
+  <!-- PROFILE SETTINGS -->
+  <div class="profile-card">
+    <h1>Profile Settings</h1>
+    <div class="subtitle">Update your information and login details.</div>
+
+    <label>Name</label>
+    <input id="nameInput" type="text" placeholder="Enter your name">
+
+    <label>Change Password</label>
+    <input id="passwordInput" type="password" placeholder="New password">
+
+    <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+
+    <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+  </div>
+
+  <!-- LIFETIME EARNINGS -->
+  <div class="lifetime">
+    <h2>Total Lifetime Earnings</h2>
+    <div class="lifetime-value">£<span id="lifetimeTotal">0.00</span></div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+    <a class="quick-btn" href="squad-dashboard.html">Dashboard</a>
+    <a class="quick-btn" href="squad-history.html">History</a>
+    <a class="quick-btn" href="booking.html">New Booking-Off</a>
+    <a class="quick-btn" onclick="logout()">Logout</a>
+  </div>
+
+</div>
+
+<script>
+/* -----------------------------
+   DARK MODE TOGGLE
+----------------------------- */
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("squadDarkMode", document.body.classList.contains("dark"));
+}
+
+if (localStorage.getItem("squadDarkMode") === "true") {
+  document.body.classList.add("dark");
+}
+
+/* -----------------------------
+   LOGIN CHECK
+----------------------------- */
+const user = sessionStorage.getItem("squadUser");
+if (!user) window.location.href = "squad-login.html";
+
+/* LOAD USER DATA */
+let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
+  name: "",
+  earnings: [],
+  bookings: []
+};
+
+/* -----------------------------
+   LOAD PROFILE + LIFETIME TOTAL
+----------------------------- */
+document.getElementById("nameInput").value = userData.name || user;
+
+function loadLifetime() {
+  let total = 0;
+  userData.earnings.forEach(e => total += e.afterCIS);
+  document.getElementById("lifetimeTotal").textContent = total.toFixed(2);
+}
+
+loadLifetime();
+
+/* -----------------------------
+   SAVE PROFILE
+----------------------------- */
+function saveProfile() {
+  const newName = document.getElementById("nameInput").value.trim();
+  const newPass = document.getElementById("passwordInput").value.trim();
+
+  if (newName) userData.name = newName;
+  if (newPass) {
+    // Store password separately
+    let users = JSON.parse(localStorage.getItem("squadUsers") || "{}");
+    users[user] = newPass;
+    localStorage.setItem("squadUsers", JSON.stringify(users));
+  }
+
+  localStorage.setItem("squad_" + user, JSON.stringify(userData));
+  alert("Profile updated!");
+}
+
+/* -----------------------------
+   DELETE ACCOUNT
+----------------------------- */
+function deleteAccount() {
+  if (!confirm("Are you sure you want to delete your account?")) return;
+
+  localStorage.removeItem("squad_" + user);
+
+  let users = JSON.parse(localStorage.getItem("squadUsers") || "{}");
+  delete users[user];
+  localStorage.setItem("squadUsers", JSON.stringify(users));
+
+  sessionStorage.removeItem("squadUser");
+  alert("Account deleted.");
+  window.location.href = "squad-login.html";
+}
+
+/* -----------------------------
+   LOGOUT
+----------------------------- */
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+</script>
+
+</body>
+</html>
