@@ -1,0 +1,58 @@
+// =============================
+// BrickBook Shared JS
+// =============================
+
+// Simple role-aware login guard
+// usage: <body data-role="contractor"> or data-role="squad"
+(function () {
+  const body = document.body;
+  if (!body) return;
+
+  const role = body.dataset.role; // "contractor" | "squad" | undefined
+  if (!role) return; // public pages (index, booking, etc.)
+
+  const loggedInKey = role === "contractor"
+    ? "contractorLoggedIn"
+    : "squadLoggedIn";
+
+  if (!sessionStorage.getItem(loggedInKey)) {
+    const loginPage = role === "contractor"
+      ? "contractor-login.html"
+      : "squad-login.html";
+
+    if (!location.pathname.endsWith(loginPage)) {
+      window.location.href = loginPage;
+    }
+  }
+})();
+
+// Logout helper (called from header links/buttons)
+function logout(role) {
+  if (role === "contractor") {
+    sessionStorage.removeItem("contractorLoggedIn");
+    window.location.href = "contractor-login.html";
+  } else if (role === "squad") {
+    sessionStorage.removeItem("squadLoggedIn");
+    window.location.href = "squad-login.html";
+  }
+}
+
+// Login helpers (call on successful login submit)
+function markContractorLoggedIn() {
+  sessionStorage.setItem("contractorLoggedIn", "1");
+}
+function markSquadLoggedIn() {
+  sessionStorage.setItem("squadLoggedIn", "1");
+}
+
+// Optional: set active nav link by data-page on body
+(function () {
+  const page = document.body.dataset.page; // e.g. "contractor-dashboard"
+  if (!page) return;
+
+  document.querySelectorAll(".nav a[data-page]").forEach(link => {
+    if (link.dataset.page === page) {
+      link.classList.add("active");
+    }
+  });
+})();
