@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad Work History – BrickBook</title>
+
+<style>
+:root {
+    --blue:#1B73E8;
+    --charcoal:#2D2D2D;
+    --white:#fff;
+    --lightgrey:#F5F7FA;
+    --green:#2ECC71;
+    --danger:#E74C3C;
+    --pending:#F1C40F;
+    --shadow:0 4px 16px rgba(0,0,0,0.08);
+}
+
+body {
+    margin:0;
+    background:var(--lightgrey);
+    font-family:'Inter',sans-serif;
+}
+
+/* HEADER */
+header {
+    background:white;
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #E5EAF0;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+.logo { font-size:20px;font-weight:800; }
+nav a {
+    margin-left:20px;
+    text-decoration:none;
+    font-weight:600;
+    color:var(--charcoal);
+}
+nav a:hover { color:var(--blue); }
+
+/* WRAPPER */
+.wrapper {
+    max-width:1150px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+h1 {
+    font-size:28px;
+    font-weight:800;
+    margin-bottom:6px;
+}
+.subtitle {
+    color:#555;
+    margin-bottom:26px;
+}
+
+.card {
+    background:white;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    margin-bottom:24px;
+}
+
+/* SUMMARY CARDS */
+.summary-row {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;
+    margin-bottom:26px;
+}
+
+.summary-box {
+    background:#fff;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    text-align:center;
+}
+.summary-title {
+    font-size:14px;
+    color:#555;
+}
+.summary-value {
+    font-size:24px;
+    font-weight:800;
+    margin-top:6px;
+    color:var(--blue);
+}
+
+/* TABLE */
+table {
+    width:100%;
+    border-collapse:collapse;
+}
+thead {
+    background:#E7EEFF;
+}
+th,td {
+    padding:12px 10px;
+    border-bottom:1px solid #E1E6F0;
+    font-size:14px;
+}
+.status {
+    padding:6px 12px;
+    border-radius:8px;
+    font-weight:700;
+    color:white;
+    font-size:12px;
+}
+.approved{background:var(--green);}
+.rejected{background:var(--danger);}
+.pending{background:var(--pending);}
+
+.view-btn {
+    background:var(--blue);
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    th,td{font-size:12px;padding:8px;}
+}
+</style>
+</head>
+
+<body>
+
+<script>
+// LOGIN CHECK
+if(!sessionStorage.getItem("squadLoggedIn")){
+    window.location.href = "squad-login.html";
+}
+function logout(){
+    sessionStorage.removeItem("squadLoggedIn");
+    window.location.href = "squad-login.html";
+}
+</script>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="squad-dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+
+    <h1>Your Work History</h1>
+    <div class="subtitle">View all your plot bookings, totals and payment details.</div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-row">
+        <div class="summary-box">
+            <div class="summary-title">This Week</div>
+            <div class="summary-value" id="week-total">£0.00</div>
+        </div>
+        <div class="summary-box">
+            <div class="summary-title">This Month</div>
+            <div class="summary-value" id="month-total">£0.00</div>
+        </div>
+        <div class="summary-box">
+            <div class="summary-title">This Year</div>
+            <div class="summary-value" id="year-total">£0.00</div>
+        </div>
+        <div class="summary-box">
+            <div class="summary-title">All Time</div>
+            <div class="summary-value" id="all-total">£0.00</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-top:0;">Completed Bookings</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Plots</th>
+                    <th>Total (£)</th>
+                    <th>Status</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+// TEMP DATA – Replace with backend later
+let history = [
+    { date:"2025-02-16", plots:3, total:1400, status:"approved" },
+    { date:"2025-02-15", plots:1, total:460, status:"pending" },
+    { date:"2025-02-14", plots:2, total:820, status:"approved" },
+    { date:"2025-02-10", plots:1, total:360, status:"rejected" },
+    { date:"2025-01-28", plots:4, total:2080, status:"approved" },
+];
+
+// LOAD TABLE
+function loadHistory(){
+    let tbody = document.getElementById("history-body");
+    let weekTotal = 0, monthTotal = 0, yearTotal = 0, allTotal = 0;
+
+    const now = new Date();
+    const currentWeek = now.getWeek();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    history.forEach(h=>{
+        let row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${h.date}</td>
+            <td>${h.plots}</td>
+            <td>£${h.total.toFixed(2)}</td>
+            <td><span class="status ${h.status}">${h.status.toUpperCase()}</span></td>
+            <td><a class="view-btn" href="contractor-review-squad.html">Open</a></td>
+        `;
+
+        tbody.appendChild(row);
+
+        // Totals
+        let d = new Date(h.date);
+        allTotal += h.total;
+        if(d.getFullYear() === currentYear) yearTotal += h.total;
+        if(d.getMonth() === currentMonth) monthTotal += h.total;
+        if(d.getWeek() === currentWeek) weekTotal += h.total;
+    });
+
+    document.getElementById("week-total").textContent = "£" + weekTotal.toFixed(2);
+    document.getElementById("month-total").textContent = "£" + monthTotal.toFixed(2);
+    document.getElementById("year-total").textContent = "£" + yearTotal.toFixed(2);
+    document.getElementById("all-total").textContent = "£" + allTotal.toFixed(2);
+}
+
+// Helper for week number
+Date.prototype.getWeek = function(){
+    let date = new Date(this.getTime());
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6)%7);
+    let week1 = new Date(date.getFullYear(),0,4);
+    return 1 + Math.round(((date - week1)/86400000 - 3 + (week1.getDay() + 6)%7)/7);
+};
+
+loadHistory();
+</script>
+
+</body>
+</html>
