@@ -7,69 +7,51 @@
 
 <style>
 /* -------------------------------------------------------
-   THEME + DARK MODE SUPPORT
+   LIGHT THEME
 ------------------------------------------------------- */
 :root {
   --blue: #1b73e8;
-  --bg: #f5f7fa;
+  --bg: #F5F7FA;
   --card: #ffffff;
   --text: #1f1f1f;
   --subtext: #666;
-  --glass: rgba(255, 255, 255, 0.55);
-  --shadow: rgba(0, 0, 0, 0.1);
+  --border: #E2E6EB;
+  --shadow: rgba(0,0,0,0.07);
 }
 
-/* DARK MODE THEME */
-.dark {
-  --bg: #0f0f0f;
-  --card: #1a1a1a;
-  --text: #f2f2f2;
-  --subtext: #bbb;
-  --glass: rgba(20, 20, 20, 0.55);
-  --shadow: rgba(0, 0, 0, 0.5);
-}
-
+/* GENERAL */
 body {
   margin: 0;
-  padding: 0;
   background: var(--bg);
+  font-family: "Inter", Arial, sans-serif;
   color: var(--text);
-  font-family: 'Inter', Arial, sans-serif;
-  transition: 0.3s;
 }
 
-/* -------------------------------------------------------
-   HEADER
-------------------------------------------------------- */
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 24px;
   background: var(--card);
-  border-bottom: 1px solid #e2e2e2;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 99;
+  z-index: 10;
 }
 
 .logo {
-  font-weight: 800;
   font-size: 22px;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 16px;
+  font-weight: 800;
 }
 
 .nav-buttons button {
-  padding: 8px 12px;
-  border-radius: 8px;
   background: var(--card);
-  border: 1px solid #ccc;
-  cursor: pointer;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
   font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .nav-buttons button:hover {
@@ -77,49 +59,39 @@ header {
   color: var(--blue);
 }
 
-/* -------------------------------------------------------
-   WRAPPER
-------------------------------------------------------- */
+/* WRAPPER */
 .wrapper {
   max-width: 1100px;
   margin: auto;
   padding: 30px 20px;
 }
 
-/* -------------------------------------------------------
-   HERO CARD (WEEKLY EARNINGS)
-------------------------------------------------------- */
+/* HERO CARD */
 .hero-card {
-  background: var(--glass);
+  background: var(--card);
   padding: 26px;
   border-radius: 20px;
-  box-shadow: 0 8px 25px var(--shadow);
-  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px var(--shadow);
   text-align: center;
   margin-bottom: 28px;
 }
 
 .hero-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 15px;
   color: var(--subtext);
 }
 
 .hero-earning {
-  font-size: 48px;
+  font-size: 46px;
   font-weight: 900;
-  background: linear-gradient(45deg, var(--blue), #00b7ff);
-  -webkit-background-clip: text;
-  color: transparent;
-  margin-top: 6px;
+  color: var(--blue);
 }
 
-/* -------------------------------------------------------
-   THREE SUMMARY CARDS
-------------------------------------------------------- */
+/* SUMMARY CARDS */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
   gap: 20px;
 }
 
@@ -127,12 +99,12 @@ header {
   background: var(--card);
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 4px 15px var(--shadow);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 .summary-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 15px;
   color: var(--subtext);
 }
 
@@ -142,83 +114,62 @@ header {
   margin-top: 6px;
 }
 
-/* STATUS COLORS */
+/* STATUS */
 .status-approved { color: #2ecc71; font-weight: 700; }
-.status-pending { color: #f1c40f; font-weight: 700; }
+.status-pending { color: #f39c12; font-weight: 700; }
 .status-rejected { color: #e74c3c; font-weight: 700; }
 
-/* -------------------------------------------------------
-   BOOKING TABLE
-------------------------------------------------------- */
+/* TABLE */
 .table-card {
-  margin-top: 40px;
   background: var(--card);
   padding: 24px;
   border-radius: 16px;
-  box-shadow: 0 6px 20px var(--shadow);
+  border: 1px solid var(--border);
+  margin-top: 40px;
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 15px;
 }
 
 th, td {
   padding: 12px;
-  border-bottom: 1px solid rgba(150, 150, 150, 0.2);
+  border-bottom: 1px solid var(--border);
 }
 
 thead {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.view-btn {
-  padding: 6px 12px;
-  background: var(--blue);
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
+  background: #EDF2FF;
   font-weight: 600;
 }
 
-/* -------------------------------------------------------
-   QUICK ACTIONS
-------------------------------------------------------- */
+/* QUICK ACTIONS */
 .quick-actions {
   margin-top: 40px;
   display: flex;
-  gap: 14px;
   flex-wrap: wrap;
+  gap: 14px;
 }
 
 .quick-btn {
-  padding: 14px 22px;
   background: var(--blue);
   color: white;
-  border-radius: 12px;
-  text-decoration: none;
+  padding: 14px 20px;
+  border-radius: 10px;
   font-weight: 700;
-  box-shadow: 0 4px 18px rgba(27,115,232,0.35);
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(27,115,232,0.3);
 }
 
 .quick-btn:hover {
   opacity: 0.9;
 }
 
-/* -------------------------------------------------------
-   DARK MODE TOGGLE
-------------------------------------------------------- */
-.dark-toggle {
-  padding: 8px 12px;
-  background: #222;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* MOBILE */
-@media(max-width: 600px) {
-  .hero-earning { font-size: 38px; }
+/* MOBILE FIX */
+@media(max-width:600px){
+  .hero-earning { font-size: 36px; }
 }
 </style>
 </head>
@@ -230,21 +181,21 @@ thead {
 
   <div class="nav-buttons">
     <button onclick="window.location.href='index.html'">Home</button>
-    <button onclick="toggleDark()">Dark Mode</button>
     <button onclick="logout()">Logout</button>
   </div>
 </header>
 
 <div class="wrapper">
 
-  <!-- WEEKLY EARNINGS HERO -->
+  <!-- HERO -->
   <div class="hero-card">
     <div class="hero-title">Weekly Earnings (After CIS)</div>
     <div class="hero-earning">£<span id="weeklyTotal">0.00</span></div>
   </div>
 
-  <!-- SUMMARY CARDS -->
+  <!-- SUMMARY -->
   <div class="summary-grid">
+
     <div class="summary-card">
       <div class="summary-title">Monthly Earnings</div>
       <div class="summary-value">£<span id="monthlyTotal">0.00</span></div>
@@ -259,11 +210,13 @@ thead {
       <div class="summary-title">Recent Booking Status</div>
       <div class="summary-value" id="recentStatus">No Data</div>
     </div>
+
   </div>
 
-  <!-- BOOKING HISTORY TABLE -->
+  <!-- BOOKING TABLE -->
   <div class="table-card">
     <h2>Your Booking-Offs</h2>
+
     <table>
       <thead>
         <tr>
@@ -275,35 +228,23 @@ thead {
           <th>View</th>
         </tr>
       </thead>
-      <tbody id="bookingTable">
-      </tbody>
+
+      <tbody id="bookingTable"></tbody>
     </table>
   </div>
 
   <!-- QUICK ACTIONS -->
-<div class="quick-actions">
+  <div class="quick-actions">
     <a class="quick-btn" href="index.html">Home</a>
     <a class="quick-btn" href="booking.html">New Booking-Off</a>
-    <a class="quick-btn" href="squad-history.html">View History</a>
+    <a class="quick-btn" href="squad-history.html">History</a>
     <a class="quick-btn" href="squad-profile.html">Profile</a>
-    <a class="quick-btn" onclick="logout()">Logout</a>
-</div>
-
+  </div>
 
 </div>
 
 <script>
-/* DARK MODE */
-function toggleDark() {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("darkmode", document.body.classList.contains("dark"));
-}
-
-if (localStorage.getItem("darkmode") === "true") {
-  document.body.classList.add("dark");
-}
-
-/* LOGIN CHECK */
+/* CHECK LOGIN */
 const user = sessionStorage.getItem("squadUser");
 if (!user) window.location.href = "squad-login.html";
 
@@ -313,7 +254,7 @@ let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
   bookings: []
 };
 
-/* CALCULATE TOTALS */
+/* TOTALS */
 function loadTotals() {
   let weekly = 0, monthly = 0, yearly = 0;
   const today = new Date();
@@ -332,32 +273,32 @@ function loadTotals() {
   document.getElementById("yearlyTotal").textContent = yearly.toFixed(2);
 }
 
-/* LOAD BOOKINGS TABLE */
+/* BOOKINGS TABLE */
 function loadBookings() {
   const table = document.getElementById("bookingTable");
   table.innerHTML = "";
 
-  if (userData.bookings.length === 0) {
+  if (!userData.bookings.length) {
     table.innerHTML = "<tr><td colspan='6'>No bookings yet.</td></tr>";
     return;
   }
 
   userData.bookings.forEach(b => {
-    let statusClass =
+    let cls =
       b.status === "Approved" ? "status-approved" :
-      b.status === "Pending" ? "status-pending" : "status-rejected";
+      b.status === "Pending" ? "status-pending" :
+      "status-rejected";
 
-    const row = `
+    table.innerHTML += `
       <tr>
         <td>${b.date}</td>
         <td>${b.plot}</td>
         <td>£${b.wage.toFixed(2)}</td>
         <td>£${b.afterCIS.toFixed(2)}</td>
-        <td class="${statusClass}">${b.status}</td>
-        <td><a class="view-btn" href="booking.html">Open</a></td>
+        <td class="${cls}">${b.status}</td>
+        <td><a class="quick-btn" style="padding:6px 10px;" href="booking.html">Open</a></td>
       </tr>
     `;
-    table.innerHTML += row;
   });
 
   document.getElementById("recentStatus").textContent =
