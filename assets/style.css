@@ -155,17 +155,27 @@ header.site-header {
   padding: 6px 8px;
 }
 
+/* MOBILE BREAKPOINT */
 @media (max-width: 760px) {
-  /* Show hamburger on mobile */
+
+  /* Hide desktop nav on mobile */
+  .nav {
+    display: none;
+  }
+
+  /* Show hamburger */
   .hamburger {
     display: block;
   }
 
-  /* Hide horizontal nav on mobile */
-  .nav {
-    display: none;
+  /* Header becomes vertical */
+  .header-inner {
+    flex-direction: row;
+    align-items: center;
   }
 }
+
+     /* MOBILE NAV - Hidden by default */
 
   }
 }
