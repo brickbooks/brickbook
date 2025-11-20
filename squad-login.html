@@ -135,32 +135,39 @@ input {
 </div>
 
 <script>
-/* Demo login data – replace with backend later */
-const squads = [
-    { username: "teamA", password: "1234" },
-    { username: "teamB", password: "1234" },
-    { username: "teamC", password: "pass" }
+/* TEMP LOGIN USER LIST */
+const USERS = [
+  { email: "squad1@brickbook.co.uk", password: "brick123" },
+  { email: "squad2@brickbook.co.uk", password: "brick123" },
+  { email: "demo@brickbook.co.uk", password: "brick123" }
 ];
 
-function loginSquad() {
-    let user = document.getElementById("username").value.trim();
-    let pass = document.getElementById("password").value.trim();
-    let errorBox = document.getElementById("errorBox");
+function handleSquadLogin() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const error = document.getElementById("login-error");
 
-    const match = squads.find(s => s.username === user && s.password === pass);
+  const found = USERS.find(u => u.email === email && u.password === password);
 
-    if (!match) {
-        errorBox.style.display = "block";
-        return;
+  if (found) {
+    // IMPORTANT — this is what the dashboard expects
+    sessionStorage.setItem("squadUser", email);
+
+    // Create user data store if not exists
+    if (!localStorage.getItem("squad_" + email)) {
+      localStorage.setItem("squad_" + email, JSON.stringify({
+        earnings: [],
+        bookings: []
+      }));
     }
 
-    // Save session
-    sessionStorage.setItem("squadLoggedIn", user);
-
-    // Redirect to squad dashboard
     window.location.href = "squad-dashboard.html";
+  } else {
+    error.style.display = "block";
+  }
 }
 </script>
+
 
 </body>
 </html>
