@@ -50,6 +50,12 @@ body {
   color: var(--text-main);
   transition: background 0.3s ease;
 }
+<script>
+// Correct login guard for squad
+if (!sessionStorage.getItem("squadUser")) {
+    window.location.href = "squad-login.html";
+}
+</script>
 
 /* ---------------------------------------
    HEADER – GLASS + ANIMATED GRADIENT LINE
