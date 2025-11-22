@@ -7,124 +7,123 @@
 
 <style>
 :root {
-    --blue:#1B73E8;
-    --bg:#F5F7FA;
-    --card:#FFFFFF;
-    --text:#1F2933;
-    --sub:#6B7280;
-    --danger:#E74C3C;
-    --shadow:0 8px 30px rgba(0,0,0,0.08);
+  --blue:#1B73E8;
+  --bg:#F5F7FA;
+  --card:#FFFFFF;
+  --text:#1F2933;
+  --sub:#6B7280;
+  --danger:#E74C3C;
+  --shadow:0 8px 28px rgba(0,0,0,0.08);
 }
 
 body {
-    margin:0;
-    background:var(--bg);
-    font-family: "Inter", sans-serif;
-    color:var(--text);
+  margin:0;
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--text);
 }
 
 /* HEADER */
 header {
-    background:var(--card);
-    padding:18px 24px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #E5E7EB;
+  background:var(--card);
+  padding:18px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #E5E7EB;
 }
-.logo {
-    font-size:22px;
-    font-weight:800;
-}
+.logo { font-size:22px;font-weight:800; }
+
 nav a {
-    margin-left:20px;
-    text-decoration:none;
-    color:var(--text);
-    font-weight:600;
+  margin-left:18px;
+  text-decoration:none;
+  font-weight:600;
+  color:var(--text);
 }
 nav a:hover { color:var(--blue); }
 
 /* CARD */
-.wrapper {
-    max-width:420px;
-    margin:60px auto;
-    padding:26px;
-    background:var(--card);
-    border-radius:18px;
-    box-shadow:var(--shadow);
+.login-wrapper {
+  max-width:420px;
+  margin:60px auto;
+  background:var(--card);
+  padding:30px 26px;
+  border-radius:18px;
+  box-shadow:var(--shadow);
 }
 
+/* TEXT */
 h1 {
-    font-size:26px;
-    font-weight:800;
-    margin-bottom:8px;
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:8px;
 }
 .subtitle {
-    color:var(--sub);
-    font-size:15px;
-    margin-bottom:20px;
+  font-size:15px;
+  color:var(--sub);
+  margin-bottom:22px;
 }
 
+/* INPUTS */
 input {
-    width:100%;
-    padding:14px;
-    border-radius:12px;
-    margin-bottom:12px;
-    border:1px solid #D1D5DB;
-    font-size:16px;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #D1D5DB;
+  margin-bottom:16px;
+  font-size:15px;
+  background:white;
+  color:var(--text);
 }
-.btn {
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-}
-.btn-primary {
-    background:var(--blue);
-    color:#fff;
-}
-.btn-primary:hover { opacity:0.92; }
 
-.error {
-    background:rgba(231,76,60,0.1);
-    color:var(--danger);
-    padding:12px;
-    border-radius:10px;
-    font-weight:600;
-    display:none;
-    margin-bottom:14px;
+/* BUTTON */
+.btn-primary {
+  width:100%;
+  padding:15px;
+  background:var(--blue);
+  color:white;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
 }
+.btn-primary:hover { opacity:0.9; }
 
 /* LINKS */
-.small-links {
-    text-align:center;
-    margin-top:12px;
+.link-row {
+  margin-top:16px;
+  text-align:center;
 }
-.small-links span {
-    color:var(--blue);
-    cursor:pointer;
-    font-weight:600;
-    display:block;
-    margin-top:6px;
+.link-row a {
+  text-decoration:none;
+  color:var(--blue);
+  font-size:14px;
+  font-weight:600;
 }
 
-/* SECTIONS hidden */
-.section { display:none; }
-.section.active { display:block; }
+/* ERROR */
+.error-msg {
+  background:rgba(231,76,60,0.14);
+  color:var(--danger);
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:16px;
+  font-weight:600;
+  display:none;
+}
 
-/* Disabled signup */
-.disabled-box {
-    background:#F3F4F6;
-    border:1px dashed #CBD5E1;
-    padding:14px;
-    border-radius:12px;
-    text-align:center;
-    color:#64748B;
-    font-size:14px;
-    margin-bottom:14px;
+/* INVITE-ONLY SIGNUP */
+.invite-box {
+  margin-top:22px;
+  font-size:14px;
+  text-align:center;
+  padding:12px;
+  background:#EEF4FF;
+  border-radius:12px;
+  font-weight:600;
+  color:#1E3A8A;
+  display:none;
 }
 </style>
 </head>
@@ -132,19 +131,69 @@ input {
 <body>
 
 <header>
-    <div class="logo">BrickBook</div>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="contractor-login.html">Contractor</a>
-        <a href="squad-login.html">Squad Login</a>
-    </nav>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="contractor-login.html">Contractor</a>
+    <a href="squad-login.html">Squad Login</a>
+  </nav>
 </header>
 
-<div class="wrapper">
+<div class="login-wrapper">
 
-    <!-- LOGIN SECTION -->
-    <div id="loginSection" class="section active">
-        <h1>Squad Login</h1>
-        <div class="subtitle">Access your Booking-Off history & earnings.</div>
+  <h1>Squad Login</h1>
+  <div class="subtitle">Enter your squad email & password to access booking-off.</div>
 
-        <div id="loginError" class="error">Incorrect email or password
+  <div id="errorBox" class="error-msg">Incorrect login details</div>
+
+  <input type="email" id="email" placeholder="Email address">
+  <input type="password" id="password" placeholder="Password">
+
+  <button class="btn-primary" onclick="handleSquadLogin()">Login</button>
+
+  <div class="link-row">
+    <a href="squad-forgot.html">Forgot password?</a>
+  </div>
+
+  <div class="link-row" style="margin-top:10px;">
+    <a href="#" onclick="showInviteMsg()">Create a squad account</a>
+  </div>
+
+  <div id="inviteMsg" class="invite-box">
+    Squad signup is invite-only.  
+    <br>Ask your contractor to create your squad login.
+  </div>
+
+</div>
+
+<script>
+/* TEMP USERS */
+const USERS = [
+  { email:"squad1@brickbook.co.uk", password:"brick123" },
+  { email:"squad2@brickbook.co.uk", password:"brick123" }
+];
+
+/* LOGIN */
+function handleSquadLogin() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const err = document.getElementById("errorBox");
+
+  const match = USERS.find(u => u.email === email && u.password === password);
+
+  if (match) {
+    sessionStorage.setItem("squadUser", email);
+    window.location.href = "squad-dashboard.html";
+  } else {
+    err.style.display = "block";
+  }
+}
+
+/* SHOW INVITE-ONLY MESSAGE */
+function showInviteMsg() {
+  document.getElementById("inviteMsg").style.display = "block";
+}
+</script>
+
+</body>
+</html>
