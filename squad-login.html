@@ -1,158 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Squad Login – BrickBook</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="assets/style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad Login – BrickBook</title>
+
+<style>
+:root {
+    --blue:#1B73E8;
+    --bg:#F5F7FA;
+    --card:#FFFFFF;
+    --text:#1F2933;
+    --sub:#6B7280;
+    --danger:#E74C3C;
+    --shadow:0 8px 30px rgba(0,0,0,0.08);
+}
+
+body {
+    margin:0;
+    background:var(--bg);
+    font-family: "Inter", sans-serif;
+    color:var(--text);
+}
+
+/* HEADER */
+header {
+    background:var(--card);
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #E5E7EB;
+}
+.logo {
+    font-size:22px;
+    font-weight:800;
+}
+nav a {
+    margin-left:20px;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:600;
+}
+nav a:hover { color:var(--blue); }
+
+/* CARD */
+.wrapper {
+    max-width:420px;
+    margin:60px auto;
+    padding:26px;
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+}
+
+h1 {
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+.subtitle {
+    color:var(--sub);
+    font-size:15px;
+    margin-bottom:20px;
+}
+
+input {
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:12px;
+    border:1px solid #D1D5DB;
+    font-size:16px;
+}
+.btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+.btn-primary {
+    background:var(--blue);
+    color:#fff;
+}
+.btn-primary:hover { opacity:0.92; }
+
+.error {
+    background:rgba(231,76,60,0.1);
+    color:var(--danger);
+    padding:12px;
+    border-radius:10px;
+    font-weight:600;
+    display:none;
+    margin-bottom:14px;
+}
+
+/* LINKS */
+.small-links {
+    text-align:center;
+    margin-top:12px;
+}
+.small-links span {
+    color:var(--blue);
+    cursor:pointer;
+    font-weight:600;
+    display:block;
+    margin-top:6px;
+}
+
+/* SECTIONS hidden */
+.section { display:none; }
+.section.active { display:block; }
+
+/* Disabled signup */
+.disabled-box {
+    background:#F3F4F6;
+    border:1px dashed #CBD5E1;
+    padding:14px;
+    border-radius:12px;
+    text-align:center;
+    color:#64748B;
+    font-size:14px;
+    margin-bottom:14px;
+}
+</style>
 </head>
 
-<body class="page">
+<body>
 
-<!-- HEADER -->
-<header class="site-header">
-  <div class="header-inner">
+<header>
     <div class="logo">BrickBook</div>
-    <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="contractor-login.html">Contractor</a>
-      <a href="squad-login.html" class="active">Squad Login</a>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="contractor-login.html">Contractor</a>
+        <a href="squad-login.html">Squad Login</a>
     </nav>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-  </div>
 </header>
 
-<div id="mobileMenu" class="mobile-nav">
-  <a href="index.html">Home</a>
-  <a href="contractor-login.html">Contractor</a>
-  <a href="squad-login.html">Squad Login</a>
-</div>
+<div class="wrapper">
 
-<!-- AUTH WRAPPER -->
-<div class="auth-wrapper">
-  <div class="auth-card card">
+    <!-- LOGIN SECTION -->
+    <div id="loginSection" class="section active">
+        <h1>Squad Login</h1>
+        <div class="subtitle">Access your Booking-Off history & earnings.</div>
 
-    <h1 class="h1" style="margin-bottom:6px;">Squad Login</h1>
-    <p class="text-muted" style="margin-bottom:18px;">
-      Access your booking history, earnings & approvals.
-    </p>
-
-    <!-- ERROR -->
-    <div id="errorBox" class="status-pill status-pill--rejected" 
-         style="display:none; margin-bottom:14px; text-align:center;">
-      Incorrect login details
-    </div>
-
-    <!-- LOGIN FORM -->
-    <label>Email</label>
-    <input type="email" id="email" placeholder="you@squadmail.com" />
-
-    <label>Password</label>
-    <input type="password" id="password" placeholder="••••••••" />
-
-    <button class="btn btn-primary btn-md" style="width:100%; margin-top:10px;"
-            onclick="squadLogin()">
-      Login
-    </button>
-
-    <div style="text-align:center; margin-top:12px;">
-      <a href="#" onclick="showForgot()">Forgot your password?</a>
-    </div>
-
-    <div style="text-align:center; margin-top:6px;">
-      <span class="text-muted">Don’t have a login?</span>
-      <a href="squad-signup.html">Create one</a>
-    </div>
-
-    <!-- FORGOT PASSWORD BOX -->
-    <div id="forgotBox"
-         style="display:none; margin-top:22px; padding-top:16px; border-top:1px solid var(--border-subtle);">
-
-      <h2 class="h2" style="margin-bottom:8px;">Reset Password</h2>
-      <p class="text-muted" style="margin-bottom:10px; font-size:14px;">
-        Enter your squad email to receive a reset link.
-      </p>
-
-      <label>Email</label>
-      <input type="email" id="forgotEmail" placeholder="you@squadmail.com" />
-
-      <button class="btn btn-primary btn-md" style="width:100%;" onclick="sendReset()">
-        Send reset link
-      </button>
-
-      <div style="text-align:center; margin-top:8px;">
-        <a href="#" onclick="hideForgot()">Back to login</a>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    © 2025 BrickBook
-    <span class="text-muted">Squad Login</span>
-  </div>
-</footer>
-
-<script src="assets/main.js"></script>
-
-<script>
-function toggleMenu() {
-  document.getElementById("mobileMenu").classList.toggle("show");
-}
-
-/* Show/hide forgot password */
-function showForgot() {
-  document.getElementById("forgotBox").style.display = "block";
-}
-function hideForgot() {
-  document.getElementById("forgotBox").style.display = "none";
-}
-
-/* TEMP squad accounts for demo */
-const SQUADS = [
-  { email: "squad1@brickbook.com", password: "brick123" },
-  { email: "squad2@brickbook.com", password: "brick123" },
-  { email: "demo@brickbook.com", password: "brick123" }
-];
-
-/* LOGIN */
-function squadLogin() {
-  const email = document.getElementById("email").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  const error = document.getElementById("errorBox");
-
-  const found = SQUADS.find(u => u.email === email && u.password === pass);
-
-  if (found) {
-    sessionStorage.setItem("squadUser", email);
-
-    // Ensure squad storage exists
-    if (!localStorage.getItem("squad_" + email)) {
-      localStorage.setItem("squad_" + email, JSON.stringify({
-        bookings: [],
-        earnings: []
-      }));
-    }
-
-    window.location.href = "squad-dashboard.html";
-  } else {
-    error.style.display = "block";
-  }
-}
-
-/* RESET PASSWORD */
-function sendReset() {
-  const email = document.getElementById("forgotEmail").value.trim();
-  if (!email) {
-    alert("Enter your email.");
-    return;
-  }
-  alert("Password reset link sent to " + email);
-}
-</script>
-
-</body>
-</html>
+        <div id="loginError" class="error">Incorrect email or password
