@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password – BrickBook</title>
+
+<style>
+:root {
+    --blue:#1B73E8;
+    --bg:#F5F7FA;
+    --card:#FFFFFF;
+    --text:#1F2933;
+    --sub:#6B7280;
+    --danger:#E74C3C;
+    --success:#10B981;
+    --shadow:0 8px 30px rgba(0,0,0,0.08);
+}
+
+body {
+    margin:0;
+    background:var(--bg);
+    font-family:"Inter",sans-serif;
+    color:var(--text);
+}
+
+/* HEADER */
+header {
+    background:var(--card);
+    padding:18px 24px;
+    border-bottom:1px solid #E5E7EB;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo { font-size:22px; font-weight:800; }
+
+header a {
+    margin-left:20px;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:600;
+}
+header a:hover { color:var(--blue); }
+
+/* CARD */
+.wrapper {
+    max-width:420px;
+    margin:60px auto;
+    background:var(--card);
+    padding:26px;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+}
+
+h1 {
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+.subtitle {
+    color:var(--sub);
+    font-size:15px;
+    margin-bottom:22px;
+}
+
+input {
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #D1D5DB;
+    margin-bottom:14px;
+    background:#fff;
+    font-size:16px;
+}
+
+.btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+.btn-primary {
+    background:var(--blue);
+    color:#fff;
+}
+.btn-primary:hover { opacity:0.92; }
+
+.error, .success {
+    padding:12px;
+    border-radius:10px;
+    font-weight:600;
+    margin-bottom:14px;
+    display:none;
+}
+.error { background:rgba(231,76,60,0.1); color:var(--danger); }
+.success { background:rgba(16,185,129,0.12); color:var(--success); }
+
+.back-link {
+    text-align:center;
+    margin-top:14px;
+}
+.back-link a {
+    cursor:pointer;
+    color:var(--blue);
+    font-weight:600;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="contractor-login.html">Contractor</a>
+        <a href="squad-login.html">Squad Login</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+    <h1>Reset Password</h1>
+    <div class="subtitle">Enter your new password below.</div>
+
+    <div id="errorBox" class="error">Invalid or expired reset link.</div>
+    <div id="successBox" class="success">Password updated successfully! Redirecting…</div>
+
+    <input type="password" id="newPass" placeholder="New password">
+    <input type="password" id="confirmPass" placeholder="Confirm new password">
+
+    <button class="btn btn-primary" onclick="resetPassword()">Update Password</button>
+
+    <div class="back-link">
+        <a href="squad-login.html">Back to login</a>
+    </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------
+   Extract ?email=xxx&token=yyy from URL
+------------------------------------------------------------ */
+const params = new URLSearchParams(window.location.search);
+const email = params.get("email");
+const token = params.get("token");
+
+/* ------------------------------------------------------------
+   Validate the token (localStorage)
+------------------------------------------------------------ */
+function validateToken() {
+    const savedToken = localStorage.getItem("resetToken_" + email);
+
+    if (!email || !token || savedToken !== token) {
+        document.getElementById("errorBox").style.display = "block";
+        return false;
+    }
+    return true;
+}
+
+validateToken();
+
+/* ------------------------------------------------------------
+   Update password in USERS store
+------------------------------------------------------------ */
+function resetPassword() {
+    if (!validateToken()) return;
+
+    const p1 = newPass.value.trim();
+    const p2 = confirmPass.value.trim();
+    const error = document.getElementById("errorBox");
+    const success = document.getElementById("successBox");
+
+    error.style.display = "none";
+
+    if (p1.length < 4) {
+        error.textContent = "Password must be at least 4 characters.";
+        error.style.display = "block";
+        return;
+    }
+
+    if (p1 !== p2) {
+        error.textContent = "Passwords do not match.";
+        error.style.display = "block";
+        return;
+    }
+
+    // Load stored USERS
+    let USERS = JSON.parse(localStorage.getItem("squad_users") || "[]");
+
+    // Find user
+    let user = USERS.find(u => u.email === email);
+    if (!user) {
+        // If user doesn't exist yet, create one
+        user = { email, password: p1 };
+        USERS.push(user);
+    } else {
+        user.password = p1;
+    }
+
+    // Save updated users
+    localStorage.setItem("squad_users", JSON.stringify(USERS));
+
+    // Remove reset token
+    localStorage.removeItem("resetToken_" + email);
+
+    success.style.display = "block";
+
+    setTimeout(() => {
+        window.location.href = "squad-login.html";
+    }, 1500);
+}
+</script>
+
+</body>
+</html>
