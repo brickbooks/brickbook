@@ -1,156 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contractor Dashboard – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Contractor Dashboard – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
 
-    <style>
-        :root {
-            --blue: #1B73E8;
-            --charcoal: #2D2D2D;
-            --lightgrey: #F5F7FA;
-            --white: #FFFFFF;
-            --success: #2ECC71;
-            --pending: #F1C40F;
-            --danger: #E74C3C;
-        }
+  <style>
+    /* Page-specific visual enhancements */
+    .dashboard-hero {
+      background: linear-gradient(
+        135deg,
+        rgba(27, 115, 232, 0.18),
+        rgba(27, 115, 232, 0.04)
+      );
+      border-radius: 20px;
+      padding: 32px 22px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
 
-        body {
-            margin: 0;
-            background: var(--lightgrey);
-            font-family: 'Inter', Arial, sans-serif;
-        }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
 
-        /* HEADER */
-        header {
-            background: var(--white);
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #E5EAF0;
-        }
-        .logo { font-size: 20px; font-weight: 700; }
-        nav a { margin-left: 20px; text-decoration: none; color: var(--charcoal); font-weight: 600; }
-        nav a:hover { color: var(--blue); }
+    .action-btn {
+      display: block;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      text-align: center;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      text-decoration: none;
+      color: var(--text-main);
+      transition: 0.2s ease;
+    }
+    .action-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
 
-        .wrapper { max-width: 1180px; margin: 0 auto; padding: 30px 20px; }
-
-        h1 { font-size: 28px; margin-bottom: 6px; font-weight: 800; }
-        .subtitle { color: #666; margin-bottom: 26px; }
-
-        .top-actions { display: flex; gap: 14px; margin-bottom: 24px; }
-        .top-btn {
-            background: white; padding: 12px 20px;
-            border-radius: 12px; border: 1px solid #D7DCE5;
-            font-weight: 600; text-decoration: none; color: var(--charcoal);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-        }
-        .top-btn:hover { border-color: var(--blue); color: var(--blue); }
-
-        .card {
-            background: white; padding: 20px; border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        }
-
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border-bottom: 1px solid #E1E6F0; }
-        thead { background: #E7EEFF; }
-
-        .status { padding: 4px 10px; border-radius: 6px; font-weight: 700; color: white; }
-        .pending { background: var(--pending); }
-        .approved { background: var(--success); }
-        .rejected { background: var(--danger); }
-
-        .view-btn {
-            background: var(--blue); color: white;
-            padding: 8px 14px; border-radius: 8px;
-            text-decoration: none; font-weight: 600;
-        }
-    </style>
+    /* Status colour improvements */
+    .status-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+  </style>
 </head>
 
-<body>
+<body class="page" data-page="dashboard">
 
+<!-- LOGIN GUARD -->
 <script>
-    /* LOGIN GUARD */
-    if (!sessionStorage.getItem("loggedIn")) {
-        window.location.href = "contractor-login.html";
-    }
-
-    function logout() {
-        sessionStorage.removeItem("loggedIn");
-        window.location.href = "contractor-login.html";
-    }
+  if (!sessionStorage.getItem("loggedIn")) {
+    window.location.href = "contractor-login.html";
+  }
+  function logout() {
+    sessionStorage.removeItem("loggedIn");
+    window.location.href = "contractor-login.html";
+  }
 </script>
 
-<header>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
     <div class="logo">BrickBook</div>
-    <nav>
-        <a href="#" onclick="logout()">Logout</a>
+    <nav class="nav">
+      <a href="contractor-dashboard.html" class="active">Dashboard</a>
+      <a href="pricing-table.html">Pricing</a>
+      <a href="approvals.html">Approvals</a>
+      <a href="contractor-review.html">Review</a>
+      <a href="#" onclick="logout()">Logout</a>
     </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div class="wrapper">
-
-    <h1>Contractor Dashboard</h1>
-    <div class="subtitle">Review Booking-Off submissions and manage rates.</div>
-
-    <div class="top-actions">
-    <a class="top-btn" href="pricing-table.html">Pricing Table</a>
-    <a class="top-btn" href="approvals.html">Pending Approvals</a>
-    <a class="top-btn" href="contractor-review.html">Review</a>
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="contractor-dashboard.html">Dashboard</a>
+  <a href="pricing-table.html">Pricing</a>
+  <a href="approvals.html">Approvals</a>
+  <a href="contractor-review.html">Review</a>
+  <a href="#" onclick="logout()">Logout</a>
 </div>
 
+<main class="container">
 
-    <div class="card">
-        <h2 style="margin-top:0;">Today's Booking-Offs</h2>
+  <!-- PAGE HERO -->
+  <section class="dashboard-hero">
+    <h1 class="h1" style="font-size:32px;">Contractor Dashboard</h1>
+    <p class="text-muted" style="font-size:16px;">
+      Review booking-off submissions, manage squads & pricing.
+    </p>
+  </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Squad</th>
-                    <th>Plots</th>
-                    <th>Total (£)</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody id="booking-table-body">
-            </tbody>
-        </table>
+  <!-- QUICK ACTION BUTTONS -->
+  <section class="quick-actions">
+    <a href="pricing-table.html" class="action-btn">💷 Pricing Table</a>
+    <a href="approvals.html" class="action-btn">📝 Pending Approvals</a>
+    <a href="contractor-review.html" class="action-btn">📊 Review All Entries</a>
+  </section>
+
+  <!-- TODAY'S BOOKINGS CARD -->
+  <section class="card">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Today's Booking-Offs</div>
+        <div class="card-sub">Live submissions received today.</div>
+      </div>
     </div>
 
-</div>
+    <table class="table" style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th>Squad</th>
+          <th>Plots</th>
+          <th>Total (£)</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody id="booking-table-body"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Contractor Dashboard</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+<script>
+  const demoBookings = [
+    { squad: "Team A", plots: 3, total: 1400, time: "08:45", status: "pending" },
+    { squad: "Team B", plots: 1, total: 460, time: "10:12", status: "approved" }
+  ];
+
+  function loadBookings() {
+    let tbody = document.getElementById("booking-table-body");
+
+    demoBookings.forEach(b => {
+      const statusColours = {
+        pending: "status-pill status-pill--pending",
+        approved: "status-pill status-pill--approved",
+        rejected: "status-pill status-pill--rejected"
+      };
+
+      let row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${b.squad}</td>
+        <td>${b.plots}</td>
+        <td>£${b.total.toFixed(2)}</td>
+        <td>${b.time}</td>
+        <td><span class="${statusColours[b.status]}">${b.status}</span></td>
+        <td><a class="btn btn-primary btn-sm" href="approvals.html">View</a></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  loadBookings();
+</script>
 
 <script>
-    const demoBookings = [
-        { squad: "Team A", plots: 3, total: 1400, time: "08:45", status: "pending" },
-        { squad: "Team B", plots: 1, total: 460, time: "10:12", status: "approved" }
-    ];
-
-    function loadBookings() {
-        let tbody = document.getElementById("booking-table-body");
-
-        demoBookings.forEach(b => {
-            let row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${b.squad}</td>
-                <td>${b.plots}</td>
-                <td>£${b.total.toFixed(2)}</td>
-                <td>${b.time}</td>
-                <td><span class="status ${b.status}">${b.status.toUpperCase()}</span></td>
-                <td><a class="view-btn" href="approvals.html">View</a></td>
-            `;
-
-            tbody.appendChild(row);
-        });
-    }
-
-    loadBookings();
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('show');
+}
 </script>
 
 </body>
