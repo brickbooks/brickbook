@@ -1,302 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Squad Dashboard – BrickBook</title>
-
-<style>
-/* -------------------------------------------------------
-   THEME (LIGHT ONLY)
-------------------------------------------------------- */
-:root {
-  --blue: #1b73e8;
-  --bg: #f5f7fa;
-  --card: #ffffff;
-  --text: #1f1f1f;
-  --subtext: #666;
-  --glass: rgba(255, 255, 255, 0.55);
-  --shadow: rgba(0, 0, 0, 0.1);
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', Arial, sans-serif;
-}
-
-/* -------------------------------------------------------
-   HEADER
-------------------------------------------------------- */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 24px;
-  background: var(--card);
-  border-bottom: 1px solid #e2e2e2;
-  position: sticky;
-  top: 0;
-  z-index: 99;
-}
-
-.logo {
-  font-weight: 800;
-  font-size: 22px;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 16px;
-}
-
-.nav-buttons button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--card);
-  border: 1px solid #ccc;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.nav-buttons button:hover {
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-/* -------------------------------------------------------
-   WRAPPER
-------------------------------------------------------- */
-.wrapper {
-  max-width: 1100px;
-  margin: auto;
-  padding: 30px 20px;
-}
-
-/* -------------------------------------------------------
-   HERO CARD (WEEKLY EARNINGS)
-------------------------------------------------------- */
-.hero-card {
-  background: var(--glass);
-  padding: 26px;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px var(--shadow);
-  backdrop-filter: blur(18px);
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.hero-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--subtext);
-}
-
-.hero-earning {
-  font-size: 48px;
-  font-weight: 900;
-  background: linear-gradient(45deg, var(--blue), #00b7ff);
-  -webkit-background-clip: text;
-  color: transparent;
-  margin-top: 6px;
-}
-
-/* -------------------------------------------------------
-   SUMMARY CARDS
-------------------------------------------------------- */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.summary-card {
-  background: var(--card);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px var(--shadow);
-}
-
-.summary-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--subtext);
-}
-
-.summary-value {
-  font-size: 32px;
-  font-weight: 800;
-  margin-top: 6px;
-}
-
-/* STATUS COLORS */
-.status-approved { color: #2ecc71; font-weight: 700; }
-.status-pending { color: #f1c40f; font-weight: 700; }
-.status-rejected { color: #e74c3c; font-weight: 700; }
-
-/* -------------------------------------------------------
-   BOOKING HISTORY
-------------------------------------------------------- */
-.table-card {
-  margin-top: 40px;
-  background: var(--card);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px var(--shadow);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-thead {
-  background: #efefef;
-}
-
-.view-btn {
-  padding: 6px 12px;
-  background: var(--blue);
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-/* -------------------------------------------------------
-   QUICK ACTIONS
-------------------------------------------------------- */
-.quick-actions {
-  margin-top: 40px;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.quick-btn {
-  padding: 14px 22px;
-  background: var(--blue);
-  color: white;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 700;
-  box-shadow: 0 4px 18px rgba(27,115,232,0.35);
-}
-
-.quick-btn:hover {
-  opacity: 0.9;
-}
-
-</style>
+  <meta charset="UTF-8" />
+  <title>Squad Dashboard – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 
-<body>
-
-<header>
-  <div class="logo">BrickBook</div>
-
-  <div class="nav-buttons">
-    <button onclick="window.location.href='index.html'">Home</button>
-    <button onclick="logout()">Logout</button>
-  </div>
-</header>
-
-<div class="wrapper">
-
-  <!-- WEEKLY EARNINGS HERO -->
-  <div class="hero-card">
-    <div class="hero-title">Weekly Earnings (After CIS)</div>
-    <div class="hero-earning">£<span id="weeklyTotal">0.00</span></div>
-  </div>
-
-  <!-- SUMMARY CARDS -->
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-title">Monthly Earnings</div>
-      <div class="summary-value">£<span id="monthlyTotal">0.00</span></div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-title">Yearly Earnings</div>
-      <div class="summary-value">£<span id="yearlyTotal">0.00</span></div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-title">Recent Booking Status</div>
-      <div class="summary-value" id="recentStatus">No Data</div>
-    </div>
-  </div>
-
-  <!-- BOOKING HISTORY TABLE -->
-  <div class="table-card">
-    <h2>Your Booking-Offs</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Plot</th>
-          <th>Your Share (£)</th>
-          <th>After CIS (£)</th>
-          <th>Status</th>
-          <th>View</th>
-        </tr>
-      </thead>
-      <tbody id="bookingTable"></tbody>
-    </table>
-  </div>
-
-  <!-- QUICK ACTION BUTTONS -->
-  <div class="quick-actions">
-    <a class="quick-btn" href="index.html">Home</a>
-    <a class="quick-btn" href="booking.html">New Booking-Off</a>
-    <a class="quick-btn" href="squad-history.html">View History</a>
-    <a class="quick-btn" href="squad-profile.html">Profile</a>
-    <a class="quick-btn" onclick="logout()">Logout</a>
-  </div>
-
-</div>
+<body class="page" data-page="squad-dashboard">
 
 <script>
-/* LOGIN CHECK — DO NOT REDIRECT WHILE MAKING NEW BOOKING */
-const user = sessionStorage.getItem("squadUser");
+// --- AUTH GUARD ---
+let squadUser = sessionStorage.getItem("squadUser");
 
-// Battle-tested fix: if user refreshes booking page, restore from localStorage backup
-if (!user) {
+// try recover from lastSquadUser if session lost
+if (!squadUser) {
   const backup = localStorage.getItem("lastSquadUser");
   if (backup) {
     sessionStorage.setItem("squadUser", backup);
+    squadUser = backup;
   } else {
     window.location.href = "squad-login.html";
   }
 }
+// remember last logged in user
+localStorage.setItem("lastSquadUser", squadUser);
+</script>
 
-// Always store last logged in user for safety
-localStorage.setItem("lastSquadUser", sessionStorage.getItem("squadUser"));
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">BrickBook</div>
+    <nav class="nav">
+      <a href="squad-dashboard.html" class="active">Dashboard</a>
+      <a href="squad-history.html">History</a>
+      <a href="squad-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
+</header>
 
-/* LOAD USER DATA */
-let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
-  earnings: [],
-  bookings: []
-};
+<!-- MOBILE NAV -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="squad-dashboard.html">Dashboard</a>
+  <a href="squad-history.html">History</a>
+  <a href="squad-profile.html">Profile</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
 
-/* CALCULATE TOTALS */
-function loadTotals() {
-  let weekly = 0, monthly = 0, yearly = 0;
+<main class="container">
+
+  <!-- HERO EARNINGS -->
+  <section class="hero-card" style="margin-top:12px;">
+    <div class="hero-header" style="flex-direction:column; gap:6px;">
+      <div>
+        <h1 class="h1" style="font-size:22px; margin-bottom:4px;">
+          Welcome back, <span id="squadNameText">Squad</span>
+        </h1>
+        <p class="hero-sub">
+          Here’s your latest earnings and booking-off activity.
+        </p>
+      </div>
+      <div>
+        <div class="text-muted" style="font-size:13px; margin-bottom:2px;">Weekly earnings (after CIS)</div>
+        <div style="font-size:30px; font-weight:800;">
+          £<span id="weeklyTotal">0.00</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="grid-3 mt-16">
+    <div class="card">
+      <div class="card-title">Monthly earnings</div>
+      <div class="card-sub">Total paid to you this month (after CIS).</div>
+      <div style="font-size:24px; font-weight:800; margin-top:8px;">
+        £<span id="monthlyTotal">0.00</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Year-to-date</div>
+      <div class="card-sub">Total for this calendar year (after CIS).</div>
+      <div style="font-size:24px; font-weight:800; margin-top:8px;">
+        £<span id="yearlyTotal">0.00</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Most recent booking</div>
+      <div class="card-sub">Status of your latest booking-off.</div>
+      <div id="recentStatusBox" style="margin-top:8px;">
+        <span class="text-muted" id="recentStatusText">No bookings yet</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT BOOKINGS TABLE -->
+  <section class="card mt-16">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Recent booking-offs</div>
+        <div class="card-sub">Last 5 submissions with your share and CIS amount.</div>
+      </div>
+      <a href="squad-history.html" class="btn btn-sm btn-ghost">View all</a>
+    </div>
+
+    <table class="table" style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Plot</th>
+          <th>Your share</th>
+          <th>After CIS</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="bookingTableBody"></tbody>
+    </table>
+  </section>
+
+  <!-- QUICK ACTIONS -->
+  <section class="card mt-16">
+    <div class="card-title">Quick actions</div>
+    <div class="card-sub">Jump straight to what you need.</div>
+
+    <div class="row row-wrap mt-12">
+      <a href="booking.html" class="btn btn-primary btn-md">New booking-off</a>
+      <a href="squad-history.html" class="btn btn-ghost btn-md">View full history</a>
+      <a href="squad-profile.html" class="btn btn-ghost btn-md">Squad profile</a>
+      <button class="btn btn-danger btn-md" type="button" onclick="logout()">Logout</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Squad Dashboard</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+<script>
+function toggleMenu() {
+  document.getElementById("mobileMenu").classList.toggle("show");
+}
+
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+
+// --- LOAD SQUAD DATA FROM LOCALSTORAGE ---
+let squadKey = "squad_" + squadUser;
+let squadData = JSON.parse(localStorage.getItem(squadKey) || "{}");
+
+// fallback structure
+if (!squadData.earnings) squadData.earnings = [];
+if (!squadData.bookings) squadData.bookings = [];
+if (!squadData.name) squadData.name = squadUser;
+
+// --- RENDER HEADER NAME ---
+document.getElementById("squadNameText").textContent = squadData.name || squadUser;
+
+// --- CALCULATE TOTALS ---
+function calculateTotals() {
+  let weekly = 0;
+  let monthly = 0;
+  let yearly = 0;
+
   const today = new Date();
-  const weekStart = new Date(); weekStart.setDate(today.getDate() - today.getDay());
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
 
-  userData.earnings.forEach(e => {
+  // start of week (Sunday)
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  weekStart.setHours(0,0,0,0);
+
+  squadData.earnings.forEach(e => {
+    if (!e.date || typeof e.afterCIS !== "number") return;
     const d = new Date(e.date);
-    if (d >= weekStart) weekly += e.afterCIS;
-    if (d.getMonth() === today.getMonth()) monthly += e.afterCIS;
-    if (d.getFullYear() === today.getFullYear()) yearly += e.afterCIS;
+    if (isNaN(d)) return;
+
+    if (d >= weekStart) {
+      weekly += e.afterCIS;
+    }
+    if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
+      monthly += e.afterCIS;
+    }
+    if (d.getFullYear() === currentYear) {
+      yearly += e.afterCIS;
+    }
   });
 
   document.getElementById("weeklyTotal").textContent = weekly.toFixed(2);
@@ -304,46 +204,71 @@ function loadTotals() {
   document.getElementById("yearlyTotal").textContent = yearly.toFixed(2);
 }
 
-/* LOAD BOOKINGS INTO TABLE */
-function loadBookings() {
-  const table = document.getElementById("bookingTable");
-  table.innerHTML = "";
+// --- RENDER BOOKINGS TABLE ---
+function renderBookings() {
+  const tbody = document.getElementById("bookingTableBody");
+  tbody.innerHTML = "";
 
-  if (userData.bookings.length === 0) {
-    table.innerHTML = "<tr><td colspan='6'>No bookings yet.</td></tr>";
+  const bookings = squadData.bookings.slice().sort((a,b) => {
+    const da = new Date(a.date || 0).getTime();
+    const db = new Date(b.date || 0).getTime();
+    return db - da;
+  }).slice(0, 5);
+
+  if (!bookings.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="6" style="font-size:13px; color:var(--text-muted); padding:12px;">
+        No bookings yet. Once you submit a booking-off, it’ll appear here.
+      </td>`;
+    tbody.appendChild(tr);
+
+    document.getElementById("recentStatusText").textContent = "No bookings yet";
     return;
   }
 
-  userData.bookings.forEach(b => {
-    const statusClass =
-      b.status === "Approved" ? "status-approved" :
-      b.status === "Pending" ? "status-pending" : "status-rejected";
+  bookings.forEach((b, idx) => {
+    const wage = typeof b.wage === "number" ? b.wage : 0;
+    const afterCIS = typeof b.afterCIS === "number" ? b.afterCIS : wage * 0.8;
+    const status = b.status || "Pending";
 
-    table.innerHTML += `
-      <tr>
-        <td>${b.date}</td>
-        <td>${b.plot}</td>
-        <td>£${b.wage.toFixed(2)}</td>
-        <td>£${b.afterCIS.toFixed(2)}</td>
-        <td class="${statusClass}">${b.status}</td>
-        <td><a class="view-btn" href="booking.html">Open</a></td>
-      </tr>
+    let statusClass = "status-pill status-pill--pending";
+    if (status.toLowerCase() === "approved") statusClass = "status-pill status-pill--approved";
+    if (status.toLowerCase() === "rejected") statusClass = "status-pill status-pill--rejected";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.date || "-"}</td>
+      <td>${b.plot || "-"}</td>
+      <td>£${wage.toFixed(2)}</td>
+      <td>£${afterCIS.toFixed(2)}</td>
+      <td><span class="${statusClass}">${status}</span></td>
+      <td style="text-align:right;">
+        <a href="squad-booking-detail.html?i=${idx}" class="btn btn-sm btn-ghost">View</a>
+      </td>
     `;
+    tbody.appendChild(tr);
   });
 
-  document.getElementById("recentStatus").textContent =
-    userData.bookings[userData.bookings.length - 1].status;
+  // most recent booking
+  const latest = bookings[0];
+  const recentStatusText = document.getElementById("recentStatusText");
+  const recentStatusBox = document.getElementById("recentStatusBox");
+  recentStatusBox.innerHTML = "";
+
+  let sClass = "status-pill status-pill--pending";
+  if (latest.status && latest.status.toLowerCase() === "approved") sClass = "status-pill status-pill--approved";
+  if (latest.status && latest.status.toLowerCase() === "rejected") sClass = "status-pill status-pill--rejected";
+
+  const span = document.createElement("span");
+  span.className = sClass;
+  span.textContent = latest.status || "Pending";
+  recentStatusBox.appendChild(span);
 }
 
-/* LOGOUT */
-function logout() {
-  sessionStorage.removeItem("squadUser");
-  window.location.href = "squad-login.html";
-}
-
-/* INIT */
-loadTotals();
-loadBookings();
+// --- INIT ---
+calculateTotals();
+renderBookings();
 </script>
 
 </body>
