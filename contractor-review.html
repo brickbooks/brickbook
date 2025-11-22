@@ -1,323 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contractor Review – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Contractor Review – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
 
-<style>
-/* Base theme */
-:root {
-    --blue: #1B73E8;
-    --charcoal: #2D2D2D;
-    --lightgrey: #F5F7FA;
-    --white: #FFFFFF;
-    --green: #22bb55;
-    --red: #e64545;
-    --yellow: #f7c948;
-    --shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
+  <style>
+    /* Page-specific enhancements */
 
-body {
-    margin: 0;
-    background: var(--lightgrey);
-    font-family: 'Inter', Arial, sans-serif;
-    color: var(--charcoal);
-}
+    .review-hero {
+      background: linear-gradient(
+        135deg,
+        rgba(27,115,232,0.18),
+        rgba(27,115,232,0.04)
+      );
+      border-radius: 20px;
+      padding: 28px 22px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 24px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
 
-/* Header */
-header {
-    background: var(--white);
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #E5EAF0;
-    position: sticky;
-    top: 0;
-    z-index: 300;
-}
+    .filters-card {
+      margin-bottom: 22px;
+    }
 
-.logo {
-    font-size: 22px;
-    font-weight: 800;
-}
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
 
-nav {
-    display: flex;
-    gap: 24px;
-}
+    .filters-row .search-wrap {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
 
-nav a {
-    text-decoration: none;
-    color: var(--charcoal);
-    font-weight: 600;
-}
-nav a:hover { color: var(--blue); }
+    .filters-row .period-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-/* Mobile menu */
-.hamburger {
-    display: none;
-    font-size: 28px;
-    cursor: pointer;
-}
-.mobile-menu {
-    display: none;
-    flex-direction: column;
-    background: white;
-    padding: 16px;
-    border-bottom: 1px solid #ddd;
-}
-.mobile-menu a {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    text-decoration: none;
-    color: var(--charcoal);
-    font-weight: 600;
-}
+    .period-chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-/* Wrapper */
-.wrapper {
-    max-width: 1200px;
-    margin: auto;
-    padding: 30px 20px 80px;
-}
+    .period-chip.active {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
+    }
 
-/* Page title */
-h1 {
-    font-size: 32px;
-    font-weight: 800;
-}
-.subtitle {
-    color: #666;
-    margin-bottom: 24px;
-}
+    /* Squad accordion cards */
+    .accordion-card {
+      margin-bottom: 14px;
+    }
 
-/* Dashboard cards */
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 18px;
-    margin-bottom: 30px;
-}
+    .accordion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
 
-.card {
-    padding: 20px;
-    background: var(--white);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-}
+    .accordion-main {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
 
-.card-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-.card-value {
-    font-size: 28px;
-    font-weight: 800;
-}
+    .accordion-main-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
 
-/* Squad list */
-.squad-card {
-    padding: 18px;
-    background: var(--white);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    margin-bottom: 16px;
-}
+    .accordion-main-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
-.squad-header {
-    font-size: 18px;
-    font-weight: 700;
-}
-.squad-totals {
-    margin-top: 8px;
-    color: #555;
-}
-.squad-members {
-    margin-top: 10px;
-    font-size: 14px;
-}
+    .accordion-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
-.review-btn {
-    margin-top: 12px;
-    padding: 10px 18px;
-    background: var(--blue);
-    color: white;
-    font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-}
+    .accordion-toggle {
+      font-size: 22px;
+      line-height: 1;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
 
-.filter-buttons {
-    margin: 14px 0 22px 0;
-    display: flex;
-    gap: 10px;
-}
+    .accordion-body {
+      margin-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 10px;
+      display: none;
+      font-size: 14px;
+    }
 
-.filter-buttons button {
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: 1px solid #ccc;
-    background: white;
-    cursor: pointer;
-}
+    .accordion-body-row {
+      margin-bottom: 4px;
+    }
 
-.filter-buttons button.active {
-    background: var(--blue);
-    color: white;
-    border-color: var(--blue);
-}
+    .pill-muted {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      font-size: 11px;
+    }
 
-/* Mobile */
-@media(max-width: 768px) {
-    nav { display: none; }
-    .hamburger { display: block; }
-}
-</style>
+    @media (max-width: 640px) {
+      .accordion-header {
+        align-items: flex-start;
+      }
+      .accordion-meta {
+        text-align: right;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="page" data-page="contractor-review">
 
-<header>
+<!-- LOGIN GUARD -->
+<script>
+  if (!sessionStorage.getItem("loggedIn")) {
+    window.location.href = "contractor-login.html";
+  }
+  function logout() {
+    sessionStorage.removeItem("loggedIn");
+    window.location.href = "contractor-login.html";
+  }
+</script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
     <div class="logo">BrickBook</div>
-
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="contractor-review.html">Review</a>
-        <a href="contractor-login.html">Logout</a>
+    <nav class="nav">
+      <a href="contractor-dashboard.html">Dashboard</a>
+      <a href="pricing-table.html">Pricing</a>
+      <a href="approvals.html">Approvals</a>
+      <a href="contractor-review.html" class="active">Review</a>
+      <a href="#" onclick="logout()">Logout</a>
     </nav>
-
     <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div class="mobile-menu" id="mobileMenu">
-    <a href="dashboard.html">Dashboard</a>
-    <a href="contractor-review.html">Review</a>
-    <a href="contractor-login.html">Logout</a>
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="contractor-dashboard.html">Dashboard</a>
+  <a href="pricing-table.html">Pricing</a>
+  <a href="approvals.html">Approvals</a>
+  <a href="contractor-review.html">Review</a>
+  <a href="#" onclick="logout()">Logout</a>
 </div>
 
-<div class="wrapper">
+<main class="container">
 
-    <h1>Review Squads</h1>
-    <div class="subtitle">Weekly, monthly & yearly totals for each squad and worker.</div>
+  <!-- HERO -->
+  <section class="review-hero">
+    <h1 class="h1" style="font-size:30px;">Squad Review</h1>
+    <p class="text-muted" style="font-size:15px;">
+      Weekly, monthly and yearly totals for each squad and worker.
+    </p>
+  </section>
 
-    <!-- Filter buttons -->
-    <div class="filter-buttons">
-        <button class="active" onclick="setFilter('week', this)">Weekly</button>
-        <button onclick="setFilter('month', this)">Monthly</button>
-        <button onclick="setFilter('year', this)">Yearly</button>
+  <!-- FILTER BAR -->
+  <section class="card filters-card">
+    <div class="filters-row">
+      <div class="search-wrap">
+        <label for="search-input">Search</label>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search by squad or worker name..."
+        />
+      </div>
+
+      <div class="period-filters">
+        <button class="period-chip active" data-period="week" onclick="setPeriod('week', this)">
+          Weekly
+        </button>
+        <button class="period-chip" data-period="month" onclick="setPeriod('month', this)">
+          Monthly
+        </button>
+        <button class="period-chip" data-period="year" onclick="setPeriod('year', this)">
+          Yearly
+        </button>
+      </div>
     </div>
+  </section>
 
-    <!-- Dash totals -->
-    <div class="grid-3">
-        <div class="card">
-            <div class="card-title">Total Payments This Period</div>
-            <div class="card-value">£<span id="total-pay-period">0.00</span></div>
-        </div>
-        <div class="card">
-            <div class="card-title">Total CIS Deductions</div>
-            <div class="card-value">£<span id="total-cis-period">0.00</span></div>
-        </div>
-        <div class="card">
-            <div class="card-title">Total Squads</div>
-            <div class="card-value"><span id="total-squads">0</span></div>
-        </div>
+  <!-- SUMMARY METRICS -->
+  <section class="grid-3">
+    <div class="card">
+      <div class="card-title">Total payments this period</div>
+      <div class="card-value">£<span id="total-pay-period">0.00</span></div>
+      <div class="card-sub" id="period-label-pay">This period</div>
     </div>
+    <div class="card">
+      <div class="card-title">Total CIS deductions (20%)</div>
+      <div class="card-value">£<span id="total-cis-period">0.00</span></div>
+      <div class="card-sub" id="period-label-cis">This period</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Total squads</div>
+      <div class="card-value"><span id="total-squads">0</span></div>
+      <div class="card-sub">Across all active squads</div>
+    </div>
+  </section>
 
-    <!-- Squad list -->
-    <div id="squad-list"></div>
+  <!-- SQUAD LIST (ACCORDION) -->
+  <section id="squad-list"></section>
 
-</div>
+</main>
 
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Contractor Review</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
 <script>
-function toggleMenu() {
-    const m = document.getElementById("mobileMenu");
-    m.style.display = m.style.display === "flex" ? "none" : "flex";
-}
-
-/* Sample data (replace with backend later) */
-let squads = [
+  /* Sample data (replace with backend later) */
+  let squads = [
     {
-        name: "Squad A",
-        weeklyTotal: 1600,
-        monthlyTotal: 5200,
-        yearlyTotal: 64000,
-        people: [
-            { name: "John", week: 500, month: 1600, year: 20000 },
-            { name: "Ryan", week: 400, month: 1400, year: 17000 },
-            { name: "Sam",  week: 700, month: 2200, year: 27000 }
-        ]
+      name: "Squad A",
+      weeklyTotal: 1600,
+      monthlyTotal: 5200,
+      yearlyTotal: 64000,
+      people: [
+        { name: "John", week: 500, month: 1600, year: 20000 },
+        { name: "Ryan", week: 400, month: 1400, year: 17000 },
+        { name: "Sam",  week: 700, month: 2200, year: 27000 }
+      ]
     },
     {
-        name: "Squad B",
-        weeklyTotal: 1200,
-        monthlyTotal: 4800,
-        yearlyTotal: 59000,
-        people: [
-            { name: "Mike", week: 600, month: 2000, year: 24000 },
-            { name: "Steve", week: 600, month: 2800, year: 35000 }
-        ]
+      name: "Squad B",
+      weeklyTotal: 1200,
+      monthlyTotal: 4800,
+      yearlyTotal: 59000,
+      people: [
+        { name: "Mike",  week: 600, month: 2000, year: 24000 },
+        { name: "Steve", week: 600, month: 2800, year: 35000 }
+      ]
     }
-];
+  ];
 
-let activeFilter = "week";
-renderPage();
+  let activePeriod = "week"; // 'week' | 'month' | 'year'
+  let searchTerm = "";
 
-/* Apply filter (week/month/year) */
-function setFilter(filter, btn) {
-    activeFilter = filter;
+  const periodLabels = {
+    week: "This week",
+    month: "This month",
+    year: "This year"
+  };
 
-    document.querySelectorAll(".filter-buttons button")
-        .forEach(b => b.classList.remove("active"));
-
-    btn.classList.add("active");
-
+  function setPeriod(period, btn) {
+    activePeriod = period;
+    document.querySelectorAll(".period-filters .period-chip").forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
     renderPage();
-}
+  }
 
-function renderPage() {
+  document.getElementById("search-input").addEventListener("input", (e) => {
+    searchTerm = e.target.value.toLowerCase();
+    renderPage();
+  });
+
+  function renderPage() {
     const list = document.getElementById("squad-list");
     list.innerHTML = "";
 
     let totalPay = 0;
     let totalCIS = 0;
 
-    squads.forEach(squad => {
-        let total = squad[activeFilter + "Total"];
+    const filteredSquads = squads.filter(squad => {
+      if (!searchTerm) return true;
+      const workerNames = squad.people.map(p => p.name).join(" ").toLowerCase();
+      return (
+        squad.name.toLowerCase().includes(searchTerm) ||
+        workerNames.includes(searchTerm)
+      );
+    });
 
-        totalPay += total;
-        totalCIS += total * 0.2; // CIS 20%
+    filteredSquads.forEach((squad, index) => {
+      const total = squad[activePeriod + "Total"];
+      totalPay += total;
+      totalCIS += total * 0.2;
 
-        const div = document.createElement("div");
-        div.className = "squad-card";
+      const card = document.createElement("div");
+      card.className = "card accordion-card";
 
-        div.innerHTML = `
-            <div class="squad-header">${squad.name}</div>
-            <div class="squad-totals">Total: £${total.toFixed(2)}</div>
-            <div class="squad-members">
-                ${squad.people.map(p => `
-                    <div>- ${p.name}: £${p[activeFilter].toFixed(2)}</div>
-                `).join("")}
+      const bodyId = "accordion-body-" + index;
+
+      card.innerHTML = `
+        <div class="accordion-header" onclick="toggleAccordion('${bodyId}')">
+          <div class="accordion-main">
+            <div class="accordion-main-title">${squad.name}</div>
+            <div class="accordion-main-sub">
+              Total this ${periodLabels[activePeriod].toLowerCase()}: £${total.toFixed(2)}
             </div>
-            <button class="review-btn" onclick="openReview('${squad.name}')">Review Submissions</button>
-        `;
+            <span class="pill-muted">${squad.people.length} worker${squad.people.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="accordion-meta">
+            <div><strong>CIS (20%):</strong> £${(total * 0.2).toFixed(2)}</div>
+            <button class="accordion-toggle" type="button">▼</button>
+          </div>
+        </div>
+        <div class="accordion-body" id="${bodyId}">
+          ${squad.people.map(p => `
+            <div class="accordion-body-row">
+              <strong>${p.name}:</strong>
+              £${p[activePeriod].toFixed(2)}
+            </div>
+          `).join("")}
+          <div class="accordion-body-row" style="margin-top:10px;">
+            <button class="btn btn-primary btn-sm" type="button" onclick="openReview('${squad.name}')">
+              Review submissions
+            </button>
+          </div>
+        </div>
+      `;
 
-        list.appendChild(div);
+      list.appendChild(card);
     });
 
     document.getElementById("total-pay-period").textContent = totalPay.toFixed(2);
     document.getElementById("total-cis-period").textContent = totalCIS.toFixed(2);
-    document.getElementById("total-squads").textContent = squads.length;
-}
+    document.getElementById("total-squads").textContent = filteredSquads.length;
+    document.getElementById("period-label-pay").textContent = periodLabels[activePeriod];
+    document.getElementById("period-label-cis").textContent = periodLabels[activePeriod];
+  }
 
-/* Contractor opens squad submissions */
-function openReview(name) {
+  function toggleAccordion(id) {
+    const body = document.getElementById(id);
+    if (!body) return;
+    const isOpen = body.style.display === "block";
+    body.style.display = isOpen ? "none" : "block";
+  }
+
+  function openReview(name) {
+    // later: redirect to contractor-review-squad.html with query param
     alert("Open detailed review for: " + name);
-    // redirect later to contractor-review-squad.html
+  }
+
+  renderPage();
+</script>
+
+<script>
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('show');
 }
 </script>
 
