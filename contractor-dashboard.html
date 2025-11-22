@@ -59,20 +59,27 @@
 
 <body class="page" data-page="dashboard">
 
-<!-- LOGIN GUARD -->
+<!-- LOGIN GUARD + LOGOUT FIX -->
 <script>
-  // Skip redirect if user just logged out
+  // Allow redirect to homepage if user intentionally logged out
   if (!sessionStorage.getItem("loggedIn") && !sessionStorage.getItem("logout")) {
     window.location.href = "contractor-login.html";
   }
-  // Clean up
+
+  // Clear logout flag once we pass any redirects
   sessionStorage.removeItem("logout");
 
   function logout(event) {
     if (event) event.preventDefault();
-    sessionStorage.setItem("logout", "true"); // allow redirect to home
+
+    // Mark this as an intentional logout
+    sessionStorage.setItem("logout", "true");
+
+    // Remove login flag
     sessionStorage.removeItem("loggedIn");
-    window.location.href = "index.html"; // home page
+
+    // Redirect to home
+    window.location.href = "index.html";
   }
 </script>
 
