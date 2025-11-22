@@ -177,14 +177,35 @@ function renderSquads() {
   squads.forEach(s => {
     dropdown.innerHTML += `<option value="${s.squadId}">${s.squadName}</option>`;
 
-    let membersHTML = s.members.length
-      ? s.members.map(m => `
-          <div class="member-line">
-            <span>${m}</span>
-            <button class="btn-danger" onclick="removeMember('${s.squadId}','${m}')">Remove</button>
-          </div>
-        `).join("")
-      : `<p style="color:var(--text-muted);">No members yet</p>`;
+    let membersHTML;
+
+if (s.members && s.members.length) {
+  membersHTML = s.members.map(email => {
+    const raw = localStorage.getItem("squad_user_" + email);
+    let display = email;
+
+    if (raw) {
+      try {
+        const user = JSON.parse(raw);
+        if (user.name) {
+          display = `${user.name} (${email})`;
+        }
+      } catch (e) {
+        // ignore parse error, fallback to email
+      }
+    }
+
+    return `
+      <div class="member-line">
+        <span>${display}</span>
+        <button class="btn-danger" onclick="removeMember('${s.squadId}','${email}')">Remove</button>
+      </div>
+    `;
+  }).join("");
+} else {
+  membersHTML = `<p style="color:var(--text-muted); font-size:13px;">No members yet</p>`;
+}
+
 
     list.innerHTML += `
       <div class="squad-box">
