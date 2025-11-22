@@ -1,133 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
+<title>Squad Sign Up – BrickBook</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squad Login – BrickBook</title>
+<link rel="stylesheet" href="assets/style.css">
 
 <style>
 :root {
-  --blue:#1B73E8;
-  --bg:#F5F7FA;
-  --card:#FFFFFF;
-  --text:#1F2933;
-  --sub:#6B7280;
-  --danger:#E74C3C;
-  --shadow:0 8px 28px rgba(0,0,0,0.08);
+  --blue: #1B73E8;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text-muted: #6B7280;
+  --shadow: 0 8px 28px rgba(0,0,0,0.06);
 }
 
 body {
-  margin:0;
-  background:var(--bg);
-  font-family:'Inter',sans-serif;
-  color:var(--text);
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
 }
 
-/* HEADER */
+/* Header */
 header {
-  background:var(--card);
-  padding:18px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #E5E7EB;
-}
-.logo { font-size:22px;font-weight:800; }
-
-nav a {
-  margin-left:18px;
-  text-decoration:none;
-  font-weight:600;
-  color:var(--text);
-}
-nav a:hover { color:var(--blue); }
-
-/* CARD */
-.login-wrapper {
-  max-width:420px;
-  margin:60px auto;
-  background:var(--card);
-  padding:30px 26px;
-  border-radius:18px;
-  box-shadow:var(--shadow);
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
 }
 
-/* TEXT */
-h1 {
-  font-size:26px;
-  font-weight:800;
-  margin-bottom:8px;
-}
-.subtitle {
-  font-size:15px;
-  color:var(--sub);
-  margin-bottom:22px;
+header nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #000;
 }
 
-/* INPUTS */
+.wrapper {
+  max-width: 480px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  padding: 26px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
 input {
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid #D1D5DB;
-  margin-bottom:16px;
-  font-size:15px;
-  background:white;
-  color:var(--text);
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
 }
 
-/* BUTTON */
 .btn-primary {
-  width:100%;
-  padding:15px;
-  background:var(--blue);
-  color:white;
-  font-size:16px;
-  font-weight:700;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-}
-.btn-primary:hover { opacity:0.9; }
-
-/* LINKS */
-.link-row {
-  margin-top:16px;
-  text-align:center;
-}
-.link-row a {
-  text-decoration:none;
-  color:var(--blue);
-  font-size:14px;
-  font-weight:600;
+  width: 100%;
+  background: var(--blue);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
 }
 
-/* ERROR */
-.error-msg {
-  background:rgba(231,76,60,0.14);
-  color:var(--danger);
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:16px;
-  font-weight:600;
-  display:none;
-}
-
-/* INVITE-ONLY SIGNUP */
 .invite-box {
-  margin-top:22px;
-  font-size:14px;
-  text-align:center;
-  padding:12px;
-  background:#EEF4FF;
-  border-radius:12px;
-  font-weight:600;
-  color:#1E3A8A;
-  display:none;
+  padding: 12px;
+  background: #e9f1ff;
+  border-left: 4px solid var(--blue);
+  border-radius: 6px;
+  margin-bottom: 18px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <header>
@@ -139,60 +99,117 @@ input {
   </nav>
 </header>
 
-<div class="login-wrapper">
+<div class="wrapper">
 
-  <h1>Squad Login</h1>
-  <div class="subtitle">Enter your squad email & password to access booking-off.</div>
+  <div class="card">
 
-  <div id="errorBox" class="error-msg">Incorrect login details</div>
+    <div class="card-title">Squad Sign Up</div>
 
-  <input type="email" id="email" placeholder="Email address">
-  <input type="password" id="password" placeholder="Password">
+    <div id="inviteInfo" class="invite-box" style="display:none;"></div>
 
-  <button class="btn-primary" onclick="handleSquadLogin()">Login</button>
+    <input type="text" id="fullName" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email Address">
+    <input type="password" id="password" placeholder="Create Password">
 
-  <div class="link-row">
-    <a href="squad-forgot.html">Forgot password?</a>
-  </div>
+    <button class="btn-primary" onclick="registerSquad()">Create Account</button>
 
-  <div class="link-row" style="margin-top:10px;">
-    <a href="#" onclick="showInviteMsg()">Create a squad account</a>
-  </div>
-
-  <div id="inviteMsg" class="invite-box">
-    Squad signup is invite-only.  
-    <br>Ask your contractor to create your squad login.
   </div>
 
 </div>
 
 <script>
-/* TEMP USERS */
-const USERS = [
-  { email:"squad1@brickbook.co.uk", password:"brick123" },
-  { email:"squad2@brickbook.co.uk", password:"brick123" }
-];
+/* ==========================
+   READ INVITE FROM URL
+========================== */
+const params = new URLSearchParams(window.location.search);
+const inviteCode = params.get("invite");
 
-/* LOGIN */
-function handleSquadLogin() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const err = document.getElementById("errorBox");
+let inviteData = null;
 
-  const match = USERS.find(u => u.email === email && u.password === password);
+/* FIND invite by code */
+function loadInvite() {
+  if (!inviteCode) return;
 
-  if (match) {
-    sessionStorage.setItem("squadUser", email);
-    window.location.href = "squad-dashboard.html";
-  } else {
-    err.style.display = "block";
+  for (let key in localStorage) {
+    if (key.startsWith("invite_")) {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data.inviteCode === inviteCode) {
+        inviteData = data;
+        break;
+      }
+    }
   }
+
+  if (!inviteData) {
+    document.getElementById("inviteInfo").style.display = "block";
+    document.getElementById("inviteInfo").innerHTML =
+      `<strong>Invite not found.</strong><br>Please check your link.`;
+    return;
+  }
+
+  // Show invite info
+  const infoBox = document.getElementById("inviteInfo");
+  infoBox.style.display = "block";
+  infoBox.innerHTML = `
+    <strong>Invite Found</strong><br>
+    You are joining: <strong>${inviteData.squadId}</strong><br>
+    Contractor invited: <strong>${inviteData.name}</strong>
+  `;
+
+  // Autofill fields
+  document.getElementById("fullName").value = inviteData.name;
+  document.getElementById("email").value = inviteData.email;
 }
 
-/* SHOW INVITE-ONLY MESSAGE */
-function showInviteMsg() {
-  document.getElementById("inviteMsg").style.display = "block";
+/* ==========================
+   REGISTER SQUAD MEMBER
+========================== */
+function registerSquad() {
+  const name = fullName.value.trim();
+  const email = email.value.trim().toLowerCase();
+  const password = password.value.trim();
+
+  if (!name || !email || !password) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  if (!inviteData) {
+    alert("Invalid or missing invite code.");
+    return;
+  }
+
+  /* Save user to localStorage */
+  const userObj = {
+    name,
+    email,
+    password,
+    squadId: inviteData.squadId,
+    contractorId: inviteData.contractorId || "default",
+    bookings: [],
+    earnings: []
+  };
+
+  localStorage.setItem("squad_user_" + email, JSON.stringify(userObj));
+
+  /* Mark invite used */
+  inviteData.status = "accepted";
+  localStorage.setItem("invite_" + email, JSON.stringify(inviteData));
+
+  /* Add to squad group */
+  let squads = JSON.parse(localStorage.getItem("contractor_squads"));
+  const squad = squads.find(s => s.squadId === inviteData.squadId);
+  squad.members.push(email);
+  localStorage.setItem("contractor_squads", JSON.stringify(squads));
+
+  alert("Account created! You can now log in.");
+
+  window.location.href = "squad-login.html";
 }
+
+/* INIT */
+loadInvite();
+
 </script>
 
 </body>
