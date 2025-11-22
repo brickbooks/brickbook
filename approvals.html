@@ -1,220 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Approvals – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Approvals – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* Page-specific enhancements only */
 
-<style>
-:root {
-    --blue: #1B73E8;
-    --charcoal: #2D2D2D;
-    --lightgrey: #F5F7FA;
-    --white: #FFFFFF;
-    --green: #2ECC71;
-    --danger: #E74C3C;
-    --pending: #F1C40F;
-    --shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
+    .approvals-hero {
+      background: linear-gradient(
+        135deg,
+        rgba(27,115,232,0.18),
+        rgba(27,115,232,0.04)
+      );
+      border-radius: 20px;
+      padding: 28px 22px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 24px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
 
-/* BASIC */
-body {
-    margin: 0;
-    background: var(--lightgrey);
-    font-family: 'Inter', Arial, sans-serif;
-}
+    .filters-card {
+      margin-bottom: 22px;
+    }
 
-header {
-    background: var(--white);
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #E5EAF0;
-}
-.logo { font-size: 22px; font-weight: 800; }
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
 
-nav a {
-    margin-left: 20px;
-    text-decoration: none;
-    color: var(--charcoal);
-    font-weight: 600;
-}
-nav a:hover { color: var(--blue); }
+    .filters-row .search-wrap {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
 
-.wrapper {
-    max-width: 1200px;
-    margin: auto;
-    padding: 30px 20px 80px;
-}
+    .filters-row .status-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-h1 { font-size: 28px; font-weight: 800; }
-.subtitle { color: #555; margin-bottom: 24px; }
+    .status-chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-.card {
-    background: var(--white);
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
-}
+    .status-chip.active {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
+    }
 
-/* FILTER BUTTONS */
-.filter-btns {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-.filter-btns button {
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: 1px solid #ccc;
-    background: white;
-    cursor: pointer;
-}
-.filter-btns button.active {
-    background: var(--blue);
-    color: white;
-    border-color: var(--blue);
-}
+    .empty-state {
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
 
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-thead {
-    background: #E7EEFF;
-}
-th, td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #E1E6F0;
-    font-size: 14px;
-}
-
-.status {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: white;
-    font-size: 12px;
-}
-.approved { background: var(--green); }
-.rejected { background: var(--danger); }
-.pending { background: var(--pending); }
-
-.view-btn {
-    background: var(--blue);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-/* MOBILE */
-@media(max-width: 768px) {
-    th, td { font-size: 12px; padding: 8px; }
-    .filter-btns { flex-wrap: wrap; }
-}
-</style>
+    @media (max-width: 640px) {
+      .filters-row {
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="page" data-page="approvals">
 
 <!-- LOGIN CHECK -->
 <script>
-if (!sessionStorage.getItem("loggedIn")) {
+  if (!sessionStorage.getItem("loggedIn")) {
     window.location.href = "contractor-login.html";
-}
-function logout() {
+  }
+  function logout() {
     sessionStorage.removeItem("loggedIn");
     window.location.href = "contractor-login.html";
-}
+  }
 </script>
 
-<header>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
     <div class="logo">BrickBook</div>
-    <nav>
-        <a href="contractor-dashboard.html">Dashboard</a>
-        <a href="contractor-review.html">Review Overview</a>
-        <a href="#" onclick="logout()">Logout</a>
+    <nav class="nav">
+      <a href="contractor-dashboard.html">Dashboard</a>
+      <a href="pricing-table.html">Pricing</a>
+      <a href="approvals.html" class="active">Approvals</a>
+      <a href="contractor-review.html">Review</a>
+      <a href="#" onclick="logout()">Logout</a>
     </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div class="wrapper">
-
-    <h1>Booking-Off Approvals</h1>
-    <div class="subtitle">Filter all submissions and review individual jobs.</div>
-
-    <!-- FILTER BUTTONS -->
-    <div class="filter-btns">
-        <button class="active" onclick="setFilter('all', this)">All</button>
-        <button onclick="setFilter('pending', this)">Pending</button>
-        <button onclick="setFilter('approved', this)">Approved</button>
-        <button onclick="setFilter('rejected', this)">Rejected</button>
-    </div>
-
-    <!-- SUBMISSIONS TABLE -->
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Squad</th>
-                    <th>Plots</th>
-                    <th>Total (£)</th>
-                    <th>Status</th>
-                    <th>View</th>
-                </tr>
-            </thead>
-            <tbody id="approvalsBody"></tbody>
-        </table>
-    </div>
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="contractor-dashboard.html">Dashboard</a>
+  <a href="pricing-table.html">Pricing</a>
+  <a href="approvals.html">Approvals</a>
+  <a href="contractor-review.html">Review</a>
+  <a href="#" onclick="logout()">Logout</a>
 </div>
 
+<main class="container">
+
+  <!-- HERO -->
+  <section class="approvals-hero">
+    <h1 class="h1" style="font-size:30px;">Booking-Off Approvals</h1>
+    <p class="text-muted" style="font-size:15px;">
+      Filter, review and action squad submissions in one place.
+    </p>
+  </section>
+
+  <!-- FILTER BAR -->
+  <section class="card filters-card">
+    <div class="filters-row">
+      <div class="search-wrap">
+        <label for="search-input">Search</label>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search by squad, date, status, plots or total..."
+        />
+      </div>
+
+      <div class="status-filters">
+        <button class="status-chip active" data-filter="all" onclick="setFilter('all', this)">
+          All
+        </button>
+        <button class="status-chip" data-filter="pending" onclick="setFilter('pending', this)">
+          Pending
+        </button>
+        <button class="status-chip" data-filter="approved" onclick="setFilter('approved', this)">
+          Approved
+        </button>
+        <button class="status-chip" data-filter="rejected" onclick="setFilter('rejected', this)">
+          Rejected
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMISSIONS TABLE -->
+  <section class="card">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Submissions</div>
+        <div class="card-sub">Newest first. Use filters above to narrow results.</div>
+      </div>
+    </div>
+
+    <table class="table" style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Squad</th>
+          <th>Plots</th>
+          <th>Total (£)</th>
+          <th>Status</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody id="approvalsBody"></tbody>
+    </table>
+
+    <div id="emptyState" class="empty-state" style="display:none;">
+      No submissions found. Try changing the filter or clearing the search.
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Approvals</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
 <script>
-/* DEMO DATA – Replace with backend later */
-let submissions = [
+  // DEMO DATA – Replace with backend later
+  let submissions = [
     { date: "2025-02-16", squad: "Team A", plots: 3, total: 1400, status: "pending" },
     { date: "2025-02-15", squad: "Team B", plots: 1, total: 460, status: "approved" },
     { date: "2025-02-15", squad: "Team A", plots: 2, total: 820, status: "rejected" },
     { date: "2025-02-14", squad: "Team C", plots: 4, total: 2100, status: "approved" }
-];
+  ];
 
-let activeFilter = "all";
+  let activeFilter = "all";
+  let searchQuery = "";
 
-/* LOAD TABLE */
-function loadTable() {
-    let tbody = document.getElementById("approvalsBody");
+  function loadTable() {
+    const tbody = document.getElementById("approvalsBody");
+    const emptyState = document.getElementById("emptyState");
     tbody.innerHTML = "";
 
-    submissions
-        .filter(s => activeFilter === "all" || s.status === activeFilter)
-        .forEach(s => {
-            let row = document.createElement("tr");
+    const query = searchQuery.trim().toLowerCase();
 
-            row.innerHTML = `
-                <td>${s.date}</td>
-                <td>${s.squad}</td>
-                <td>${s.plots}</td>
-                <td>£${s.total.toFixed(2)}</td>
-                <td><span class="status ${s.status}">${s.status.toUpperCase()}</span></td>
-                <td><a class="view-btn" href="contractor-review-squad.html">View</a></td>
-            `;
-            tbody.appendChild(row);
-        });
-}
+    const filtered = submissions.filter(s => {
+      // status filter
+      if (activeFilter !== "all" && s.status !== activeFilter) return false;
 
-function setFilter(f, btn) {
-    activeFilter = f;
-    document.querySelectorAll(".filter-btns button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+      // search filter (all fields: date, squad, plots, total, status)
+      if (!query) return true;
+      const haystack = [
+        s.date,
+        s.squad,
+        String(s.plots),
+        String(s.total),
+        s.status
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(query);
+    });
+
+    if (!filtered.length) {
+      emptyState.style.display = "block";
+      return;
+    } else {
+      emptyState.style.display = "none";
+    }
+
+    filtered.forEach(s => {
+      let row = document.createElement("tr");
+
+      const statusClassMap = {
+        pending: "status-pill status-pill--pending",
+        approved: "status-pill status-pill--approved",
+        rejected: "status-pill status-pill--rejected"
+      };
+
+      row.innerHTML = `
+        <td>${s.date}</td>
+        <td>${s.squad}</td>
+        <td>${s.plots}</td>
+        <td>£${s.total.toFixed(2)}</td>
+        <td><span class="${statusClassMap[s.status]}">${s.status}</span></td>
+        <td><a class="btn btn-primary btn-sm" href="contractor-review-squad.html">View</a></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll(".status-filters .status-chip").forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
     loadTable();
-}
+  }
 
-loadTable();
+  document.getElementById("search-input").addEventListener("input", (e) => {
+    searchQuery = e.target.value;
+    loadTable();
+  });
+
+  loadTable();
+</script>
+
+<script>
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('show');
+}
 </script>
 
 </body>
