@@ -1,462 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pricing Manager – BrickBook</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="assets/style.css" />
+<meta charset="UTF-8">
+<title>Pricing Table – BrickBook</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/style.css">
+
+<style>
+:root {
+  --blue: #1B73E8;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text-muted: #6B7280;
+  --shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: "Inter", sans-serif;
+}
+
+/* HEADER */
+header {
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #000;
+}
+nav a:hover { color: var(--blue); }
+
+.wrapper {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  padding: 26px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.split-box {
+  padding: 14px;
+  background: #f0f4ff;
+  border-radius: 12px;
+  margin-top: 14px;
+}
+</style>
 </head>
 
-<body class="page" data-page="pricing">
+<body>
 
-<script>
-  // Contractor login guard
-  if (!sessionStorage.getItem("loggedIn")) {
-    window.location.href = "contractor-login.html";
-  }
-  function logout() {
-    sessionStorage.removeItem("loggedIn");
-    window.location.href = "contractor-login.html";
-  }
-</script>
-
-<!-- SHARED CONTRACTOR HEADER -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="logo">BrickBook</div>
-    <nav class="nav">
-      <a href="contractor-dashboard.html">Dashboard</a>
-      <a href="pricing-table.html" class="active">Pricing</a>
-      <a href="approvals.html">Approvals</a>
-      <a href="contractor-review.html">Review</a>
-      <a href="#" onclick="logout()">Logout</a>
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-  </div>
+<header>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="contractor-dashboard.html">Dashboard</a>
+    <a href="approvals.html">Approvals</a>
+    <a href="contractor-review.html">Review</a>
+    <a href="contractor-add-squads.html">Add Squads</a>
+    <a href="contractor-login.html">Logout</a>
+  </nav>
 </header>
 
-<!-- MOBILE NAV -->
-<div id="mobileMenu" class="mobile-nav">
-  <a href="contractor-dashboard.html">Dashboard</a>
-  <a href="pricing-table.html">Pricing</a>
-  <a href="approvals.html">Approvals</a>
-  <a href="contractor-review.html">Review</a>
-  <a href="#" onclick="logout()">Logout</a>
+<div class="wrapper">
+
+  <div class="card">
+    <div class="card-title">Create Pricing Profile</div>
+
+    <label>Pricing Name</label>
+    <input type="text" id="priceName" placeholder="E.g. Standard Rates">
+
+    <label>Select Squad</label>
+    <select id="pricingSquadSelect" onchange="loadSquadMembers()"></select>
+
+    <div id="splitBox" class="split-box">
+      <p style="color:var(--text-muted); margin:0;">Select a squad to load members...</p>
+    </div>
+
+    <label>Price Per Brickwork Unit (£)</label>
+    <input type="number" id="priceRate" placeholder="Enter rate">
+
+    <button class="btn-primary" onclick="savePricing()">Save Pricing</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Existing Pricing Profiles</div>
+    <div id="pricingList"></div>
+  </div>
+
 </div>
 
-<main class="container">
-
-  <!-- HERO -->
-  <section class="hero-card" style="margin-top:8px;">
-    <div class="hero-header" style="flex-direction:column; align-items:flex-start; gap:8px;">
-      <div>
-        <h1 class="h1" style="font-size:24px; margin-bottom:4px;">Pricing Manager</h1>
-        <p class="hero-sub" style="font-size:14px;">
-          Set custom rates by squad &amp; site. Add any measurements you like – bricks, insulation, DPC, you name it.
-        </p>
-      </div>
-      <span class="badge">Local-only for now · Backend-ready</span>
-    </div>
-  </section>
-
-  <!-- GRID -->
-  <section class="grid-2 mt-20">
-    <!-- LEFT: SETUP FORM -->
-    <div class="card">
-      <div class="card-title">Squads &amp; Sites</div>
-      <div class="card-sub">
-        Create squads and sites, then link them to a custom pricing profile.
-      </div>
-
-      <!-- Squads -->
-      <div class="mt-12">
-        <label for="new-squad">Add squad</label>
-        <div class="row row-wrap" style="margin-bottom:6px;">
-          <input type="text" id="new-squad" placeholder="e.g. Team A" />
-          <button class="btn btn-sm btn-primary" type="button" onclick="addSquad()">+ Add</button>
-        </div>
-        <div class="chip-row" id="squad-chips"></div>
-      </div>
-
-      <!-- Sites -->
-      <div class="mt-16">
-        <label for="new-site">Add site</label>
-        <div class="row row-wrap" style="margin-bottom:6px;">
-          <input type="text" id="new-site" placeholder="e.g. Plot 12-30, Greenfield Estate" />
-          <button class="btn btn-sm btn-primary" type="button" onclick="addSite()">+ Add</button>
-        </div>
-        <div class="chip-row" id="site-chips"></div>
-      </div>
-
-      <hr style="border:none; border-top:1px solid var(--border-subtle); margin:14px 0;" />
-
-      <!-- Squad + site for this pricing profile -->
-      <div class="grid-2">
-        <div>
-          <label for="squad-select">Squad</label>
-          <select id="squad-select">
-            <option value="">Select squad…</option>
-          </select>
-        </div>
-        <div>
-          <label for="site-select">Site</label>
-          <select id="site-select">
-            <option value="">Select site…</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="card-sub mt-12">
-        Now define the measurements &amp; rates for this squad + site.
-      </div>
-
-      <!-- CUSTOM FIELDS TABLE -->
-      <table class="table field-table" id="fields-table" style="margin-top:8px;">
-        <thead>
-          <tr>
-            <th style="width:45%;">Measurement</th>
-            <th style="width:25%;">Unit (note)</th>
-            <th style="width:20%;">Rate (£)</th>
-            <th style="width:10%;"></th>
-          </tr>
-        </thead>
-        <tbody id="fields-body"></tbody>
-      </table>
-
-      <button class="btn btn-sm btn-ghost" type="button" onclick="addFieldRow()">
-        + Add measurement
-      </button>
-
-      <div class="row row-justify-end mt-16">
-        <button class="btn btn-md btn-ghost" type="button" onclick="clearForm()">Clear</button>
-        <button class="btn btn-md btn-primary" type="button" onclick="saveProfile()">Save pricing</button>
-      </div>
-    </div>
-
-    <!-- RIGHT: ACTIVE PROFILES -->
-    <div class="card">
-      <div class="card-header-row">
-        <div>
-          <div class="card-title">Active pricing profiles</div>
-          <div class="card-sub">One row per squad + site. Click edit to update rates.</div>
-        </div>
-      </div>
-
-      <table class="table profiles-table" style="margin-top:10px;">
-        <thead>
-          <tr>
-            <th>Squad</th>
-            <th>Site</th>
-            <th>Fields</th>
-            <th>Updated</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="profiles-body"></tbody>
-      </table>
-    </div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2025 BrickBook</span>
-    <span class="text-muted">Pricing Manager</span>
-  </div>
-</footer>
-
-<script src="assets/main.js"></script>
 <script>
-  // ---------- STATE & STORAGE ----------
-  const STORAGE_KEY = "brickbook_pricing_state";
+/* LOAD SQUADS */
+function loadSquadsForPricing() {
+    let squadSelect = document.getElementById("pricingSquadSelect");
+    squadSelect.innerHTML = "";
 
-  let state = {
-    squads: [],
-    sites: [],
-    profiles: [] // { id, squad, site, fields:[{name,unit,rate}], updatedAt }
-  };
+    let squads = JSON.parse(localStorage.getItem("contractor_squads")) || [];
 
-  function loadState() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    try {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        state = Object.assign(state, parsed);
-      }
-    } catch (e) {
-      console.error("Failed to parse pricing state", e);
+    if (squads.length === 0) {
+        squadSelect.innerHTML = `<option>No squads found</option>`;
+        return;
     }
-  }
 
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  // ---------- SQUADS & SITES ----------
-  function addSquad() {
-    const input = document.getElementById("new-squad");
-    const name = input.value.trim();
-    if (!name) return;
-    if (!state.squads.includes(name)) {
-      state.squads.push(name);
-      saveState();
-      renderSquads();
-    }
-    input.value = "";
-  }
-
-  function addSite() {
-    const input = document.getElementById("new-site");
-    const name = input.value.trim();
-    if (!name) return;
-    if (!state.sites.includes(name)) {
-      state.sites.push(name);
-      saveState();
-      renderSites();
-    }
-    input.value = "";
-  }
-
-  function removeSquad(name) {
-    state.squads = state.squads.filter(s => s !== name);
-    // Also remove profiles tied to this squad
-    state.profiles = state.profiles.filter(p => p.squad !== name);
-    saveState();
-    renderSquads();
-    renderProfiles();
-  }
-
-  function removeSite(name) {
-    state.sites = state.sites.filter(s => s !== name);
-    state.profiles = state.profiles.filter(p => p.site !== name);
-    saveState();
-    renderSites();
-    renderProfiles();
-  }
-
-  function renderSquads() {
-    const chips = document.getElementById("squad-chips");
-    const select = document.getElementById("squad-select");
-    chips.innerHTML = "";
-    select.innerHTML = `<option value="">Select squad…</option>`;
-
-    state.squads.forEach(name => {
-      // chip
-      const chip = document.createElement("div");
-      chip.className = "chip";
-      chip.innerHTML = `
-        <span>${name}</span>
-        <span class="remove" onclick="removeSquad('${name.replace(/'/g,"\\'")}')">×</span>
-      `;
-      chips.appendChild(chip);
-
-      // option
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
+    squads.forEach(s => {
+        squadSelect.innerHTML += `
+            <option value="${s.squadId}">${s.squadName}</option>
+        `;
     });
-  }
 
-  function renderSites() {
-    const chips = document.getElementById("site-chips");
-    const select = document.getElementById("site-select");
-    chips.innerHTML = "";
-    select.innerHTML = `<option value="">Select site…</option>`;
+    loadSquadMembers();
+}
 
-    state.sites.forEach(name => {
-      const chip = document.createElement("div");
-      chip.className = "chip";
-      chip.innerHTML = `
-        <span>${name}</span>
-        <span class="remove" onclick="removeSite('${name.replace(/'/g,"\\'")}')">×</span>
-      `;
-      chips.appendChild(chip);
+/* LOAD MEMBERS FOR SPLITS */
+function loadSquadMembers() {
+    let squadId = document.getElementById("pricingSquadSelect").value;
+    let squads = JSON.parse(localStorage.getItem("contractor_squads")) || [];
+    let squad = squads.find(s => s.squadId === squadId);
 
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
+    let splitBox = document.getElementById("splitBox");
+    splitBox.innerHTML = "";
+
+    if (!squad) {
+        splitBox.innerHTML = `<p>No squad selected</p>`;
+        return;
+    }
+
+    if (squad.members.length === 0) {
+        splitBox.innerHTML = `<p style="color:var(--text-muted);">No squad members yet</p>`;
+        return;
+    }
+
+    squad.members.forEach(email => {
+        let user = JSON.parse(localStorage.getItem("squad_user_" + email));
+
+        splitBox.innerHTML += `
+            <div style="margin-bottom:10px;">
+                <label>${user.name} (${email})</label>
+                <input type="number" class="split-input" data-email="${email}" placeholder="Split %">
+            </div>
+        `;
     });
-  }
+}
 
-  // ---------- FIELDS (CUSTOM MEASUREMENTS) ----------
-  function addFieldRow(field = { name: "", unit: "", rate: "" }) {
-    const tbody = document.getElementById("fields-body");
-    const tr = document.createElement("tr");
+/* SAVE PRICING PROFILE */
+function savePricing() {
+    const name = document.getElementById("priceName").value.trim();
+    const rate = document.getElementById("priceRate").value.trim();
+    const squadId = document.getElementById("pricingSquadSelect").value;
 
-    tr.innerHTML = `
-      <td><input type="text" placeholder="e.g. Bricks" value="${field.name || ""}"></td>
-      <td><input type="text" placeholder="e.g. £/1000" value="${field.unit || ""}"></td>
-      <td><input type="number" placeholder="0.00" step="0.01" value="${field.rate || ""}"></td>
-      <td style="text-align:center;">
-        <button class="btn btn-sm btn-danger" type="button" onclick="removeFieldRow(this)">×</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-
-  function removeFieldRow(btn) {
-    const tr = btn.closest("tr");
-    if (tr) tr.remove();
-  }
-
-  function getFieldsFromForm() {
-    const rows = document.querySelectorAll("#fields-body tr");
-    const fields = [];
-    rows.forEach(tr => {
-      const inputs = tr.querySelectorAll("input");
-      const name = inputs[0].value.trim();
-      const unit = inputs[1].value.trim();
-      const rate = parseFloat(inputs[2].value);
-      if (!name || isNaN(rate)) return;
-      fields.push({ name, unit, rate });
-    });
-    return fields;
-  }
-
-  function setFieldsInForm(fields) {
-    const tbody = document.getElementById("fields-body");
-    tbody.innerHTML = "";
-    if (!fields || !fields.length) {
-      addFieldRow();
-    } else {
-      fields.forEach(f => addFieldRow(f));
-    }
-  }
-
-  // ---------- PROFILES ----------
-  let editingProfileId = null;
-
-  function saveProfile() {
-    const squad = document.getElementById("squad-select").value;
-    const site = document.getElementById("site-select").value;
-    const fields = getFieldsFromForm();
-
-    if (!squad || !site) {
-      alert("Select a squad and a site before saving.");
-      return;
-    }
-    if (!fields.length) {
-      alert("Add at least one measurement and rate.");
-      return;
+    if (!name || !rate) {
+        alert("Enter all pricing details.");
+        return;
     }
 
-    const now = new Date().toISOString();
-
-    if (editingProfileId) {
-      // Update existing
-      const idx = state.profiles.findIndex(p => p.id === editingProfileId);
-      if (idx !== -1) {
-        state.profiles[idx] = { ...state.profiles[idx], squad, site, fields, updatedAt: now };
-      }
-    } else {
-      // Either update matching squad+site, or create new
-      let existing = state.profiles.find(p => p.squad === squad && p.site === site);
-      if (existing) {
-        existing.fields = fields;
-        existing.updatedAt = now;
-      } else {
-        state.profiles.push({
-          id: "p_" + Date.now(),
-          squad,
-          site,
-          fields,
-          updatedAt: now
+    const splits = [];
+    document.querySelectorAll(".split-input").forEach(input => {
+        splits.push({
+            email: input.dataset.email,
+            percent: input.value ? parseFloat(input.value) : 0
         });
-      }
-    }
-
-    saveState();
-    renderProfiles();
-    editingProfileId = null;
-    alert("Pricing saved for " + squad + " @ " + site);
-  }
-
-  function renderProfiles() {
-    const tbody = document.getElementById("profiles-body");
-    tbody.innerHTML = "";
-
-    if (!state.profiles.length) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td colspan="5" style="font-size:12px; color:var(--text-muted); padding:12px 6px;">
-          No pricing profiles yet. Add a squad, add a site, define measurements, then click Save.
-        </td>
-      `;
-      tbody.appendChild(tr);
-      return;
-    }
-
-    state.profiles.forEach(p => {
-      const tr = document.createElement("tr");
-
-      const dateStr = p.updatedAt
-        ? new Date(p.updatedAt).toLocaleDateString(undefined, {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-          })
-        : "-";
-
-      tr.innerHTML = `
-        <td>${p.squad}</td>
-        <td>${p.site}</td>
-        <td><span class="tag">${p.fields.length} fields</span></td>
-        <td>${dateStr}</td>
-        <td style="text-align:right;">
-          <button class="btn btn-sm btn-ghost" type="button" onclick="editProfile('${p.id}')">Edit</button>
-          <button class="btn btn-sm btn-danger" type="button" onclick="deleteProfile('${p.id}')">Del</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
     });
-  }
 
-  function editProfile(id) {
-    const p = state.profiles.find(x => x.id === id);
-    if (!p) return;
-    editingProfileId = id;
+    let pricingList = JSON.parse(localStorage.getItem("pricing_profiles") || "[]");
 
-    document.getElementById("squad-select").value = p.squad;
-    document.getElementById("site-select").value = p.site;
-    setFieldsInForm(p.fields);
-  }
+    pricingList.push({
+        id: "pricing_" + Date.now(),
+        name,
+        rate,
+        squadId,
+        splits
+    });
 
-  function deleteProfile(id) {
-    if (!confirm("Delete this pricing profile?")) return;
-    state.profiles = state.profiles.filter(p => p.id !== id);
-    saveState();
-    renderProfiles();
-    if (editingProfileId === id) {
-      clearForm();
+    localStorage.setItem("pricing_profiles", JSON.stringify(pricingList));
+
+    alert("Pricing profile saved.");
+    renderPricingList();
+}
+
+/* SHOW EXISTING PROFILES */
+function renderPricingList() {
+    let container = document.getElementById("pricingList");
+    let pricingList = JSON.parse(localStorage.getItem("pricing_profiles") || "[]");
+    let squads = JSON.parse(localStorage.getItem("contractor_squads") || "[]");
+
+    container.innerHTML = "";
+
+    if (pricingList.length === 0) {
+        container.innerHTML = `<p style='color:var(--text-muted);'>No pricing profiles yet.</p>`;
+        return;
     }
-  }
 
-  function clearForm() {
-    editingProfileId = null;
-    document.getElementById("squad-select").value = "";
-    document.getElementById("site-select").value = "";
-    setFieldsInForm([]);
-  }
+    pricingList.forEach(p => {
+        let squad = squads.find(s => s.squadId === p.squadId);
 
-  // ---------- INIT ----------
-  (function init() {
-    loadState();
-    renderSquads();
-    renderSites();
-    renderProfiles();
-    if (!document.querySelector("#fields-body tr")) {
-      addFieldRow();
-    }
-  })();
-</script>
+        container.innerHTML += `
+            <div style="padding:12px; border:1px solid var(--border); 
+                        border-radius:10px; margin-bottom:10px;">
+              <strong>${p.name}</strong><br>
+              Rate: £${p.rate}<br>
+              Squad: ${squad ? squad.squadName : "Unknown"}<br>
+              Splits:
+              <ul>
+                ${p.splits
+                  .map(s => `<li>${s.email} — ${s.percent}%</li>`)
+                  .join("")}
+              </ul>
+            </div>
+        `;
+    });
+}
 
-<script>
-  function toggleMenu() {
-    document.getElementById('mobileMenu').classList.toggle('show');
-  }
+/* INIT */
+loadSquadsForPricing();
+renderPricingList();
 </script>
 
 </body>
