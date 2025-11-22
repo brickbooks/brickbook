@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Booking Detail – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+<body class="page" data-page="squad-booking-detail">
+
+<script>
+// --- LOGIN GUARD ---
+let squadUser = sessionStorage.getItem("squadUser");
+if (!squadUser) {
+  const backup = localStorage.getItem("lastSquadUser");
+  if (backup) {
+    sessionStorage.setItem("squadUser", backup);
+    squadUser = backup;
+  } else {
+    window.location.href = "squad-login.html";
+  }
+}
+localStorage.setItem("lastSquadUser", squadUser);
+</script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">BrickBook</div>
+    <nav class="nav">
+      <a href="squad-dashboard.html">Dashboard</a>
+      <a href="squad-history.html">History</a>
+      <a href="squad-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="squad-dashboard.html">Dashboard</a>
+  <a href="squad-history.html">History</a>
+  <a href="squad-profile.html">Profile</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<main class="container">
+
+  <!-- HERO / SUMMARY -->
+  <section class="hero-card" style="margin-top:12px;">
+    <div class="hero-header" style="flex-direction:column; gap:8px;">
+      <div>
+        <h1 class="h1" id="heroPlotTitle" style="margin-bottom:4px;">Plot</h1>
+        <p class="hero-sub" id="heroSub">
+          Full breakdown of this booking-off and totals for this plot.
+        </p>
+      </div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div>
+          <div class="text-muted" style="font-size:13px;">Plot total (wages)</div>
+          <div style="font-size:22px; font-weight:800;">
+            £<span id="plotTotalWage">0.00</span>
+          </div>
+        </div>
+        <div>
+          <div class="text-muted" style="font-size:13px;">Plot total after CIS</div>
+          <div style="font-size:22px; font-weight:800;">
+            £<span id="plotTotalAfterCIS">0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THIS BOOKING -->
+  <section class="card mt-16" id="thisBookingCard">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">This booking-off</div>
+        <div class="card-sub">Details for this specific submission.</div>
+      </div>
+      <div id="thisStatusBox"></div>
+    </div>
+
+    <div class="grid-2 mt-12">
+      <div>
+        <div class="text-muted" style="font-size:13px;">Date</div>
+        <div id="thisDate" style="font-size:15px; font-weight:600;">-</div>
+      </div>
+      <div>
+        <div class="text-muted" style="font-size:13px;">Your share</div>
+        <div style="font-size:15px; font-weight:600;">
+          £<span id="thisWage">0.00</span>
+        </div>
+      </div>
+      <div>
+        <div class="text-muted" style="font-size:13px;">After CIS</div>
+        <div style="font-size:15px; font-weight:600;">
+          £<span id="thisAfterCIS">0.00</span>
+        </div>
+      </div>
+      <div>
+        <div class="text-muted" style="font-size:13px;">Status</div>
+        <div id="thisStatusText" style="font-size:15px; font-weight:600;">-</div>
+      </div>
+    </div>
+
+    <!-- MATERIALS FOR THIS BOOKING -->
+    <div class="mt-16">
+      <div class="card-title" style="font-size:14px;">Materials recorded (this booking)</div>
+      <div class="card-sub">Materials are for records only – not added to wages.</div>
+
+      <table class="table mt-8" id="thisMaterialsTable">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Rate (£)</th>
+            <th>Total (£)</th>
+          </tr>
+        </thead>
+        <tbody id="thisMaterialsBody"></tbody>
+      </table>
+      <div id="thisMaterialsEmpty" class="text-muted" style="font-size:13px; margin-top:6px; display:none;">
+        No materials recorded on this booking.
+      </div>
+    </div>
+  </section>
+
+  <!-- ALL BOOKINGS FOR THIS PLOT -->
+  <section class="card mt-16">
+    <div class="card-title">All booking-offs for this plot</div>
+    <div class="card-sub">Every time this plot has been booked-off, with running totals.</div>
+
+    <table class="table mt-10">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Your share</th>
+          <th>After CIS</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="plotBookingsBody"></tbody>
+    </table>
+  </section>
+
+  <!-- MATERIAL TOTALS FOR PLOT -->
+  <section class="card mt-16">
+    <div class="card-title">Materials total for this plot</div>
+    <div class="card-sub">
+      Combined materials from every booking for this plot. Materials are tracked only – not added to earnings.
+    </div>
+
+    <div class="grid-2 mt-12">
+      <div>
+        <div class="text-muted" style="font-size:13px;">Total bricks</div>
+        <div style="font-size:18px; font-weight:700;" id="totalBricks">0</div>
+      </div>
+      <div>
+        <div class="text-muted" style="font-size:13px;">Total blocks</div>
+        <div style="font-size:18px; font-weight:700;" id="totalBlocks">0</div>
+      </div>
+    </div>
+
+    <table class="table mt-12">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Total Qty</th>
+          <th>Unit</th>
+          <th>Approx. Value (£)</th>
+        </tr>
+      </thead>
+      <tbody id="materialsTotalsBody"></tbody>
+    </table>
+    <div id="materialsTotalsEmpty" class="text-muted" style="font-size:13px; margin-top:6px; display:none;">
+      No materials recorded yet for this plot.
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Booking Detail</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+<script>
+function toggleMenu() {
+  document.getElementById("mobileMenu").classList.toggle("show");
+}
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+
+// --- LOAD DATA FROM LOCALSTORAGE ---
+const squadKey = "squad_" + squadUser;
+let squadData = JSON.parse(localStorage.getItem(squadKey) || "{}");
+if (!squadData.bookings) squadData.bookings = [];
+
+// --- GET URL PARAMS: entry or plot ---
+const params = new URLSearchParams(window.location.search);
+const entryParam = params.get("entry");
+const plotParam = params.get("plot");
+
+let bookings = squadData.bookings;
+let currentBooking = null;
+let plotId = null;
+
+// If plot param is provided, use that first
+if (plotParam) {
+  plotId = plotParam;
+  currentBooking = bookings.find(b => (b.plot || "") == plotParam) || bookings[0] || null;
+} else if (entryParam !== null) {
+  const idx = parseInt(entryParam, 10);
+  if (!isNaN(idx) && idx >= 0 && idx < bookings.length) {
+    currentBooking = bookings[idx];
+    plotId = currentBooking.plot || "";
+  }
+}
+
+// If still no booking found
+if (!currentBooking || !plotId) {
+  document.querySelector("main .container")?.remove;
+  // Simpler: show a basic error
+  document.querySelector("main")?.insertAdjacentHTML("afterbegin",
+    '<section class="card" style="margin-top:16px;"><div class="card-title">No booking found</div><div class="card-sub">The booking you are trying to view could not be found.</div></section>'
+  );
+} else {
+  renderPage();
+}
+
+function renderPage() {
+  // HERO
+  document.getElementById("heroPlotTitle").textContent = "Plot " + (plotId || "-");
+
+  // THIS BOOKING
+  const d = currentBooking.date || "-";
+  const wage = typeof currentBooking.wage === "number" ? currentBooking.wage : 0;
+  const ac = typeof currentBooking.afterCIS === "number" ? currentBooking.afterCIS : (wage * 0.8);
+  const status = currentBooking.status || "Pending";
+
+  document.getElementById("thisDate").textContent = d;
+  document.getElementById("thisWage").textContent = wage.toFixed(2);
+  document.getElementById("thisAfterCIS").textContent = ac.toFixed(2);
+  document.getElementById("thisStatusText").textContent = status;
+
+  let sClass = "status-pill status-pill--pending";
+  if (status.toLowerCase() === "approved") sClass = "status-pill status-pill--approved";
+  if (status.toLowerCase() === "rejected") sClass = "status-pill status-pill--rejected";
+
+  document.getElementById("thisStatusBox").innerHTML =
+    `<span class="${sClass}">${status}</span>`;
+
+  // MATERIALS FOR THIS BOOKING
+  renderThisBookingMaterials(currentBooking);
+
+  // ALL BOOKINGS FOR THIS PLOT
+  const samePlotBookings = bookings.filter(b => (b.plot || "") === plotId);
+  renderPlotBookings(samePlotBookings);
+
+  // PLOT TOTALS (EARNINGS)
+  let totalWage = 0;
+  let totalAfterCIS = 0;
+
+  samePlotBookings.forEach(b => {
+    const w = typeof b.wage === "number" ? b.wage : 0;
+    const a = typeof b.afterCIS === "number" ? b.afterCIS : (w * 0.8);
+    totalWage += w;
+    totalAfterCIS += a;
+  });
+
+  document.getElementById("plotTotalWage").textContent = totalWage.toFixed(2);
+  document.getElementById("plotTotalAfterCIS").textContent = totalAfterCIS.toFixed(2);
+
+  // MATERIAL TOTALS FOR THIS PLOT
+  renderMaterialTotals(samePlotBookings);
+}
+
+function renderThisBookingMaterials(b) {
+  const body = document.getElementById("thisMaterialsBody");
+  const empty = document.getElementById("thisMaterialsEmpty");
+  body.innerHTML = "";
+
+  const mats = Array.isArray(b.materials) ? b.materials : [];
+
+  if (!mats.length) {
+    empty.style.display = "block";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  mats.forEach(m => {
+    const qty = Number(m.qty) || 0;
+    const rate = Number(m.rate) || 0;
+    const total = qty * rate;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.name || "-"}</td>
+      <td>${qty}</td>
+      <td>${m.unit || ""}</td>
+      <td>${rate ? "£" + rate.toFixed(2) : "-"}</td>
+      <td>${rate ? "£" + total.toFixed(2) : "-"}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function renderPlotBookings(list) {
+  const body = document.getElementById("plotBookingsBody");
+  body.innerHTML = "";
+
+  if (!list.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-muted" style="padding:12px;">
+          No bookings for this plot yet.
+        </td>
+      </tr>`;
+    return;
+  }
+
+  const sorted = list.slice().sort((a,b) => {
+    const da = new Date(a.date || 0).getTime();
+    const db = new Date(b.date || 0).getTime();
+    return db - da;
+  });
+
+  sorted.forEach(b => {
+    const w = typeof b.wage === "number" ? b.wage : 0;
+    const a = typeof b.afterCIS === "number" ? b.afterCIS : w * 0.8;
+    const status = b.status || "Pending";
+
+    let sClass = "status-pill status-pill--pending";
+    if (status.toLowerCase() === "approved") sClass = "status-pill status-pill--approved";
+    if (status.toLowerCase() === "rejected") sClass = "status-pill status-pill--rejected";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.date || "-"}</td>
+      <td>£${w.toFixed(2)}</td>
+      <td>£${a.toFixed(2)}</td>
+      <td><span class="${sClass}">${status}</span></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function renderMaterialTotals(list) {
+  const body = document.getElementById("materialsTotalsBody");
+  const empty = document.getElementById("materialsTotalsEmpty");
+  body.innerHTML = "";
+
+  const totals = {}; // { name: { qty, unit, value } }
+  let totalBricks = 0;
+  let totalBlocks = 0;
+
+  list.forEach(b => {
+    const mats = Array.isArray(b.materials) ? b.materials : [];
+    mats.forEach(m => {
+      const name = (m.name || "").trim();
+      const key = name.toLowerCase();
+      const qty = Number(m.qty) || 0;
+      const rate = Number(m.rate) || 0;
+      const val = qty * rate;
+
+      if (!totals[name]) {
+        totals[name] = {
+          qty: 0,
+          unit: m.unit || "",
+          value: 0
+        };
+      }
+      totals[name].qty += qty;
+      totals[name].value += val;
+
+      if (key.includes("brick")) totalBricks += qty;
+      if (key.includes("block")) totalBlocks += qty;
+    });
+  });
+
+  document.getElementById("totalBricks").textContent = totalBricks;
+  document.getElementById("totalBlocks").textContent = totalBlocks;
+
+  const names = Object.keys(totals);
+  if (!names.length) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  names.forEach(name => {
+    const t = totals[name];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${t.qty}</td>
+      <td>${t.unit}</td>
+      <td>${t.value ? "£" + t.value.toFixed(2) : "-"}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+</script>
+
+</body>
+</html>
