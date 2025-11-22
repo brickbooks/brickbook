@@ -1,269 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squad History – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Booking History – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-/* -------------------------------------------------------
-   THEME (LIGHT + DARK)
-------------------------------------------------------- */
-:root {
-  --blue: #1b73e8;
-  --bg: #f5f7fa;
-  --card: #ffffff;
-  --text: #1f1f1f;
-  --subtext: #555;
-  --shadow: rgba(0, 0, 0, 0.1);
-}
-
-.dark {
-  --bg: #0f0f0f;
-  --card: #1a1a1a;
-  --text: #f1f1f1;
-  --subtext: #aaa;
-  --shadow: rgba(0, 0, 0, 0.6);
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  font-family: 'Inter', Arial, sans-serif;
-  color: var(--text);
-  transition: 0.25s ease;
-}
-
-/* -------------------------------------------------------
-   HEADER
-------------------------------------------------------- */
-header {
-  background: var(--card);
-  padding: 18px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(150,150,150,0.2);
-  position: sticky;
-  top: 0;
-  z-index: 99;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-}
-
-nav a {
-  margin-left: 20px;
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 600;
-}
-
-nav a:hover {
-  color: var(--blue);
-}
-
-.dark-toggle {
-  padding: 8px 12px;
-  background: var(--blue);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* -------------------------------------------------------
-   WRAPPER
-------------------------------------------------------- */
-.wrapper {
-  max-width: 1100px;
-  margin: auto;
-  padding: 30px 20px;
-}
-
-/* -------------------------------------------------------
-   TITLE
-------------------------------------------------------- */
-h1 {
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-.subtitle {
-  font-size: 15px;
-  color: var(--subtext);
-  margin-bottom: 30px;
-}
-
-/* -------------------------------------------------------
-   TABLE CARD
-------------------------------------------------------- */
-.table-card {
-  background: var(--card);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px var(--shadow);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid rgba(150,150,150,0.2);
-}
-
-thead {
-  background: rgba(0,0,0,0.05);
-}
-
-.status-approved { color: #2ecc71; font-weight: 700; }
-.status-pending { color: #f1c40f; font-weight: 700; }
-.status-rejected { color: #e74c3c; font-weight: 700; }
-
-/* -------------------------------------------------------
-   QUICK ACTIONS
-------------------------------------------------------- */
-.quick-actions {
-  margin-top: 40px;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.quick-btn {
-  padding: 14px 22px;
-  background: var(--blue);
-  color: white;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(27,115,232,0.35);
-}
-
-.quick-btn:hover {
-  opacity: 0.9;
-}
-
-@media(max-width: 700px) {
-  th, td { font-size: 14px; }
-}
-</style>
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 
-<body>
+<body class="page" data-page="squad-history">
 
-<header>
-  <div class="logo">BrickBook</div>
+<script>
+// ------- LOGIN GUARD -------
+let squadUser = sessionStorage.getItem("squadUser");
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="squad-dashboard.html">Dashboard</a>
-  </nav>
+if (!squadUser) {
+  const backup = localStorage.getItem("lastSquadUser");
+  if (backup) {
+    sessionStorage.setItem("squadUser", backup);
+    squadUser = backup;
+  } else {
+    window.location.href = "squad-login.html";
+  }
+}
 
-  <div class="dark-toggle" onclick="toggleDark()">Dark Mode</div>
+localStorage.setItem("lastSquadUser", squadUser);
+</script>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">BrickBook</div>
+
+    <nav class="nav">
+      <a href="squad-dashboard.html">Dashboard</a>
+      <a class="active" href="squad-history.html">History</a>
+      <a href="squad-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div class="wrapper">
+<!-- MOBILE NAV -->
+<div id="mobileMenu" class="mobile-nav">
+  <a href="squad-dashboard.html">Dashboard</a>
+  <a href="squad-history.html">History</a>
+  <a href="squad-profile.html">Profile</a>
+  <a href="#" onclick="logout()">Logout</a>
+</div>
 
-  <h1>Work History</h1>
-  <div class="subtitle">All your Booking-Off entries and CIS deductions.</div>
+<main class="container">
 
-  <div class="table-card">
-    <h2>Your Booking-Off Records</h2>
+  <section class="card" style="margin-top:16px;">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Booking History</div>
+        <div class="card-sub">Your full list of booking-offs.</div>
+      </div>
+    </div>
 
-    <table>
+    <!-- FILTERS -->
+    <div class="row row-wrap mt-16" style="gap:10px;">
+      <button class="btn btn-sm btn-ghost filter-btn active" data-filter="all">All</button>
+      <button class="btn btn-sm btn-ghost filter-btn" data-filter="approved">Approved</button>
+      <button class="btn btn-sm btn-ghost filter-btn" data-filter="pending">Pending</button>
+      <button class="btn btn-sm btn-ghost filter-btn" data-filter="rejected">Rejected</button>
+
+      <select id="monthFilter" class="input" style="max-width:160px; margin-left:auto;">
+        <option value="all">All Months</option>
+      </select>
+    </div>
+
+    <!-- TABLE -->
+    <table class="table mt-16">
       <thead>
         <tr>
           <th>Date</th>
           <th>Plot</th>
-          <th>Your Share (£)</th>
-          <th>After CIS (£)</th>
+          <th>Your Share</th>
+          <th>After CIS</th>
           <th>Status</th>
+          <th style="width:60px;"></th>
         </tr>
       </thead>
-
-      <tbody id="historyTable"></tbody>
+      <tbody id="historyTableBody"></tbody>
     </table>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Squad History</span>
   </div>
+</footer>
 
-  <div class="quick-actions">
-    <a class="quick-btn" href="squad-dashboard.html">Back to Dashboard</a>
-    <a class="quick-btn" href="booking.html">New Booking-Off</a>
-    <a class="quick-btn" onclick="logout()">Logout</a>
-  </div>
-
-</div>
-
+<script src="assets/main.js"></script>
 <script>
-/* -----------------------------
-   DARK MODE
------------------------------ */
-function toggleDark() {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("squadDarkMode", document.body.classList.contains("dark"));
+
+// --- MENU TOGGLE ---
+function toggleMenu() {
+  document.getElementById("mobileMenu").classList.toggle("show");
 }
 
-if (localStorage.getItem("squadDarkMode") === "true") {
-  document.body.classList.add("dark");
-}
-
-/* -----------------------------
-   LOGIN CHECK
------------------------------ */
-const user = sessionStorage.getItem("squadUser");
-if (!user) window.location.href = "squad-login.html";
-
-/* -----------------------------
-   LOAD USER HISTORY
------------------------------ */
-let userData = JSON.parse(localStorage.getItem("squad_" + user)) || {
-  bookings: []
-};
-
-function loadHistory() {
-  const table = document.getElementById("historyTable");
-  table.innerHTML = "";
-
-  if (!userData.bookings.length) {
-    table.innerHTML = `<tr><td colspan="5">No booking history yet.</td></tr>`;
-    return;
-  }
-
-  userData.bookings.forEach(rec => {
-    let statusClass =
-      rec.status === "Approved" ? "status-approved" :
-      rec.status === "Pending" ? "status-pending" : "status-rejected";
-
-    const row = `
-      <tr>
-        <td>${rec.date}</td>
-        <td>${rec.plot}</td>
-        <td>£${rec.wage.toFixed(2)}</td>
-        <td>£${rec.afterCIS.toFixed(2)}</td>
-        <td class="${statusClass}">${rec.status}</td>
-      </tr>
-    `;
-
-    table.innerHTML += row;
-  });
-}
-
-/* -----------------------------
-   LOGOUT
------------------------------ */
+// --- LOGOUT ---
 function logout() {
   sessionStorage.removeItem("squadUser");
   window.location.href = "squad-login.html";
 }
 
-/* INIT */
-loadHistory();
+// --- LOAD USER DATA ---
+let squadKey = "squad_" + squadUser;
+let squadData = JSON.parse(localStorage.getItem(squadKey) || "{}");
+
+if (!squadData.bookings) squadData.bookings = [];
+if (!squadData.earnings) squadData.earnings = [];
+
+// --- POPULATE MONTH FILTER ---
+function loadMonthOptions() {
+  const select = document.getElementById("monthFilter");
+  const months = new Set();
+
+  squadData.bookings.forEach(b => {
+    if (!b.date) return;
+    const d = new Date(b.date);
+    if (!isNaN(d)) {
+      months.add(d.toLocaleString("default", { month: "long", year: "numeric" }));
+    }
+  });
+
+  [...months].forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = m;
+    select.appendChild(opt);
+  });
+}
+
+// --- RENDER BOOKINGS ---
+function renderHistory() {
+  const tbody = document.getElementById("historyTableBody");
+  const filter = document.querySelector(".filter-btn.active").dataset.filter;
+  const monthFilter = document.getElementById("monthFilter").value;
+
+  tbody.innerHTML = "";
+
+  let list = squadData.bookings.slice().sort((a,b) => {
+    const da = new Date(a.date).getTime();
+    const db = new Date(b.date).getTime();
+    return db - da;
+  });
+
+  // status filter
+  if (filter !== "all") {
+    list = list.filter(b => (b.status || "Pending").toLowerCase() === filter);
+  }
+
+  // month filter
+  if (monthFilter !== "all") {
+    list = list.filter(b => {
+      const d = new Date(b.date);
+      const m = d.toLocaleString("default", { month: "long", year: "numeric" });
+      return m === monthFilter;
+    });
+  }
+
+  if (!list.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-muted" style="padding:16px;">
+          No bookings match your filters.
+        </td>
+      </tr>`;
+    return;
+  }
+
+  list.forEach((b, i) => {
+    const date = b.date || "-";
+    const plot = b.plot || "-";
+    const wage = typeof b.wage === "number" ? b.wage : 0;
+    const cis = typeof b.afterCIS === "number" ? b.afterCIS : wage * 0.8;
+    const status = b.status || "Pending";
+
+    let sClass = "status-pill status-pill--pending";
+    if (status.toLowerCase() === "approved") sClass = "status-pill status-pill--approved";
+    if (status.toLowerCase() === "rejected") sClass = "status-pill status-pill--rejected";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${date}</td>
+      <td>${plot}</td>
+      <td>£${wage.toFixed(2)}</td>
+      <td>£${cis.toFixed(2)}</td>
+      <td><span class="${sClass}">${status}</span></td>
+      <td style="text-align:right;">
+        <a href="squad-booking-detail.html?entry=${i}" class="btn btn-sm btn-ghost">View</a>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+// --- FILTER BUTTONS ---
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderHistory();
+  });
+});
+
+// month filter
+document.getElementById("monthFilter").addEventListener("change", renderHistory);
+
+// --- INIT ---
+loadMonthOptions();
+renderHistory();
+
 </script>
 
 </body>
