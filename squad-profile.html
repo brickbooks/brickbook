@@ -168,6 +168,7 @@ input[type="file"] {
     color: #c40000;
     margin-bottom: 10px;
     display: none;
+    font-size: 14px;
 }
 
 .success-msg {
@@ -177,6 +178,7 @@ input[type="file"] {
     color: #0f7a32;
     margin-bottom: 10px;
     display: none;
+    font-size: 14px;
 }
 
 .date-row {
@@ -227,10 +229,12 @@ input[type="file"] {
     <!-- Password Reset -->
     <div class="section-card">
         <div class="section-title">Reset Password</div>
-        <div id="passError" class="error-msg">Passwords do not match.</div>
+        <div id="passError" class="error-msg"></div>
+        <div id="passSuccess" class="success-msg">Password updated successfully.</div>
 
+        <input type="password" id="currentPass" placeholder="Current password (leave blank if none set yet)">
         <input type="password" id="newPass" placeholder="New password">
-        <input type="password" id="confirmPass" placeholder="Confirm password">
+        <input type="password" id="confirmPass" placeholder="Confirm new password">
 
         <button class="btn-outline" onclick="savePassword()">Update Password</button>
     </div>
@@ -252,84 +256,152 @@ input[type="file"] {
 
 <script>
 /* -----------------------------------------
-   USER LOAD
+   LOGIN GUARD
 ----------------------------------------- */
 const email = sessionStorage.getItem("squadUser");
-if (!email) window.location.href = "squad-login.html";
-
+if (!email) {
+    window.location.href = "squad-login.html";
+}
 document.getElementById("profileEmail").textContent = email;
 
-// Load user store
-let userData = JSON.parse(localStorage.getItem("squad_" + email)) || {
-    name: "Unnamed",
-    photo: "",
-    earnings: []
-};
+/* -----------------------------------------
+   LOAD USER DATA
+   (Everything lives in squad_<email>)
+----------------------------------------- */
+let userData = JSON.parse(localStorage.getItem("squad_" + email) || "null");
+if (!userData || typeof userData !== "object") {
+    userData = {
+        name: "Unnamed",
+        photo: "",
+        earnings: [],
+        // passwordHash: undefined initially
+    };
+}
+
+// Fallbacks
+if (!userData.name) userData.name = "Unnamed";
+if (!userData.earnings) userData.earnings = [];
 
 document.getElementById("profileName").textContent = userData.name;
-document.getElementById("profilePhoto").src = userData.photo || "https://via.placeholder.com/130";
+document.getElementById("profilePhoto").src =
+    userData.photo || "https://via.placeholder.com/130?text=Squad";
 
 /* -----------------------------------------
-   SAVE PROFILE
+   SAVE PROFILE (NAME + PHOTO)
 ----------------------------------------- */
 function saveProfile() {
-    let name = document.getElementById("newName").value.trim();
-    let file = document.getElementById("photoUpload").files[0];
+    const name = document.getElementById("newName").value.trim();
+    const file = document.getElementById("photoUpload").files[0];
 
-    if (name) userData.name = name;
+    if (name) {
+        userData.name = name;
+    }
 
     if (file) {
-        let reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = e => {
             userData.photo = e.target.result;
-            finishSave();
+            finishSaveProfile();
         };
         reader.readAsDataURL(file);
     } else {
-        finishSave();
+        finishSaveProfile();
     }
 }
 
-function finishSave() {
+function finishSaveProfile() {
     localStorage.setItem("squad_" + email, JSON.stringify(userData));
 
     document.getElementById("profileName").textContent = userData.name;
-    document.getElementById("profilePhoto").src = userData.photo;
+    if (userData.photo) {
+        document.getElementById("profilePhoto").src = userData.photo;
+    }
 
-    let box = document.getElementById("saveSuccess");
+    const box = document.getElementById("saveSuccess");
     box.style.display = "block";
-    setTimeout(() => box.style.display = "none", 2000);
+    setTimeout(() => { box.style.display = "none"; }, 2000);
 }
 
 /* -----------------------------------------
-   PASSWORD UPDATE
+   PASSWORD HASHING (SHA-256)
 ----------------------------------------- */
-function savePassword() {
+async function hashPassword(password) {
+    const enc = new TextEncoder();
+    const data = enc.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* -----------------------------------------
+   PASSWORD UPDATE (LOCAL ONLY)
+----------------------------------------- */
+async function savePassword() {
+    const current = document.getElementById("currentPass").value;
     const p1 = document.getElementById("newPass").value;
     const p2 = document.getElementById("confirmPass").value;
 
-    if (p1 !== p2 || p1.length < 4) {
-        document.getElementById("passError").style.display = "block";
+    const errorBox = document.getElementById("passError");
+    const successBox = document.getElementById("passSuccess");
+
+    errorBox.style.display = "none";
+    errorBox.textContent = "";
+    successBox.style.display = "none";
+
+    // Basic checks
+    if (!p1 || !p2) {
+        errorBox.textContent = "Enter and confirm your new password.";
+        errorBox.style.display = "block";
+        return;
+    }
+    if (p1 !== p2) {
+        errorBox.textContent = "New passwords do not match.";
+        errorBox.style.display = "block";
+        return;
+    }
+    if (p1.length < 4) {
+        errorBox.textContent = "Password should be at least 4 characters (demo limit).";
+        errorBox.style.display = "block";
         return;
     }
 
-    document.getElementById("passError").style.display = "none";
+    // If a password already exists, check current one
+    if (userData.passwordHash) {
+        if (!current) {
+            errorBox.textContent = "Enter your current password.";
+            errorBox.style.display = "block";
+            return;
+        }
+        const currentHash = await hashPassword(current);
+        if (currentHash !== userData.passwordHash) {
+            errorBox.textContent = "Current password is incorrect.";
+            errorBox.style.display = "block";
+            return;
+        }
+    }
+    // else: first time setting a password – no current password needed
 
-    let users = JSON.parse(localStorage.getItem("squadUsers")) || {};
-    users[email] = p1;
-    localStorage.setItem("squadUsers", JSON.stringify(users));
+    const newHash = await hashPassword(p1);
+    userData.passwordHash = newHash;
+    localStorage.setItem("squad_" + email, JSON.stringify(userData));
 
-    alert("Password updated.");
+    // Clear fields
+    document.getElementById("currentPass").value = "";
+    document.getElementById("newPass").value = "";
+    document.getElementById("confirmPass").value = "";
+
+    successBox.style.display = "block";
+    setTimeout(() => { successBox.style.display = "none"; }, 2000);
 }
 
 /* -----------------------------------------
    PAYSLIP EXPORT PLACEHOLDERS
 ----------------------------------------- */
 function generatePayslip() {
-    alert("PDF payslip generator will be ready when you want it activated.");
+    alert("PDF payslip generator will hook into earnings when you're ready to wire it up.");
 }
 function downloadCSV() {
-    alert("CSV export connected — waiting for final earnings structure.");
+    alert("CSV export will use squad earnings data once finalised.");
 }
 
 /* -----------------------------------------
