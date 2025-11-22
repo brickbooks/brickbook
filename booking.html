@@ -1,477 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Booking-Off – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Booking-Off – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-/* ---------------------------------------
-   LIGHT MODE VARIABLES (DEFAULT)
----------------------------------------- */
-:root {
-  --bg: #f5f7fb;
-  --card-bg: rgba(255,255,255,0.7);
-  --card-border: rgba(0,0,0,0.06);
-  --text-main: #1f2937;
-  --text-light: #6b7280;
-  --primary: #1b73e8;
-  --primary-hover: #155ac2;
-  --shadow: 0 8px 28px rgba(0,0,0,0.07);
-  --glass-blur: blur(18px);
-}
+  <!-- Global styles -->
+  <link rel="stylesheet" href="assets/style.css" />
 
-/* ---------------------------------------
-   DARK MODE VARIABLES
----------------------------------------- */
-body.dark {
-  --bg: #0b1220;
-  --card-bg: rgba(15,23,42,0.65);
-  --card-border: rgba(255,255,255,0.09);
-  --text-main: #e5e7eb;
-  --text-light: #9ca3af;
-  --primary: #3ba4ff;
-  --primary-hover: #1d8fe6;
-  --shadow: 0 8px 40px rgba(0,0,0,0.6);
-}
+  <style>
+    /* Page-specific helpers (built on top of assets/style.css) */
 
-/* ---------------------------------------
-   GLOBAL RESET
----------------------------------------- */
-* { margin:0; padding:0; box-sizing:border-box; }
+    .plot-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-body {
-  background: var(--bg);
-  font-family: "Inter", Arial, sans-serif;
-  color: var(--text-main);
-  transition: 0.25s ease;
-}
+    .plot-card-header .plot-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
 
-/* ---------------------------------------
-   HEADER (glass)
----------------------------------------- */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: var(--card-bg);
-  backdrop-filter: var(--glass-blur);
-  padding: 16px 22px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid var(--card-border);
-}
+    .plot-card-totals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
 
-.logo { font-size:22px; font-weight:800; }
+    .plot-card-totals div span.value {
+      font-weight: 700;
+      font-size: 15px;
+      margin-left: 4px;
+    }
 
-nav { display:flex; gap:22px; align-items:center; }
-nav a {
-  text-decoration:none;
-  color:var(--text-main);
-  font-weight:600;
-}
-nav a:hover { color:var(--primary); }
+    .grand-totals-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      font-size: 14px;
+      margin-top: 10px;
+    }
 
-.toggle {
-  width:44px; height:24px; border-radius:999px;
-  background:rgba(0,0,0,0.15);
-  padding:3px; cursor:pointer;
-}
-.toggle-thumb {
-  width:18px; height:18px;
-  background:white;
-  border-radius:50%;
-  transition:0.25s;
-}
-body.dark .toggle { background:rgba(255,255,255,0.3); }
-body.dark .toggle-thumb { transform:translateX(20px); }
+    .grand-totals-row div span.value {
+      font-weight: 800;
+      font-size: 18px;
+      margin-left: 4px;
+    }
 
-.hamburger { display:none; font-size:30px; cursor:pointer; }
+    .split-row {
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
 
-.mobile-menu {
-  display:none;
-  flex-direction:column;
-  background:var(--card-bg);
-  padding:14px;
-  border-bottom:1px solid var(--card-border);
-}
-.mobile-menu a {
-  padding:10px 0;
-  text-decoration:none;
-  color:var(--text-main);
-  border-bottom:1px solid var(--card-border);
-}
-
-/* ---------------------------------------
-   WRAPPER
----------------------------------------- */
-.wrapper {
-  max-width:900px;
-  margin:auto;
-  padding:30px 18px 80px;
-}
-
-h1 { font-size:32px; font-weight:800; }
-.subtitle { color:var(--text-light); margin-bottom:20px; }
-
-/* ---------------------------------------
-   CARDS
----------------------------------------- */
-.card,
-.plot-card,
-.split-card {
-  background:var(--card-bg);
-  border:1px solid var(--card-border);
-  border-radius:18px;
-  padding:20px;
-  margin-bottom:22px;
-  backdrop-filter:var(--glass-blur);
-  box-shadow:var(--shadow);
-}
-
-table { width:100%; border-collapse:collapse; margin-top:10px; }
-thead { background:rgba(255,255,255,0.2); }
-
-th,td {
-  padding:8px;
-  border-bottom:1px solid var(--card-border);
-  font-size:14px;
-}
-
-input, select, textarea {
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid var(--card-border);
-  background:rgba(255,255,255,0.7);
-}
-body.dark input, body.dark select, body.dark textarea {
-  background:rgba(255,255,255,0.1);
-}
-
-textarea { height:80px; }
-
-/* photo preview */
-.photo-preview img {
-  width:85px; height:85px;
-  border-radius:10px;
-  object-fit:cover;
-  margin-right:8px;
-  margin-top:8px;
-  border:1px solid var(--card-border);
-}
-
-/* BUTTONS */
-.btn {
-  padding:12px 18px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-  border:none;
-}
-.btn-primary { background:var(--primary); color:white; }
-.btn-primary:hover { background:var(--primary-hover); }
-.btn-secondary {
-  background:rgba(255,255,255,0.5);
-  border:1px solid var(--card-border);
-  color:var(--primary);
-}
-
-.split-row {
-  display:grid;
-  grid-template-columns:1fr 70px 100px 120px;
-  gap:12px;
-  margin-bottom:10px;
-}
-
-.grand-total-box {
-  text-align:right;
-  font-weight:800;
-  font-size:22px;
-  margin-top:20px;
-}
-
-@media(max-width:768px){
-  nav { display:none; }
-  .hamburger{ display:block; }
-  .btn-primary,.btn-secondary { width:100%; margin-top:10px; }
-  .split-row {
-    grid-template-columns:1fr 60px 90px 90px;
-  }
-}
-</style>
+    @media (max-width: 640px) {
+      .split-row {
+        grid-template-columns: 1.4fr 0.6fr 1fr 1fr;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="page" data-page="booking">
 
 <script>
-/* ------------------------------------------------
-   FIXED LOGIN GUARD
--------------------------------------------------- */
-if (!sessionStorage.getItem("squadUser")) {
+// --- LOGIN GUARD ---
+let squadUser = sessionStorage.getItem("squadUser");
+if (!squadUser) {
+  const backup = localStorage.getItem("lastSquadUser");
+  if (backup) {
+    sessionStorage.setItem("squadUser", backup);
+    squadUser = backup;
+  } else {
     window.location.href = "squad-login.html";
+  }
 }
+localStorage.setItem("lastSquadUser", squadUser);
 </script>
 
-<header>
-  <div class="logo">BrickBook</div>
-
-  <nav>
-    <a href="booking.html">Booking-Off</a>
-    <a href="squad-dashboard.html">Dashboard</a>
-    <a href="squad-history.html">History</a>
-    <a href="#" onclick="logout()">Logout</a>
-
-    <div class="toggle" onclick="toggleDark()">
-      <div class="toggle-thumb"></div>
-    </div>
-  </nav>
-
-  <div class="hamburger" onclick="toggleMenu()">☰</div>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">BrickBook</div>
+    <nav class="nav">
+      <a href="booking.html" class="active">Booking-Off</a>
+      <a href="squad-dashboard.html">Dashboard</a>
+      <a href="squad-history.html">History</a>
+      <a href="squad-profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div id="mobileMenu" class="mobile-menu">
+<!-- MOBILE NAV -->
+<div id="mobileMenu" class="mobile-nav">
   <a href="booking.html">Booking-Off</a>
   <a href="squad-dashboard.html">Dashboard</a>
   <a href="squad-history.html">History</a>
+  <a href="squad-profile.html">Profile</a>
   <a href="#" onclick="logout()">Logout</a>
 </div>
 
-<script>
-function toggleMenu(){
-  let m=document.getElementById("mobileMenu");
-  m.style.display = m.style.display==="flex" ? "none" : "flex";
-}
+<main class="container">
 
-function logout(){
-  sessionStorage.removeItem("squadUser");
-  window.location.href = "squad-login.html";
-}
+  <!-- HERO -->
+  <section class="hero-card" style="margin-top:12px;">
+    <div class="hero-header" style="flex-direction:column; gap:8px;">
+      <div>
+        <h1 class="h1" style="font-size:22px; margin-bottom:4px;">
+          Booking-Off
+        </h1>
+        <p class="hero-sub">
+          Choose your squad & site, then book off plots with labour + materials.
+          Materials are recorded only – they don’t affect wages.
+        </p>
+      </div>
+    </div>
+  </section>
 
-function toggleDark(){
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme",document.body.classList.contains("dark"));
-}
+  <!-- SQUAD + SITE -->
+  <section class="card mt-16">
+    <div class="card-title">Squad & Site</div>
+    <div class="card-sub">Rates and materials load from the Pricing Manager.</div>
 
-if(localStorage.getItem("theme")==="true"){
-  document.body.classList.add("dark");
-}
-</script>
-
-<div class="wrapper">
-
-  <h1>Booking-Off</h1>
-  <div class="subtitle">Select squad + site to load measurements.</div>
-
-  <!-- Squad + Site Selector -->
-  <div class="card">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
       <div>
         <label>Squad</label>
-        <select id="select-squad"><option value="">Select Squad…</option></select>
+        <select id="select-squad">
+          <option value="">Select Squad…</option>
+        </select>
       </div>
       <div>
         <label>Site</label>
-        <select id="select-site"><option value="">Select Site…</option></select>
+        <select id="select-site">
+          <option value="">Select Site…</option>
+        </select>
       </div>
     </div>
-  </div>
 
-  <button class="btn btn-secondary" onclick="addPlot()">+ Add Plot</button>
+    <div class="mt-12 text-muted" style="font-size:13px;">
+      Choose a squad + site, then add plots below. Fields & rates come from your contractor’s pricing profiles.
+    </div>
+  </section>
 
-  <div id="plots-container"></div>
+  <!-- PLOTS AREA -->
+  <section class="card mt-16">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Plots</div>
+        <div class="card-sub">Add each plot booked off this session.</div>
+      </div>
+      <button class="btn btn-sm btn-ghost" type="button" onclick="addPlot()">
+        + Add plot
+      </button>
+    </div>
 
-  <div class="grand-total-box">
-    Grand Total: £<span id="grand-total">0.00</span>
-  </div>
+    <div id="plots-container" class="mt-12"></div>
 
-  <!-- Squad Split -->
-  <div class="split-card">
-    <h2>Squad Split</h2>
+    <div class="grand-totals-row">
+      <div>
+        Labour total:
+        £<span class="value" id="grand-labour-total">0.00</span>
+      </div>
+      <div>
+        Materials total:
+        £<span class="value" id="grand-materials-total">0.00</span>
+      </div>
+    </div>
+  </section>
 
-    <div class="split-row" style="font-weight:700;">
-      <div>Name</div><div>%</div><div>Wages</div><div>After CIS</div>
+  <!-- SQUAD SPLIT -->
+  <section class="card mt-16">
+    <div class="card-title">Squad Split (optional)</div>
+    <div class="card-sub">
+      Use this to work out wages per person. This doesn’t change the contractor totals – it’s for your squad only.
+    </div>
+
+    <div class="split-row mt-12" style="font-weight:700; font-size:13px;">
+      <div>Name</div>
+      <div>%</div>
+      <div>Wages (£)</div>
+      <div>After CIS</div>
     </div>
 
     <div id="split-container"></div>
 
-    <div class="grand-total-box">
-      Total After CIS: £<span id="final-total-cis">0.00</span>
+    <div class="row row-wrap row-justify-end mt-12">
+      <button class="btn btn-sm btn-ghost" type="button" onclick="addSplitRow()">+ Add person</button>
     </div>
+
+    <div class="grand-totals-row">
+      <div>
+        Total after CIS (from split):
+        £<span class="value" id="split-total-cis">0.00</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <section class="card mt-16">
+    <div class="card-title">Submit booking-off</div>
+    <div class="card-sub">
+      Checks will be done by your contractor. You’ll see the status under Dashboard & History.
+    </div>
+
+    <div class="row row-wrap mt-16">
+      <button class="btn btn-primary" type="button" onclick="submitBooking()">
+        Submit Booking-Off
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Booking-Off</span>
   </div>
+</footer>
 
-  <button class="btn btn-primary" onclick="submitBooking()">Submit Booking-Off</button>
-
-</div>
-
+<script src="assets/main.js"></script>
 <script>
-/* ------------------------------------------------
-   LOAD PRICING MANAGER DATA
--------------------------------------------------- */
-const PRICING_KEY="brickbook_pricing_state";
-let pricing={squads:[],sites:[],profiles:[]};
-
-if(localStorage.getItem(PRICING_KEY)){
-  pricing = JSON.parse(localStorage.getItem(PRICING_KEY));
+// ---- HEADER / NAV ----
+function toggleMenu() {
+  document.getElementById("mobileMenu").classList.toggle("show");
+}
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
 }
 
-/* populate squad + site selects */
-pricing.squads.forEach(s=>{
-  let o=document.createElement("option"); o.value=s; o.textContent=s;
-  document.getElementById("select-squad").appendChild(o);
-});
-pricing.sites.forEach(s=>{
-  let o=document.createElement("option"); o.value=s; o.textContent=s;
-  document.getElementById("select-site").appendChild(o);
-});
+// ---- PRICING MANAGER DATA ----
+const PRICING_KEY = "brickbook_pricing_state";
+let pricing = { squads: [], sites: [], profiles: [] };
 
-function getActiveFields(){
-  let s=document.getElementById("select-squad").value;
-  let t=document.getElementById("select-site").value;
-  return pricing.profiles.find(p=>p.squad===s && p.site===t)?.fields || [];
-}
-
-/* ------------------------------------------------
-   ADD PLOT
--------------------------------------------------- */
-function addPlot(){
-  const fields=getActiveFields();
-  if(!fields.length){ alert("Select squad + site first."); return; }
-
-  const id=Date.now();
-  const card=document.createElement("div");
-  card.className="plot-card";
-
-  card.innerHTML=`
-    <button class="btn btn-secondary" onclick="this.closest('.plot-card').remove();calcGrandTotal();calcSplitTotals();">Delete Plot</button>
-
-    <div style="margin-top:10px;font-weight:600;">
-      Plot <input type="text" class="plot-number" placeholder="e.g. 24A">
-    </div>
-
-    <table>
-      <thead><tr><th>Measurement</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
-      <tbody>
-        ${fields.map(f=>`
-          <tr>
-            <td>${f.name}</td>
-            <td><input type="number" class="qty" oninput="calcRow(this);calcPlot(this)"></td>
-            <td><input type="number" class="rate" value="${f.rate}" readonly></td>
-            <td><input type="number" class="total" readonly></td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-
-    <label style="margin-top:10px;">Notes</label>
-    <textarea class="plot-notes"></textarea>
-
-    <label style="margin-top:10px;">Photos</label>
-    <input type="file" accept="image/*" onchange="previewPhoto(this,'${id}')">
-    <button class="btn btn-secondary" style="margin-top:6px;" onclick="addPhotoField(this,'${id}')">+ Add Photo</button>
-
-    <div class="photo-preview" id="preview-${id}"></div>
-
-    <div class="grand-total-box" style="font-size:17px;">
-      Plot Total: £<span class="plot-total">0.00</span>
-    </div>
-  `;
-
-  document.getElementById("plots-container").appendChild(card);
-}
-
-function previewPhoto(input,id){
-  if(!input.files[0]) return;
-  let img=document.createElement("img");
-  img.src=URL.createObjectURL(input.files[0]);
-  document.getElementById("preview-"+id).appendChild(img);
-}
-
-function addPhotoField(btn,id){
-  let i=document.createElement("input");
-  i.type="file";
-  i.accept="image/*";
-  i.onchange = ()=>previewPhoto(i,id);
-  btn.insertAdjacentElement("beforebegin",i);
-}
-
-/* ------------------------------------------------
-   CALCULATIONS
--------------------------------------------------- */
-function calcRow(el){
-  let tr=el.closest("tr");
-  let qty=parseFloat(el.value)||0;
-  let rate=parseFloat(tr.querySelector(".rate").value)||0;
-  tr.querySelector(".total").value=(qty*rate).toFixed(2);
-}
-
-function calcPlot(el){
-  let card=el.closest(".plot-card");
-  let sum=0;
-  card.querySelectorAll(".total").forEach(t=>sum+=parseFloat(t.value)||0);
-  card.querySelector(".plot-total").textContent=sum.toFixed(2);
-  calcGrandTotal();
-  calcSplitTotals();
-}
-
-function calcGrandTotal(){
-  let g=0;
-  document.querySelectorAll(".plot-total").forEach(c=>g+=parseFloat(c.textContent)||0);
-  document.getElementById("grand-total").textContent=g.toFixed(2);
-}
-
-/* ------------------------------------------------
-   SQUAD SPLIT
--------------------------------------------------- */
-const splitContainer=document.getElementById("split-container");
-for(let i=0;i<5;i++) addSplitRow();
-
-function addSplitRow(){
-  let r=document.createElement("div");
-  r.className="split-row";
-  r.innerHTML=`
-    <input type="text" class="split-name">
-    <input type="number" class="split-percent" oninput="percentChanged(this)">
-    <input type="number" class="split-wages" oninput="wagesChanged(this)">
-    <input type="number" class="split-cis" readonly>
-  `;
-  splitContainer.appendChild(r);
-}
-
-function percentChanged(el){
-  const row=el.closest(".split-row");
-  const pct=parseFloat(el.value)||0;
-  const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
-  const wages=grand*(pct/100);
-  row.querySelector(".split-wages").value=wages.toFixed(2);
-  row.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
-  calcSplitTotals();
-}
-
-function wagesChanged(el){
-  const row=el.closest(".split-row");
-  const wages=parseFloat(el.value)||0;
-  const grand=parseFloat(document.getElementById("grand-total").textContent)||0;
-
-  if(grand>0){
-    row.querySelector(".split-percent").value=((wages/grand)*100).toFixed(2);
+try {
+  const stored = localStorage.getItem(PRICING_KEY);
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    if (parsed && typeof parsed === "object") {
+      pricing = Object.assign(pricing, parsed);
+    }
   }
-  row.querySelector(".split-cis").value=(wages*0.8).toFixed(2);
-  calcSplitTotals();
+} catch (e) {
+  console.error("Error parsing pricing state", e);
 }
 
-function calcSplitTotals(){
-  let total=0;
-  document.querySelectorAll(".split-cis").forEach(c=>total+=parseFloat(c.value)||0);
-  document.getElementById("final-total-cis").textContent=total.toFixed(2);
+// populate squad/site selects
+const squadSelect = document.getElementById("select-squad");
+const siteSelect = document.getElementById("select-site");
+
+pricing.squads.forEach(name => {
+  const opt = document.createElement("option");
+  opt.value = name;
+  opt.textContent = name;
+  squadSelect.appendChild(opt);
+});
+pricing.sites.forEach(name => {
+  const opt = document.createElement("option");
+  opt.value = name;
+  opt.textContent = name;
+  siteSelect.appendChild(opt);
+});
+
+function getActiveProfileFields() {
+  const s = squadSelect.value;
+  const t = siteSelect.value;
+  if (!s || !t) return [];
+  const profile = pricing.profiles.find(p => p.squad === s && p.site === t);
+  return profile ? (profile.fields || []) : [];
 }
 
-/* ------------------------------------------------
-   SUBMIT
--------------------------------------------------- */
-function submitBooking(){
-  alert("Booking-Off submitted successfully!");
+// simple heuristic to decide what is a material
+function splitLabourAndMaterials(fields) {
+  const labour = [];
+  const materials = [];
+  fields.forEach(f => {
+    const name = (f.name || "").toLowerCase();
+    if (/brick|block|insulation|dpc|tie|lintel|sand|cement|mortar|stone/.test(name)) {
+      materials.push(f);
+    } else {
+      labour.push(f);
+    }
+  });
+  return { labour, materials };
+}
+
+// ---- PLOTS ----
+const plotsContainer = document.getElementById("plots-container");
+
+function addPlot() {
+  const allFields = getActiveProfileFields();
+  if (!allFields.length) {
+    alert("Pick a squad and site that has a pricing profile set up.");
+    return;
+  }
+
+  const { labour, materials } = splitLabourAndMaterials(allFields);
+
+  const plotId = "plot-" + Date.now();
+  const card = document.createElement("div");
+  card.className = "card plot-card";
+  card.dataset.plotId = plotId;
+
+  // Labour rows HTML
+  const labourRowsHtml = labour.map(f => `
+    <tr class="labour-row" data-name="${f.name || ""}">
+      <td>${f.name || ""}</td>
+      <td><input type="number" class="qty input-labour" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
+      <td><input type="number" class="rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
+      <td>£<span class="row-total-labour">0.00</span></td>
+    </tr>
+  `).join("");
+
+  // Materials rows HTML
+  const materialsRowsHtml = materials.map(f => `
+    <tr class="material-row" data-name="${f.name || ""}" data-unit="${f.unit || ""}">
+      <td>${f.name || ""}</td>
+      <td><input type="number" class="mat-qty" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
+      <td>${f.unit || ""}</td>
+      <td><input type="number" class="mat-rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
+      <td>£<span class="row-total-material">0.00</span></td>
+    </tr>
+  `).join("");
+
+  card.innerHTML = `
+    <div class="plot-card-header">
+      <div class="plot-label">
+        Plot
+        <input type="text" class="plot-number" placeholder="e.g. 24A" style="max-width:120px;">
+      </div>
+      <button class="btn btn-sm btn-danger" type="button" onclick="removePlot(this)">Remove</button>
+    </div>
+
+    <div class="card-sub" style="margin-bottom:8px;">
+      Fill in labour done and any materials used on this plot.
+    </div>
+
+    <div class="mt-8">
+      <div class="card-title" style="font-size:14px;">Labour</div>
+      <table class="table mt-8">
+        <thead>
+          <tr>
+            <th>Measurement</th>
+            <th style="width:90px;">Qty</th>
+            <th style="width:80px;">Rate (£)</th>
+            <th style="width:100px;">Total (£)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${labourRowsHtml || `
+            <tr><td colspan="4" class="text-muted" style="font-size:13px;">No labour fields for this profile.</td></tr>
+          `}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-16">
+      <div class="card-title" style="font-size:14px;">Materials</div>
+      <div class="card-sub">Tracked only – not added into wages.</div>
+      <table class="table mt-8">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th style="width:90px;">Qty</th>
+            <th style="width:70px;">Unit</th>
+            <th style="width:80px;">Rate (£)</th>
+            <th style="width:100px;">Total (£)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${materialsRowsHtml || `
+            <tr><td colspan="5" class="text-muted" style="font-size:13px;">No materials set in pricing for this profile.</td></tr>
+          `}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-12">
+      <label>Notes</label>
+      <textarea class="plot-notes" placeholder="Optional site notes for this plot..."></textarea>
+    </div>
+
+    <div class="plot-card-totals">
+      <div>Labour total: £<span class="value plot-labour-total">0.00</span></div>
+      <div>Materials total: £<span class="value plot-materials-total">0.00</span></div>
+    </div>
+  `;
+
+  plotsContainer.appendChild(card);
+}
+
+function removePlot(btn) {
+  const card = btn.closest(".plot-card");
+  card?.remove();
+  updateGrandTotals();
+  updateSplitTotals();
+}
+
+function updatePlotTotals(el) {
+  const card = el.closest(".plot-card");
+  if (!card) return;
+
+  // Labour
+  let labourTotal = 0;
+  card.querySelectorAll("tr.labour-row").forEach(tr => {
+    const qty = parseFloat(tr.querySelector(".qty")?.value) || 0;
+    const rate = parseFloat(tr.querySelector(".rate")?.value) || 0;
+    const rowTotal = qty * rate;
+    labourTotal += rowTotal;
+    const span = tr.querySelector(".row-total-labour");
+    if (span) span.textContent = rowTotal.toFixed(2);
+  });
+
+  // Materials
+  let materialsTotal = 0;
+  card.querySelectorAll("tr.material-row").forEach(tr => {
+    const qty = parseFloat(tr.querySelector(".mat-qty")?.value) || 0;
+    const rate = parseFloat(tr.querySelector(".mat-rate")?.value) || 0;
+    const rowTotal = qty * rate;
+    materialsTotal += rowTotal;
+    const span = tr.querySelector(".row-total-material");
+    if (span) span.textContent = rowTotal.toFixed(2);
+  });
+
+  const labourSpan = card.querySelector(".plot-labour-total");
+  const materialsSpan = card.querySelector(".plot-materials-total");
+  if (labourSpan) labourSpan.textContent = labourTotal.toFixed(2);
+  if (materialsSpan) materialsSpan.textContent = materialsTotal.toFixed(2);
+
+  updateGrandTotals();
+  updateSplitTotals();
+}
+
+function updateGrandTotals() {
+  let grandLabour = 0;
+  let grandMaterials = 0;
+  document.querySelectorAll(".plot-labour-total").forEach(s => {
+    grandLabour += parseFloat(s.textContent) || 0;
+  });
+  document.querySelectorAll(".plot-materials-total").forEach(s => {
+    grandMaterials += parseFloat(s.textContent) || 0;
+  });
+
+  document.getElementById("grand-labour-total").textContent = grandLabour.toFixed(2);
+  document.getElementById("grand-materials-total").textContent = grandMaterials.toFixed(2);
+}
+
+// ---- SQUAD SPLIT ----
+const splitContainer = document.getElementById("split-container");
+
+function addSplitRow() {
+  const row = document.createElement("div");
+  row.className = "split-row";
+  row.innerHTML = `
+    <input type="text" class="split-name" placeholder="Name">
+    <input type="number" class="split-percent" min="0" max="100" step="0.1" oninput="onSplitPercentChange(this)">
+    <input type="number" class="split-wages" step="0.01" oninput="onSplitWagesChange(this)">
+    <input type="number" class="split-aftercis" step="0.01" readonly>
+  `;
+  splitContainer.appendChild(row);
+}
+
+// start with 3 rows
+addSplitRow();
+addSplitRow();
+addSplitRow();
+
+function onSplitPercentChange(el) {
+  const row = el.closest(".split-row");
+  if (!row) return;
+
+  const pct = parseFloat(el.value) || 0;
+  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+  const wages = grandLabour * (pct / 100);
+
+  row.querySelector(".split-wages").value = wages.toFixed(2);
+  row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
+
+  updateSplitTotals();
+}
+
+function onSplitWagesChange(el) {
+  const row = el.closest(".split-row");
+  if (!row) return;
+  const wages = parseFloat(el.value) || 0;
+  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+
+  if (grandLabour > 0) {
+    const pct = (wages / grandLabour) * 100;
+    row.querySelector(".split-percent").value = pct.toFixed(1);
+  }
+  row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
+  updateSplitTotals();
+}
+
+function updateSplitTotals() {
+  let totalCIS = 0;
+  document.querySelectorAll(".split-aftercis").forEach(input => {
+    totalCIS += parseFloat(input.value) || 0;
+  });
+  document.getElementById("split-total-cis").textContent = totalCIS.toFixed(2);
+}
+
+// ---- SUBMIT BOOKING ----
+function submitBooking() {
+  const plots = document.querySelectorAll(".plot-card");
+  if (!plots.length) {
+    alert("Add at least one plot before submitting.");
+    return;
+  }
+
+  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+  if (grandLabour <= 0) {
+    alert("Enter some labour quantities so the total is above £0.00.");
+    return;
+  }
+
+  const key = "squad_" + squadUser;
+  let data;
+  try {
+    data = JSON.parse(localStorage.getItem(key) || "{}");
+  } catch (e) {
+    data = {};
+  }
+  if (!data.bookings) data.bookings = [];
+  if (!data.earnings) data.earnings = [];
+
+  const today = new Date();
+  const dateStr = today.toISOString().slice(0,10); // YYYY-MM-DD
+
+  // for each plot, create a booking entry
+  plots.forEach(card => {
+    const plotNumber = card.querySelector(".plot-number")?.value.trim() || "";
+    if (!plotNumber) return; // skip empty plot
+
+    const labourTotal = parseFloat(card.querySelector(".plot-labour-total")?.textContent) || 0;
+    const afterCIS = labourTotal * 0.8;
+
+    // labour rows
+    const labourRows = [];
+    card.querySelectorAll("tr.labour-row").forEach(tr => {
+      const name = tr.dataset.name || "";
+      const qty = parseFloat(tr.querySelector(".qty")?.value) || 0;
+      const rate = parseFloat(tr.querySelector(".rate")?.value) || 0;
+      if (!qty) return;
+      labourRows.push({
+        measurement: name,
+        qty,
+        rate,
+        total: qty * rate
+      });
+    });
+
+    // materials rows
+    const materials = [];
+    card.querySelectorAll("tr.material-row").forEach(tr => {
+      const name = tr.dataset.name || "";
+      const unit = tr.dataset.unit || "";
+      const qty = parseFloat(tr.querySelector(".mat-qty")?.value) || 0;
+      const rate = parseFloat(tr.querySelector(".mat-rate")?.value) || 0;
+      if (!qty) return;
+      materials.push({
+        name,
+        unit,
+        qty,
+        rate,
+        total: qty * rate
+      });
+    });
+
+    const notes = card.querySelector(".plot-notes")?.value.trim() || "";
+
+    data.bookings.push({
+      date: dateStr,
+      plot: plotNumber,
+      wage: labourTotal,
+      afterCIS,
+      status: "Pending",
+      notes,
+      labourRows,
+      materials
+      // photos could be wired in later if you want to store base64/urls
+    });
+  });
+
+  // add earnings summary record for this booking session
+  if (grandLabour > 0) {
+    data.earnings.push({
+      date: dateStr,
+      afterCIS: grandLabour * 0.8
+    });
+  }
+
+  localStorage.setItem(key, JSON.stringify(data));
+
+  alert("Booking-Off submitted. It will appear under Dashboard & History as Pending.");
+  window.location.href = "squad-dashboard.html";
 }
 </script>
 
