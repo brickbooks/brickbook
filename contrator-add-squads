@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Squads – BrickBook</title>
+
+<style>
+:root {
+  --blue: #1B73E8;
+  --charcoal: #1F2937;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text-muted: #6B7280;
+  --shadow: 0 8px 28px rgba(0,0,0,0.06);
+}
+
+/* GLOBAL */
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--charcoal);
+}
+
+/* HEADER */
+header {
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+nav a {
+  text-decoration: none;
+  margin-left: 20px;
+  color: var(--charcoal);
+  font-weight: 600;
+}
+
+nav a:hover { color: var(--blue); }
+
+/* WRAPPER */
+.wrapper {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+/* CARD */
+.card {
+  background: var(--card);
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+/* INPUTS */
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+/* BUTTONS */
+.btn-primary {
+  padding: 12px 20px;
+  background: var(--blue);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-danger {
+  padding: 6px 12px;
+  background: #E74C3C;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+}
+
+.table-card {
+  padding: 22px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  background: #f0f4ff;
+  text-align: left;
+  font-size: 14px;
+  color: var(--charcoal);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="contractor-dashboard.html">Dashboard</a>
+    <a href="contractor-review.html">Review</a>
+    <a href="pricing-table.html">Pricing</a>
+    <a href="contractor-add-squads.html">Add Squads</a>
+    <a href="contractor-login.html">Logout</a>
+  </nav>
+</header>
+
+<div class="wrapper">
+
+  <!-- ADD SQUAD FORM -->
+  <div class="card">
+    <div class="card-title">Add New Squad Member</div>
+
+    <input type="text" id="squadName" placeholder="Full Name">
+    <input type="email" id="squadEmail" placeholder="Email Address">
+    <input type="password" id="squadPass" placeholder="Temporary Password (optional)">
+    <input type="file" id="squadPhoto" accept="image/*">
+
+    <button class="btn-primary" onclick="addSquad()">Add Squad Member</button>
+  </div>
+
+  <!-- EXISTING SQUADS LIST -->
+  <div class="table-card">
+    <h2 style="margin-bottom:14px;">Current Squad Members</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="squadTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+/* FETCH ALL SQUAD USERS */
+function getAllSquads() {
+  let squads = [];
+  for (let key in localStorage) {
+    if (key.startsWith("squad_")) {
+      const data = JSON.parse(localStorage.getItem(key));
+      squads.push({ email: key.replace("squad_", ""), ...data });
+    }
+  }
+  return squads;
+}
+
+/* RENDER TABLE */
+function renderSquads() {
+  const tbody = document.getElementById("squadTable");
+  tbody.innerHTML = "";
+
+  const squads = getAllSquads();
+  if (squads.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">No squads added yet.</td></tr>`;
+    return;
+  }
+
+  squads.forEach(s => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${s.name}</td>
+        <td>${s.email}</td>
+        <td>${s.password ? s.password : "No password"}</td>
+        <td><button class="btn-danger" onclick="deleteSquad('${s.email}')">Delete</button></td>
+      </tr>
+    `;
+  });
+}
+
+/* ADD SQUAD */
+function addSquad() {
+  const name = document.getElementById("squadName").value.trim();
+  const email = document.getElementById("squadEmail").value.trim().toLowerCase();
+  const pass = document.getElementById("squadPass").value.trim();
+  const file = document.getElementById("squadPhoto").files[0];
+
+  if (!name || !email) {
+    alert("Name and email are required.");
+    return;
+  }
+
+  if (localStorage.getItem("squad_" + email)) {
+    alert("A squad member with this email already exists.");
+    return;
+  }
+
+  const password = pass || "brick123"; // auto-password
+
+  let photoData = "";
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoData = e.target.result;
+      saveSquad();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    saveSquad();
+  }
+
+  function saveSquad() {
+    const obj = {
+      name: name,
+      email: email,
+      password: password,
+      photo: photoData,
+      earnings: [],
+      bookings: []
+    };
+
+    localStorage.setItem("squad_" + email, JSON.stringify(obj));
+    alert("Squad member added.");
+    renderSquads();
+  }
+}
+
+/* DELETE SQUAD */
+function deleteSquad(email) {
+  if (!confirm("Delete this squad member?")) return;
+
+  localStorage.removeItem("squad_" + email);
+  renderSquads();
+}
+
+/* INIT */
+renderSquads();
+</script>
+
+</body>
+</html>
