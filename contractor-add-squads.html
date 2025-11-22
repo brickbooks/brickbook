@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Squads – BrickBook</title>
+<title>Add & Manage Squads – BrickBook</title>
+
+<link rel="stylesheet" href="assets/style.css">
 
 <style>
 :root {
   --blue: #1B73E8;
-  --charcoal: #1F2937;
   --bg: #F5F7FA;
   --card: #FFFFFF;
   --border: #E5E7EB;
@@ -16,12 +17,10 @@
   --shadow: 0 8px 28px rgba(0,0,0,0.06);
 }
 
-/* GLOBAL */
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
   background: var(--bg);
-  color: var(--charcoal);
+  font-family: "Inter", sans-serif;
 }
 
 /* HEADER */
@@ -32,24 +31,14 @@ header {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 800;
 }
 
 nav a {
-  text-decoration: none;
   margin-left: 20px;
-  color: var(--charcoal);
+  color: black;
+  text-decoration: none;
   font-weight: 600;
 }
-
-nav a:hover { color: var(--blue); }
 
 /* WRAPPER */
 .wrapper {
@@ -62,73 +51,57 @@ nav a:hover { color: var(--blue); }
 .card {
   background: var(--card);
   padding: 22px;
-  border-radius: 16px;
   border: 1px solid var(--border);
+  border-radius: 18px;
   box-shadow: var(--shadow);
-  margin-bottom: 24px;
+  margin-bottom: 25px;
 }
 
 .card-title {
   font-size: 22px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-/* INPUTS */
-input, select {
+input {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 /* BUTTONS */
 .btn-primary {
   padding: 12px 20px;
   background: var(--blue);
-  border: none;
   color: white;
+  border: none;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
 }
-.btn-primary:hover { opacity: 0.9; }
 
-.btn-danger {
-  padding: 6px 12px;
-  background: #E74C3C;
-  color: white;
-  font-size: 13px;
-  cursor: pointer;
-  border-radius: 6px;
-  border: none;
-}
-
-.table-card {
-  padding: 22px;
-  border-radius: 16px;
-  background: var(--card);
+.squad-box {
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  background: #fff;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.member-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
 }
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-}
-th {
-  background: #f0f4ff;
-  text-align: left;
-  font-size: 14px;
-  color: var(--charcoal);
-}
+
+.member-line:last-child { border: none; }
+.btn-danger { background:red;color:#fff;padding:6px 10px;border:none;border-radius:6px;}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -144,130 +117,133 @@ th {
 
 <div class="wrapper">
 
-  <!-- ADD SQUAD FORM -->
+  <!-- INVITE NEW MEMBER -->
   <div class="card">
-    <div class="card-title">Add New Squad Member</div>
+    <div class="card-title">Invite New Squad Member</div>
 
-    <input type="text" id="squadName" placeholder="Full Name">
-    <input type="email" id="squadEmail" placeholder="Email Address">
-    <input type="password" id="squadPass" placeholder="Temporary Password (optional)">
-    <input type="file" id="squadPhoto" accept="image/*">
+    <input id="inviteName" type="text" placeholder="Full Name">
+    <input id="inviteEmail" type="email" placeholder="Email Address">
+    <input id="invitePhone" type="tel" placeholder="Phone Number">
 
-    <button class="btn-primary" onclick="addSquad()">Add Squad Member</button>
+    <label>Select Squad</label>
+    <select id="inviteSquadSelect"></select>
+
+    <button class="btn-primary" onclick="sendInvite()">Send Invite</button>
   </div>
 
-  <!-- EXISTING SQUADS LIST -->
-  <div class="table-card">
-    <h2 style="margin-bottom:14px;">Current Squad Members</h2>
+  <!-- MANAGE SQUADS -->
+  <div class="card">
+    <div class="card-title">Manage Active Squads</div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Password</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="squadTable"></tbody>
-    </table>
+    <div id="squadList"></div>
+
+    <button class="btn-primary" onclick="createNewSquad()">+ Create New Squad</button>
   </div>
 
 </div>
 
 <script>
-/* FETCH ALL SQUAD USERS */
-function getAllSquads() {
-  let squads = [];
-  for (let key in localStorage) {
-    if (key.startsWith("squad_")) {
-      const data = JSON.parse(localStorage.getItem(key));
-      squads.push({ email: key.replace("squad_", ""), ...data });
-    }
-  }
-  return squads;
+/* ================================
+   DATA STRUCTURE
+   contractor_squads = [
+     { squadId, squadName, members: [emails] }
+   ]
+   squadInvites[email] = { name, phone, email, inviteCode, squadId, status }
+================================ */
+
+if (!localStorage.getItem("contractor_squads")) {
+  localStorage.setItem("contractor_squads", JSON.stringify([
+    { squadId: "squad_1", squadName: "Squad 1", members: [] }
+  ]));
 }
 
-/* RENDER TABLE */
-function renderSquads() {
-  const tbody = document.getElementById("squadTable");
-  tbody.innerHTML = "";
+function loadSquads() {
+  return JSON.parse(localStorage.getItem("contractor_squads"));
+}
 
-  const squads = getAllSquads();
-  if (squads.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4">No squads added yet.</td></tr>`;
-    return;
-  }
+function saveSquads(arr) {
+  localStorage.setItem("contractor_squads", JSON.stringify(arr));
+}
+
+/* RENDER SQUADS */
+function renderSquads() {
+  const squads = loadSquads();
+  const list = document.getElementById("squadList");
+  const dropdown = document.getElementById("inviteSquadSelect");
+
+  list.innerHTML = "";
+  dropdown.innerHTML = "";
 
   squads.forEach(s => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${s.name}</td>
-        <td>${s.email}</td>
-        <td>${s.password ? s.password : "No password"}</td>
-        <td><button class="btn-danger" onclick="deleteSquad('${s.email}')">Delete</button></td>
-      </tr>
+    dropdown.innerHTML += `<option value="${s.squadId}">${s.squadName}</option>`;
+
+    let membersHTML = s.members.length
+      ? s.members.map(m => `
+          <div class="member-line">
+            <span>${m}</span>
+            <button class="btn-danger" onclick="removeMember('${s.squadId}','${m}')">Remove</button>
+          </div>
+        `).join("")
+      : `<p style="color:var(--text-muted);">No members yet</p>`;
+
+    list.innerHTML += `
+      <div class="squad-box">
+        <strong>${s.squadName}</strong>
+        ${membersHTML}
+      </div>
     `;
   });
 }
 
-/* ADD SQUAD */
-function addSquad() {
-  const name = document.getElementById("squadName").value.trim();
-  const email = document.getElementById("squadEmail").value.trim().toLowerCase();
-  const pass = document.getElementById("squadPass").value.trim();
-  const file = document.getElementById("squadPhoto").files[0];
+/* CREATE NEW SQUAD */
+function createNewSquad() {
+  const squads = loadSquads();
+  const id = "squad_" + (squads.length + 1);
 
-  if (!name || !email) {
-    alert("Name and email are required.");
-    return;
-  }
+  squads.push({
+    squadId: id,
+    squadName: "Squad " + (squads.length + 1),
+    members: []
+  });
 
-  if (localStorage.getItem("squad_" + email)) {
-    alert("A squad member with this email already exists.");
-    return;
-  }
-
-  const password = pass || "brick123"; // auto-password
-
-  let photoData = "";
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      photoData = e.target.result;
-      saveSquad();
-    };
-    reader.readAsDataURL(file);
-  } else {
-    saveSquad();
-  }
-
-  function saveSquad() {
-    const obj = {
-      name: name,
-      email: email,
-      password: password,
-      photo: photoData,
-      earnings: [],
-      bookings: []
-    };
-
-    localStorage.setItem("squad_" + email, JSON.stringify(obj));
-    alert("Squad member added.");
-    renderSquads();
-  }
-}
-
-/* DELETE SQUAD */
-function deleteSquad(email) {
-  if (!confirm("Delete this squad member?")) return;
-
-  localStorage.removeItem("squad_" + email);
+  saveSquads(squads);
   renderSquads();
 }
 
-/* INIT */
+/* SEND INVITE */
+function sendInvite() {
+  const name = inviteName.value.trim();
+  const email = inviteEmail.value.trim().toLowerCase();
+  const phone = invitePhone.value.trim();
+  const squadId = inviteSquadSelect.value;
+
+  if (!name || !email || !phone) {
+    alert("Fill all fields");
+    return;
+  }
+
+  const inviteCode = "SQUAD-" + Math.floor(1000 + Math.random() * 9000);
+
+  const inviteObj = { name, email, phone, squadId, inviteCode, status: "pending" };
+
+  localStorage.setItem("invite_" + email, JSON.stringify(inviteObj));
+
+  alert(`Invite sent!\nInvite Code: ${inviteCode}`);
+
+  inviteName.value = "";
+  inviteEmail.value = "";
+  invitePhone.value = "";
+}
+
+/* REMOVE MEMBER */
+function removeMember(squadId, email) {
+  const squads = loadSquads();
+  const squad = squads.find(s => s.squadId === squadId);
+  squad.members = squad.members.filter(m => m !== email);
+  saveSquads(squads);
+  renderSquads();
+}
+
 renderSquads();
 </script>
 
