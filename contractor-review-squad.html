@@ -1,356 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Review Submission – BrickBook</title>
+  <meta charset="UTF-8" />
+  <title>Review Submission – BrickBook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="assets/style.css" />
 
-<style>
-:root {
-    --blue: #1B73E8;
-    --charcoal: #2D2D2D;
-    --lightgrey: #F5F7FA;
-    --white: #FFFFFF;
-    --green: #2ECC71;
-    --danger: #E74C3C;
-    --pending: #F1C40F;
-    --shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
+  <style>
+    /* Page-specific styling */
 
-/* GENERAL */
-body {
-    margin: 0;
-    background: var(--lightgrey);
-    font-family: 'Inter', Arial, sans-serif;
-}
+    .review-squad-hero {
+      background: linear-gradient(
+        135deg,
+        rgba(27,115,232,0.18),
+        rgba(27,115,232,0.04)
+      );
+      border-radius: 20px;
+      padding: 24px 22px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 24px;
+      margin-bottom: 22px;
+    }
 
-/* HEADER */
-header {
-    background: white;
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #E5EAF0;
-}
-.logo { font-size: 22px; font-weight: 800; }
+    .review-squad-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
 
-nav a { margin-left: 20px; text-decoration: none; color: var(--charcoal); font-weight: 600; }
-nav a:hover { color: var(--blue); }
+    .review-squad-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: right;
+    }
 
-.wrapper {
-    max-width: 1100px;
-    margin: auto;
-    padding: 30px 20px 80px;
-}
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      text-decoration: none;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
 
-h1 { font-size: 28px; font-weight: 800; }
-.subtitle { color: #555; margin-bottom: 24px; }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+    }
 
-/* CARDS */
-.card {
-    background: var(--white);
-    padding: 20px;
-    margin-bottom: 22px;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-}
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 12px;
+      border-radius: 999px 999px 0 0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
 
-.card-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--border-subtle);
+      border-bottom-color: #ffffff;
+    }
 
-.plot-box {
-    margin-bottom: 20px;
-    padding: 14px;
-    background: #FAFAFF;
-    border-radius: 10px;
-    border: 1px solid #eaeaea;
-}
+    .tab-panel {
+      display: none;
+    }
 
-.plot-header {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
+    .tab-panel.active {
+      display: block;
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 12px;
-}
+    /* Plots / photos */
+    .plot-card {
+      margin-bottom: 18px;
+      padding: 14px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: #f9fbff;
+    }
 
-th, td {
-    padding: 8px;
-    border-bottom: 1px solid #e2e2e2;
-    font-size: 14px;
-}
+    .plot-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-thead {
-    background: #e7efff;
-}
+    .plot-notes {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 8px 0 10px 0;
+    }
 
-/* PHOTOS */
-.photo-preview {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.photo-preview img {
-    width: 120px;
-    height: 120px;
-    border-radius: 10px;
-    object-fit: cover;
-    border: 1px solid #ddd;
-}
+    .photo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
 
-/* SQUAD SPLIT */
-.split-row {
-    display: grid;
-    grid-template-columns: 1fr 90px 120px 120px;
-    gap: 8px;
-    margin-bottom: 8px;
-}
+    .photo-grid img {
+      width: 110px;
+      height: 110px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border-subtle);
+    }
 
-.badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-}
-.pending { background: var(--pending); }
-.approved { background: var(--green); }
-.rejected { background: var(--danger); }
-
-textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 18px;
-    resize: vertical;
-}
-
-.btn-approve {
-    padding: 14px 22px;
-    background: var(--green);
-    color: white;
-    font-weight: 700;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.btn-reject {
-    padding: 14px 22px;
-    background: var(--danger);
-    color: white;
-    font-weight: 700;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-}
-
-@media(max-width: 768px) {
-    .split-row { grid-template-columns: 1fr 70px 80px 80px; }
-    th, td { font-size: 12px; }
-    .photo-preview img { width: 100px; height: 100px; }
-}
-</style>
+    @media (max-width: 640px) {
+      .review-squad-header {
+        flex-direction: column;
+      }
+      .review-squad-meta {
+        text-align: left;
+      }
+      .photo-grid img {
+        width: 90px;
+        height: 90px;
+      }
+    }
+  </style>
 </head>
 
-<body>
+<body class="page" data-page="review-squad">
 
-<header>
+<!-- LOGIN GUARD -->
+<script>
+  if (!sessionStorage.getItem("loggedIn")) {
+    window.location.href = "contractor-login.html";
+  }
+</script>
+
+<!-- GLOBAL HEADER (HOME / BOOKING / CONTRACTOR / SQUAD) -->
+<header class="site-header">
+  <div class="header-inner">
     <div class="logo">BrickBook</div>
-    <nav>
-        <a href="contractor-dashboard.html">Dashboard</a>
-        <a href="contractor-review.html">Review</a>
-        <a href="contractor-login.html">Logout</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Booking</a>
+      <a href="contractor-login.html">Contractor</a>
+      <a href="squad-login.html">Squad</a>
     </nav>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </div>
 </header>
 
-<div class="wrapper">
-
-    <h1>Review Submission</h1>
-    <div class="subtitle">Inspect work, photos, totals and approve or reject.</div>
-
-    <div class="card">
-        <div class="card-title">Squad: <span id="squadName"></span></div>
-        <div>Status: <span id="submissionStatus" class="badge pending">PENDING</span></div>
-        <div style="margin-top:8px;">Submitted: <span id="submissionTime">Today 14:02</span></div>
-    </div>
-
-    <!-- PLOTS DISPLAY -->
-    <div class="card">
-        <div class="card-title">Plots Submitted</div>
-        <div id="plotsContainer"></div>
-    </div>
-
-    <!-- SQUAD SPLIT -->
-    <div class="card">
-        <div class="card-title">Squad Split Summary</div>
-
-        <div class="split-row" style="font-weight:700;">
-            <div>Name</div>
-            <div>%</div>
-            <div>Wages (£)</div>
-            <div>After CIS</div>
-        </div>
-
-        <div id="splitRows"></div>
-
-        <div style="text-align:right; font-size:18px; font-weight:800; margin-top:10px;">
-            Total: £<span id="totalPaid">0.00</span>
-        </div>
-    </div>
-
-    <!-- CONTRACTOR NOTE -->
-    <div class="card">
-        <div class="card-title">Contractor Note (optional)</div>
-        <textarea id="contractorNote" placeholder="Reason for rejection, feedback or site notes..."></textarea>
-
-        <button class="btn-approve" onclick="approve()">Approve Booking</button>
-        <button class="btn-reject" onclick="reject()">Reject Booking</button>
-    </div>
-
+<div id="mobileMenu" class="mobile-nav">
+  <a href="index.html">Home</a>
+  <a href="booking.html">Booking</a>
+  <a href="contractor-login.html">Contractor Login</a>
+  <a href="squad-login.html">Squad Login</a>
 </div>
 
+<main class="container">
 
+  <!-- HERO -->
+  <section class="review-squad-hero">
+    <a href="approvals.html" class="pill-link">← Back to approvals</a>
+    <div class="review-squad-header">
+      <div>
+        <h1 class="h1" style="font-size:26px; margin-bottom:4px;">
+          Review submission – <span id="heroSquad">Squad</span>
+        </h1>
+        <div class="text-muted" style="font-size:14px;">
+          Inspect plots, photos and squad splits before approving.
+        </div>
+      </div>
+      <div class="review-squad-meta">
+        <div>
+          Status:
+          <span id="heroStatus" class="status-pill status-pill--pending">pending</span>
+        </div>
+        <div>Submitted: <span id="heroSubmitted">Today 14:02</span></div>
+        <div>Grand total: £<span id="heroTotal">0.00</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABS + PANELS -->
+  <section class="card">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="overview" onclick="showTab('overview', this)">Overview</button>
+      <button class="tab-btn" data-tab="plots" onclick="showTab('plots', this)">Plots</button>
+      <button class="tab-btn" data-tab="photos" onclick="showTab('photos', this)">Photos</button>
+      <button class="tab-btn" data-tab="split" onclick="showTab('split', this)">Squad split</button>
+      <button class="tab-btn" data-tab="notes" onclick="showTab('notes', this)">Notes & actions</button>
+    </div>
+
+    <!-- Overview -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="card-sub" id="overviewSummary">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+    <!-- Plots -->
+    <div class="tab-panel" id="tab-plots">
+      <div id="plotsContainer"></div>
+    </div>
+
+    <!-- Photos -->
+    <div class="tab-panel" id="tab-photos">
+      <div id="photosContainer" class="photo-grid"></div>
+      <div id="noPhotosText" class="card-sub" style="margin-top:8px; display:none;">
+        No photos attached for this submission.
+      </div>
+    </div>
+
+    <!-- Squad split -->
+    <div class="tab-panel" id="tab-split">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Worker</th>
+            <th>Split %</th>
+            <th>Wages (£)</th>
+            <th>After CIS (£)</th>
+          </tr>
+        </thead>
+        <tbody id="splitRows"></tbody>
+      </table>
+      <div style="text-align:right; font-weight:700; margin-top:10px;">
+        Total paid after CIS: £<span id="totalPaid">0.00</span>
+      </div>
+    </div>
+
+    <!-- Notes & actions -->
+    <div class="tab-panel" id="tab-notes">
+      <label for="contractorNote">Contractor note (optional)</label>
+      <textarea
+        id="contractorNote"
+        placeholder="Reason for rejection, feedback or additional site notes..."
+        style="min-height:90px;"
+      ></textarea>
+
+      <div class="row row-wrap" style="margin-top:8px;">
+        <button class="btn btn-primary" type="button" onclick="approveSubmission()">
+          Approve booking
+        </button>
+        <button class="btn btn-danger" type="button" onclick="rejectSubmission()">
+          Reject booking
+        </button>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Review submission</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
 <script>
-/* TEMP DATA SIMULATING A REAL SUBMISSION FROM THE BOOKING PAGE */
-let submission = {
+  // TEMP DATA (same as your original – swap for real backend later)
+  let submission = {
     squad: "Team A",
     status: "pending",
     submitted: "Today 14:02",
     plots: [
-        {
-            plot: "44",
-            notes: "Good progress today.",
-            photos: ["https://picsum.photos/200?1", "https://picsum.photos/200?2"],
-            rows: [
-                { measurement: "Bricks", qty: 900, rate: 0.6 },
-                { measurement: "Trench", qty: 4, rate: 25 },
-                { measurement: "100mm", qty: 12, rate: 16 },
-            ]
-        },
-        {
-            plot: "45",
-            notes: "Rain slowed things down.",
-            photos: ["https://picsum.photos/200?3"],
-            rows: [
-                { measurement: "Bricks", qty: 600, rate: 0.6 },
-                { measurement: "Commons", qty: 150, rate: 0.35 },
-                { measurement: "Squad Hours", qty: 8, rate: 50 }
-            ]
-        }
+      {
+        plot: "44",
+        notes: "Good progress today.",
+        photos: ["https://picsum.photos/200?1", "https://picsum.photos/200?2"],
+        rows: [
+          { measurement: "Bricks", qty: 900, rate: 0.6 },
+          { measurement: "Trench", qty: 4, rate: 25 },
+          { measurement: "100mm", qty: 12, rate: 16 }
+        ]
+      },
+      {
+        plot: "45",
+        notes: "Rain slowed things down.",
+        photos: ["https://picsum.photos/200?3"],
+        rows: [
+          { measurement: "Bricks", qty: 600, rate: 0.6 },
+          { measurement: "Commons", qty: 150, rate: 0.35 },
+          { measurement: "Squad Hours", qty: 8, rate: 50 }
+        ]
+      }
     ],
     split: [
-        { name: "John", percent: 40 },
-        { name: "Ryan", percent: 30 },
-        { name: "Sam", percent: 30 }
+      { name: "John", percent: 40 },
+      { name: "Ryan", percent: 30 },
+      { name: "Sam", percent: 30 }
     ]
-};
+  };
 
+  // TAB HANDLER
+  function showTab(tab, btn) {
+    document.querySelectorAll(".tab-panel").forEach(p => {
+      p.classList.toggle("active", p.id === "tab-" + tab);
+    });
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
+  }
 
-/* LOAD INTO PAGE */
-document.getElementById("squadName").textContent = submission.squad;
-document.getElementById("submissionStatus").textContent = submission.status.toUpperCase();
-document.getElementById("submissionTime").textContent = submission.submitted;
+  // RENDER
+  function initSubmission() {
+    const heroSquad = document.getElementById("heroSquad");
+    const heroStatus = document.getElementById("heroStatus");
+    const heroSubmitted = document.getElementById("heroSubmitted");
+    const heroTotal = document.getElementById("heroTotal");
+    const overviewSummary = document.getElementById("overviewSummary");
+    const plotsContainer = document.getElementById("plotsContainer");
+    const photosContainer = document.getElementById("photosContainer");
+    const noPhotosText = document.getElementById("noPhotosText");
+    const splitRows = document.getElementById("splitRows");
+    const totalPaidEl = document.getElementById("totalPaid");
 
+    heroSquad.textContent = submission.squad;
+    heroSubmitted.textContent = submission.submitted;
 
-/* LOAD PLOTS */
-let plotHTML = "";
-let grandTotal = 0;
+    // status pill
+    heroStatus.textContent = submission.status;
+    heroStatus.classList.remove("status-pill--pending","status-pill--approved","status-pill--rejected");
+    if (submission.status === "approved") {
+      heroStatus.classList.add("status-pill--approved");
+    } else if (submission.status === "rejected") {
+      heroStatus.classList.add("status-pill--rejected");
+    } else {
+      heroStatus.classList.add("status-pill--pending");
+    }
 
-submission.plots.forEach(p => {
-    let rowsHTML = "";
-    let plotTotal = 0;
+    // compute totals & render plots
+    let grandTotal = 0;
+    let workerTotals = {};
 
-    p.rows.forEach(r => {
-        let total = r.qty * r.rate;
+    plotsContainer.innerHTML = "";
+    photosContainer.innerHTML = "";
+
+    submission.plots.forEach(p => {
+      let plotTotal = 0;
+
+      // table rows for measurements
+      let rowsHTML = "";
+      p.rows.forEach(r => {
+        const total = r.qty * r.rate;
         plotTotal += total;
-
         rowsHTML += `
-            <tr>
-                <td>${r.measurement}</td>
-                <td>${r.qty}</td>
-                <td>£${r.rate}</td>
-                <td><strong>£${total.toFixed(2)}</strong></td>
-            </tr>
+          <tr>
+            <td>${r.measurement}</td>
+            <td>${r.qty}</td>
+            <td>£${r.rate}</td>
+            <td><strong>£${total.toFixed(2)}</strong></td>
+          </tr>
         `;
+      });
+
+      grandTotal += plotTotal;
+
+      // plot card
+      const plotCard = document.createElement("div");
+      plotCard.className = "plot-card";
+      plotCard.innerHTML = `
+        <div class="plot-title">Plot ${p.plot}</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Measurement</th>
+              <th>Qty</th>
+              <th>Rate (£)</th>
+              <th>Total (£)</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHTML}</tbody>
+        </table>
+        <div class="plot-notes"><strong>Notes:</strong> ${p.notes}</div>
+        ${
+          p.photos && p.photos.length
+            ? `<div class="photo-grid">
+                ${p.photos.map(src => `<img src="${src}" alt="Plot photo">`).join("")}
+               </div>`
+            : ""
+        }
+        <div style="text-align:right; margin-top:10px; font-weight:700;">
+          Plot total: £${plotTotal.toFixed(2)}
+        </div>
+      `;
+      plotsContainer.appendChild(plotCard);
+
+      // photos tab grid
+      if (p.photos && p.photos.length) {
+        p.photos.forEach(src => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "Submission photo";
+          photosContainer.appendChild(img);
+        });
+      }
     });
 
-    grandTotal += plotTotal;
+    heroTotal.textContent = grandTotal.toFixed(2);
 
-    plotHTML += `
-        <div class="plot-box">
-            <div class="plot-header">Plot ${p.plot}</div>
-
-            <table>
-                <thead>
-                    <tr><th>Measurement</th><th>Qty</th><th>Rate</th><th>Total</th></tr>
-                </thead>
-                <tbody>${rowsHTML}</tbody>
-            </table>
-
-            <strong>Notes:</strong><br>${p.notes}<br><br>
-
-            <div class="photo-preview">
-                ${p.photos.map(img => `<img src="${img}">`).join("")}
-            </div>
-
-            <div style="text-align:right; margin-top:12px; font-weight:700;">
-                Plot Total: £${plotTotal.toFixed(2)}
-            </div>
-        </div>
-    `;
-});
-
-document.getElementById("plotsContainer").innerHTML = plotHTML;
-
-/* LOAD SPLIT */
-let splitHTML = "";
-let totalPaid = 0;
-
-submission.split.forEach(s => {
-    let wages = grandTotal * (s.percent / 100);
-    let cis = wages * 0.8;
-    totalPaid += cis;
-
-    splitHTML += `
-        <div class="split-row">
-            <div>${s.name}</div>
-            <div>${s.percent}%</div>
-            <div>£${wages.toFixed(2)}</div>
-            <div>£${cis.toFixed(2)}</div>
-        </div>
-    `;
-});
-
-document.getElementById("splitRows").innerHTML = splitHTML;
-document.getElementById("totalPaid").textContent = totalPaid.toFixed(2);
-
-/* APPROVE / REJECT ACTIONS */
-function approve() {
-    alert("Booking approved!");
-    document.getElementById("submissionStatus").className = "badge approved";
-    document.getElementById("submissionStatus").textContent = "APPROVED";
-}
-
-function reject() {
-    let note = document.getElementById("contractorNote").value.trim();
-    if (note.length < 3) {
-        alert("Add a short reason for rejection.");
-        return;
+    // photos empty state
+    if (!photosContainer.children.length) {
+      noPhotosText.style.display = "block";
+    } else {
+      noPhotosText.style.display = "none";
     }
+
+    // overview summary text
+    overviewSummary.innerHTML = `
+      <p>
+        <strong>${submission.squad}</strong> submitted
+        <strong>${submission.plots.length}</strong> plot${submission.plots.length !== 1 ? "s" : ""}
+        with a total of <strong>£${grandTotal.toFixed(2)}</strong>.
+      </p>
+      <p class="mt-12">
+        ${submission.split.length} worker${submission.split.length !== 1 ? "s are" : " is"} on this squad split.
+      </p>
+    `;
+
+    // squad split
+    let totalPaid = 0;
+    splitRows.innerHTML = "";
+
+    submission.split.forEach(s => {
+      const wages = grandTotal * (s.percent / 100);
+      const cis = wages * 0.8;
+      totalPaid += cis;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td>${s.percent}%</td>
+        <td>£${wages.toFixed(2)}</td>
+        <td>£${cis.toFixed(2)}</td>
+      `;
+      splitRows.appendChild(tr);
+    });
+
+    totalPaidEl.textContent = totalPaid.toFixed(2);
+  }
+
+  function approveSubmission() {
+    submission.status = "approved";
+    alert("Booking approved!");
+    initSubmission();
+  }
+
+  function rejectSubmission() {
+    const note = document.getElementById("contractorNote").value.trim();
+    if (note.length < 3) {
+      alert("Please add a short reason for rejection.");
+      return;
+    }
+    submission.status = "rejected";
     alert("Booking rejected.");
-    document.getElementById("submissionStatus").className = "badge rejected";
-    document.getElementById("submissionStatus").textContent = "REJECTED";
+    initSubmission();
+  }
+
+  initSubmission();
+</script>
+
+<script>
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('show');
 }
 </script>
 
