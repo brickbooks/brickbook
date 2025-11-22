@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="assets/style.css" />
 
   <style>
-    /* Page-specific visual enhancements */
     .dashboard-hero {
       background: linear-gradient(
         135deg,
@@ -47,7 +46,6 @@
       color: var(--blue);
     }
 
-    /* Status colour improvements */
     .status-pill {
       padding: 6px 10px;
       border-radius: 999px;
@@ -63,13 +61,19 @@
 
 <!-- LOGIN GUARD -->
 <script>
-  if (!sessionStorage.getItem("loggedIn")) {
+  // Skip redirect if user just logged out
+  if (!sessionStorage.getItem("loggedIn") && !sessionStorage.getItem("logout")) {
     window.location.href = "contractor-login.html";
   }
- function logout() {
-  sessionStorage.removeItem("loggedIn");
-  window.location.href = "index.html";
-}
+  // Clean up
+  sessionStorage.removeItem("logout");
+
+  function logout(event) {
+    if (event) event.preventDefault();
+    sessionStorage.setItem("logout", "true"); // allow redirect to home
+    sessionStorage.removeItem("loggedIn");
+    window.location.href = "index.html"; // home page
+  }
 </script>
 
 <!-- HEADER -->
@@ -81,7 +85,7 @@
       <a href="pricing-table.html">Pricing</a>
       <a href="approvals.html">Approvals</a>
       <a href="contractor-review.html">Review</a>
-      <a href="#" onclick="logout()">logout</a>
+      <a href="#" onclick="logout(event)">Logout</a>
     </nav>
     <div class="hamburger" onclick="toggleMenu()">☰</div>
   </div>
@@ -93,7 +97,7 @@
   <a href="pricing-table.html">Pricing</a>
   <a href="approvals.html">Approvals</a>
   <a href="contractor-review.html">Review</a>
-  <a href="#" onclick="logout()">logout</a>
+  <a href="#" onclick="logout(event)">Logout</a>
 </div>
 
 <main class="container">
@@ -148,6 +152,7 @@
 </footer>
 
 <script src="assets/main.js"></script>
+
 <script>
   const demoBookings = [
     { squad: "Team A", plots: 3, total: 1400, time: "08:45", status: "pending" },
