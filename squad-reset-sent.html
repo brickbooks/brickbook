@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Sent – BrickBook</title>
+
+<style>
+:root {
+    --blue:#1B73E8;
+    --bg:#F5F7FA;
+    --card:#FFFFFF;
+    --text:#1F2933;
+    --sub:#6B7280;
+    --shadow:0 8px 26px rgba(0,0,0,0.08);
+}
+
+body {
+    margin:0;
+    background:var(--bg);
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+}
+
+/* HEADER */
+header {
+    background:var(--card);
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #E5E7EB;
+}
+.logo { font-size:22px; font-weight:800; }
+
+nav a {
+    margin-left:20px;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:600;
+}
+nav a:hover { color:var(--blue); }
+
+/* CARD */
+.wrapper {
+    max-width:420px;
+    margin:60px auto;
+    background:var(--card);
+    padding:28px;
+    border-radius:18px;
+    text-align:center;
+    box-shadow:var(--shadow);
+}
+
+h1 {
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.subtitle {
+    font-size:15px;
+    color:var(--sub);
+    margin-bottom:20px;
+}
+
+.icon {
+    font-size:46px;
+    margin-bottom:16px;
+    color:var(--blue);
+}
+
+.btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:var(--blue);
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:18px;
+}
+.btn:hover { opacity:0.9; }
+
+.small-link {
+    margin-top:14px;
+    display:block;
+    text-align:center;
+}
+.small-link a {
+    text-decoration:none;
+    font-weight:600;
+    color:var(--blue);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">BrickBook</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="contractor-login.html">Contractor</a>
+        <a href="squad-login.html">Squad Login</a>
+    </nav>
+</header>
+
+<div class="wrapper">
+
+    <div class="icon">📬</div>
+
+    <h1>Check Your Email</h1>
+
+    <div class="subtitle">
+        If the email you entered is registered, you’ll receive a link to reset your password shortly.
+    </div>
+
+    <button class="btn" onclick="window.location.href='squad-login.html'">
+        Back to Login
+    </button>
+
+    <div class="small-link">
+        <a href="squad-forgot.html">Try another email</a>
+    </div>
+</div>
+
+</body>
+</html>
