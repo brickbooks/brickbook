@@ -143,6 +143,55 @@ input {
 </div>
 
 <script>
+  /* ==========================
+   TEMPORARY DEMO SQUADS
+   (ONLY ADDED IF NONE EXIST)
+========================== */
+
+if (!localStorage.getItem("contractor_squads")) {
+    const demoSquads = [
+        {
+            squadId: "squad_1",
+            squadName: "Squad 1",
+            members: [
+                "john@example.com",
+                "paul@example.com",
+                "dave@example.com"
+            ]
+        },
+        {
+            squadId: "squad_2",
+            squadName: "Squad 2",
+            members: [
+                "mick@example.com",
+                "lee@example.com"
+            ]
+        },
+        {
+            squadId: "squad_3",
+            squadName: "Squad 3",
+            members: [
+                "moe@example.com"
+            ]
+        }
+    ];
+
+    localStorage.setItem("contractor_squads", JSON.stringify(demoSquads));
+
+    // Also create demo user profiles so names appear
+    const users = {
+        "john@example.com": { name: "John Mason", email: "john@example.com" },
+        "paul@example.com": { name: "Paul Turner", email: "paul@example.com" },
+        "dave@example.com": { name: "Dave Clay", email: "dave@example.com" },
+        "mick@example.com": { name: "Mick Ryan", email: "mick@example.com" },
+        "lee@example.com": { name: "Lee Carter", email: "lee@example.com" },
+        "moe@example.com": { name: "Moe Collins", email: "moe@example.com" }
+    };
+
+    for (let email in users) {
+        localStorage.setItem("squad_user_" + email, JSON.stringify(users[email]));
+    }
+}
 /* ================================
    DATA STRUCTURE
    contractor_squads = [
