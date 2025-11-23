@@ -5,6 +5,14 @@
   <title>Contractor Sign Up – BrickBook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/style.css" />
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+  const supabase = createClient(
+    "YOUR_SUPABASE_URL",
+    "YOUR_PUBLIC_ANON_KEY"
+  );
+</script>
 
   <style>
     .signup-hero {
