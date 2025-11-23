@@ -28,10 +28,18 @@
 
       try {
         // 1) Create Supabase Auth user
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password
-        });
+    const { data, error } = await supabase.auth.signUp({
+  email,
+  password
+});
+
+await supabase.from("contractors").insert({
+  auth_id: data.user.id,
+  email,
+  company_name,
+  full_name
+});
+
 
         if (signUpError) {
           console.error(signUpError);
