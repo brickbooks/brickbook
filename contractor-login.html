@@ -5,14 +5,18 @@
   <title>Contractor Login – BrickBook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="assets/style.css">
-  <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-  const supabase = createClient(
-    "https://kokcedwrsxdfldnipzzn.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtva2NlZHdyc3hkZmxkbmlwenpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTYzNjIsImV4cCI6MjA3OTQzMjM2Mn0.prA8B_WywgiydpAEm1JYxEafdAiWPnakNW6cM1Gro6A"
-  );
-</script>
+  <!-- Supabase client -->
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    // ❗ Replace these with your new regenerated keys (do NOT reuse the old ones)
+    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_NEW_ANON_KEY";
+
+    export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
 </head>
 
 <body class="page">
@@ -90,41 +94,65 @@
 
 <script src="assets/main.js"></script>
 
-<script>
-function toggleMenu() {
-  document.getElementById("mobileMenu").classList.toggle("show");
-}
+<script type="module">
+  import { supabase } from "./supabase.js"; // optional if you move client out
 
-function showForgot() {
-  document.getElementById("forgotBox").style.display = "block";
-}
-
-function hideForgot() {
-  document.getElementById("forgotBox").style.display = "none";
-}
-
-function login() {
-  let email = document.getElementById("email").value.trim();
-  let pass = document.getElementById("password").value.trim();
-
-  if (!email || !pass) {
-    alert("Enter email & password.");
-    return;
+  function toggleMenu() {
+    document.getElementById("mobileMenu").classList.toggle("show");
   }
 
-  // TEMP login (replace with backend later)
-  sessionStorage.setItem("loggedIn", "true");
-  window.location.href = "contractor-dashboard.html";
-}
-
-function sendReset() {
-  let email = document.getElementById("forgotEmail").value.trim();
-  if (!email) {
-    alert("Enter your email.");
-    return;
+  function showForgot() {
+    document.getElementById("forgotBox").style.display = "block";
   }
-  alert("Password reset link sent to " + email);
-}
+  function hideForgot() {
+    document.getElementById("forgotBox").style.display = "none";
+  }
+
+  // ---------------------------
+  // SUPABASE LOGIN
+  // ---------------------------
+  window.login = async function() {
+    let email = document.getElementById("email").value.trim();
+    let pass = document.getElementById("password").value.trim();
+
+    if (!email || !pass) {
+      alert("Enter email & password.");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: pass
+    });
+
+    if (error) {
+      alert("Login failed: " + error.message);
+      return;
+    }
+
+    // Success → redirect
+    window.location.href = "contractor-dashboard.html";
+  }
+
+  // ---------------------------
+  // SUPABASE PASSWORD RESET
+  // ---------------------------
+  window.sendReset = async function() {
+    let email = document.getElementById("forgotEmail").value.trim();
+    if (!email) {
+      alert("Enter your email.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      alert("Error: " + error.message);
+      return;
+    }
+
+    alert("Password reset email sent!");
+  }
 </script>
 
 </body>
