@@ -5,14 +5,6 @@
   <title>Contractor Sign Up – BrickBook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/style.css" />
- <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-  const supabase = createClient(
-    "https://kokcedwrsxdfldnipzzn.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtva2NlZHdyc3hkZmxkbmlwenpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTYzNjIsImV4cCI6MjA3OTQzMjM2Mn0.prA8B_WywgiydpAEm1JYxEafdAiWPnakNW6cM1Gro6A"
-  );
-</script>
 
   <style>
     .signup-hero {
@@ -153,32 +145,55 @@
   </div>
 </footer>
 
-<script>
-function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('show');
-}
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Placeholder signup action (localStorage for now)
-// Later this will switch to Firebase/Supabase auth + contractor table.
-document.getElementById("contractorSignupForm").addEventListener("submit", function (e) {
+// your project URL + anon key
+const supabase = createClient(
+  "https://kokcedwrsxdfldnipzzn.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtva2NlZHdyc3hkZmxkbmlwenpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTYzNjIsImV4cCI6MjA3OTQzMjM2Mn0.prA8B_WywgiydpAEm1JYxEafdAiWPnakNW6cM1Gro6A"
+);
+
+document.getElementById("contractorSignupForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const contractor = {
-    companyName: document.getElementById("companyName").value,
-    fullName: document.getElementById("fullName").value,
-    email: document.getElementById("email").value.toLowerCase(),
-    phone: document.getElementById("phone").value,
-    password: document.getElementById("password").value
-  };
+  const companyName = document.getElementById("companyName").value.trim();
+  const fullName    = document.getElementById("fullName").value.trim();
+  const email       = document.getElementById("email").value.trim().toLowerCase();
+  const phone       = document.getElementById("phone").value.trim();
+  const password    = document.getElementById("password").value.trim();
 
-  // Save to localStorage (temporary)
-  localStorage.setItem("contractorAccount", JSON.stringify(contractor));
+  // 1️⃣ Create Auth user
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
-  // Auto-login for now
-  sessionStorage.setItem("loggedIn", "true");
+  if (authError) {
+    alert("Signup error: " + authError.message);
+    return;
+  }
 
-  // Redirect to dashboard
-  window.location.href = "contractor-dashboard.html";
+  const authId = authData.user.id;
+
+  // 2️⃣ Create contractor row in DB
+  const { error: insertError } = await supabase.from("contractors").insert([
+    {
+      auth_id: authId,
+      company_name: companyName,
+      full_name: fullName,
+      email: email,
+      phone: phone
+    }
+  ]);
+
+  if (insertError) {
+    alert("Database error: " + insertError.message);
+    return;
+  }
+
+  alert("Account created — check email to verify!");
+  window.location.href = "contractor-login.html";
 });
 </script>
 
