@@ -4,14 +4,14 @@
   import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // IMPORTANT — replace this with your Firebase config
+  // Correct Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyBm7PmX1VjRYd_JHr3OPZ7RAglgD1v-rys",
-  authDomain: "brick-book-72713.firebaseapp.com",
-  projectId: "brick-book-72713",
-  storageBucket: "brick-book-72713.firebasestorage.app",
-  messagingSenderId: "970832425744",
-  appId: "1:970832425744:web:7fccf44e6f53417efd2b95"
+    authDomain: "brick-book-72713.firebaseapp.com",
+    projectId: "brick-book-72713",
+    storageBucket: "brick-book-72713.appspot.com",  // ← FIXED
+    messagingSenderId: "970832425744",
+    appId: "1:970832425744:web:7fccf44e6f53417efd2b95"
   };
 
   export const app = initializeApp(firebaseConfig);
