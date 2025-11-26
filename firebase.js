@@ -1,17 +1,20 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+<script type="module">
+  // Firebase imports MUST be from URLs, not npm names
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBm7PmX1VjRYd_JHr3OPZ7RAglgD1v-rys",
+  // IMPORTANT — replace this with your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBm7PmX1VjRYd_JHr3OPZ7RAglgD1v-rys",
   authDomain: "brick-book-72713.firebaseapp.com",
   projectId: "brick-book-72713",
   storageBucket: "brick-book-72713.firebasestorage.app",
   messagingSenderId: "970832425744",
   appId: "1:970832425744:web:7fccf44e6f53417efd2b95"
-};
+  };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+  export const app = initializeApp(firebaseConfig);
+  export const auth = getAuth(app);
+  export const db = getFirestore(app);
+</script>
