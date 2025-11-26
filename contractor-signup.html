@@ -28,21 +28,13 @@
 
       try {
         // 1) Create Supabase Auth user
-    const { data, error } = await supabase.auth.signUp({
-  email,
-  password
-});
-
-await supabase.from("contractors").insert({
-  auth_id: data.user.id,
-  email,
-  company_name,
-  full_name
-});
-
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password
+        });
 
         if (signUpError) {
-          console.error(signUpError);
+          console.error("Signup Error:", signUpError);
           alert("Signup error: " + signUpError.message);
           return;
         }
@@ -53,7 +45,7 @@ await supabase.from("contractors").insert({
           return;
         }
 
-        // 2) Insert contractor row
+        // 2) Insert contractor profile
         const { error: insertError } = await supabase
           .from("contractors")
           .insert({
@@ -65,17 +57,17 @@ await supabase.from("contractors").insert({
           });
 
         if (insertError) {
-          console.error(insertError);
+          console.error("Insert Error:", insertError);
           alert("Error saving contractor profile: " + insertError.message);
           return;
         }
 
-        // 3) Done → redirect to dashboard
-        // Optionally set a simple flag so your existing login guard works temporarily
+        // 3) Redirect after success
         sessionStorage.setItem("loggedIn", "true");
         window.location.href = "contractor-dashboard.html";
+
       } catch (e) {
-        console.error(e);
+        console.error("Unexpected error:", e);
         alert("Unexpected error during signup.");
       }
     };
@@ -168,7 +160,8 @@ await supabase.from("contractors").insert({
       <input type="password" id="password" class="form-input" required>
     </div>
 
-    <button class="btn btn-primary" style="width:100%; padding:14px; font-size:16px;"
+    <button class="btn btn-primary"
+            style="width:100%; padding:14px; font-size:16px;"
             onclick="handleSignup()">
       Create Account
     </button>
@@ -194,5 +187,6 @@ function toggleMenu() {
   document.getElementById('mobileMenu').classList.toggle('show');
 }
 </script>
+
 </body>
 </html>
