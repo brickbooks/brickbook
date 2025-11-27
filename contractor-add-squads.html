@@ -7,6 +7,9 @@
 
 <link rel="stylesheet" href="assets/style.css">
 
+<!-- Load Firebase -->
+<script type="module" src="./firebase.js"></script>
+
 <style>
 :root {
   --blue: #1B73E8;
@@ -23,7 +26,6 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-/* HEADER */
 header {
   background: var(--card);
   padding: 18px 24px;
@@ -40,14 +42,12 @@ nav a {
   font-weight: 600;
 }
 
-/* WRAPPER */
 .wrapper {
   max-width: 900px;
   margin: 30px auto;
   padding: 20px;
 }
 
-/* CARD */
 .card {
   background: var(--card);
   padding: 22px;
@@ -63,7 +63,7 @@ nav a {
   margin-bottom: 12px;
 }
 
-input {
+input, select {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
@@ -71,7 +71,6 @@ input {
   margin-bottom: 12px;
 }
 
-/* BUTTONS */
 .btn-primary {
   padding: 12px 20px;
   background: var(--blue);
@@ -98,7 +97,15 @@ input {
 }
 
 .member-line:last-child { border: none; }
-.btn-danger { background:red;color:#fff;padding:6px 10px;border:none;border-radius:6px;}
+
+.btn-danger {
+  background:red;
+  color:#fff;
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -110,14 +117,14 @@ input {
     <a href="contractor-dashboard.html">Dashboard</a>
     <a href="contractor-review.html">Review</a>
     <a href="pricing-table.html">Pricing</a>
-    <a href="contractor-add-squads.html">Add Squads</a>
-    <a href="contractor-login.html">Logout</a>
+    <a href="contractor-add-squads.html" class="active">Add Squads</a>
+    <a href="#" onclick="logout(event)">Logout</a>
   </nav>
 </header>
 
 <div class="wrapper">
 
-  <!-- INVITE NEW MEMBER -->
+  <!-- INVITE MEMBER FORM -->
   <div class="card">
     <div class="card-title">Invite New Squad Member</div>
 
@@ -131,7 +138,7 @@ input {
     <button class="btn-primary" onclick="sendInvite()">Send Invite</button>
   </div>
 
-  <!-- MANAGE SQUADS -->
+  <!-- SQUAD MANAGEMENT -->
   <div class="card">
     <div class="card-title">Manage Active Squads</div>
 
@@ -142,179 +149,148 @@ input {
 
 </div>
 
-<script>
-  /* ==========================
-   TEMPORARY DEMO SQUADS
-   (ONLY ADDED IF NONE EXIST)
-========================== */
+<!-- FIREBASE SQUAD LOGIC -->
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { 
+    onAuthStateChanged,
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-if (!localStorage.getItem("contractor_squads")) {
-    const demoSquads = [
-        {
-            squadId: "squad_1",
-            squadName: "Squad 1",
-            members: [
-                "john@example.com",
-                "paul@example.com",
-                "dave@example.com"
-            ]
-        },
-        {
-            squadId: "squad_2",
-            squadName: "Squad 2",
-            members: [
-                "mick@example.com",
-                "lee@example.com"
-            ]
-        },
-        {
-            squadId: "squad_3",
-            squadName: "Squad 3",
-            members: [
-                "moe@example.com"
-            ]
-        }
-    ];
+  import { 
+    collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteField, arrayUnion, arrayRemove 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    localStorage.setItem("contractor_squads", JSON.stringify(demoSquads));
 
-    // Also create demo user profiles so names appear
-    const users = {
-        "john@example.com": { name: "John Mason", email: "john@example.com" },
-        "paul@example.com": { name: "Paul Turner", email: "paul@example.com" },
-        "dave@example.com": { name: "Dave Clay", email: "dave@example.com" },
-        "mick@example.com": { name: "Mick Ryan", email: "mick@example.com" },
-        "lee@example.com": { name: "Lee Carter", email: "lee@example.com" },
-        "moe@example.com": { name: "Moe Collins", email: "moe@example.com" }
-    };
+  let contractorId = null;
 
-    for (let email in users) {
-        localStorage.setItem("squad_user_" + email, JSON.stringify(users[email]));
+  // Redirect if not logged in
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "contractor-login.html";
+      return;
     }
-}
-/* ================================
-   DATA STRUCTURE
-   contractor_squads = [
-     { squadId, squadName, members: [emails] }
-   ]
-   squadInvites[email] = { name, phone, email, inviteCode, squadId, status }
-================================ */
 
-if (!localStorage.getItem("contractor_squads")) {
-  localStorage.setItem("contractor_squads", JSON.stringify([
-    { squadId: "squad_1", squadName: "Squad 1", members: [] }
-  ]));
-}
+    contractorId = user.uid;
 
-function loadSquads() {
-  return JSON.parse(localStorage.getItem("contractor_squads"));
-}
+    loadSquads();
+  });
 
-function saveSquads(arr) {
-  localStorage.setItem("contractor_squads", JSON.stringify(arr));
-}
+  // Logout
+  window.logout = async function(event) {
+    if (event) event.preventDefault();
+    await signOut(auth);
+    window.location.href = "contractor-login.html";
+  };
 
-/* RENDER SQUADS */
-function renderSquads() {
-  const squads = loadSquads();
-  const list = document.getElementById("squadList");
-  const dropdown = document.getElementById("inviteSquadSelect");
 
-  list.innerHTML = "";
-  dropdown.innerHTML = "";
+  /* ======================================================
+       LOAD SQUADS FROM FIRESTORE
+  ====================================================== */
+  async function loadSquads() {
+    const squadList = document.getElementById("squadList");
+    const dropdown = document.getElementById("inviteSquadSelect");
 
-  squads.forEach(s => {
-    dropdown.innerHTML += `<option value="${s.squadId}">${s.squadName}</option>`;
+    squadList.innerHTML = "<p>Loading squads...</p>";
+    dropdown.innerHTML = "";
 
-    let membersHTML;
+    const squadsRef = collection(db, "contractors", contractorId, "squads");
+    const snapshot = await getDocs(squadsRef);
 
-if (s.members && s.members.length) {
-  membersHTML = s.members.map(email => {
-    const raw = localStorage.getItem("squad_user_" + email);
-    let display = email;
+    squadList.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const squad = docSnap.data();
 
-    if (raw) {
-      try {
-        const user = JSON.parse(raw);
-        if (user.name) {
-          display = `${user.name} (${email})`;
-        }
-      } catch (e) {
-        // ignore parse error, fallback to email
+      // Add to dropdown
+      dropdown.innerHTML += `<option value="${docSnap.id}">${squad.squadName}</option>`;
+
+      // Build UI
+      let membersHTML = "";
+
+      if (squad.members?.length > 0) {
+        membersHTML = squad.members.map(m => `
+          <div class="member-line">
+            <span>${m.name} (${m.email})</span>
+            <button class="btn-danger" onclick="removeMember('${docSnap.id}', '${m.email}')">Remove</button>
+          </div>
+        `).join("");
+      } else {
+        membersHTML = `<p style="color:var(--text-muted); font-size:13px;">No members yet</p>`;
       }
-    }
 
-    return `
-      <div class="member-line">
-        <span>${display}</span>
-        <button class="btn-danger" onclick="removeMember('${s.squadId}','${email}')">Remove</button>
-      </div>
-    `;
-  }).join("");
-} else {
-  membersHTML = `<p style="color:var(--text-muted); font-size:13px;">No members yet</p>`;
-}
-
-
-    list.innerHTML += `
-      <div class="squad-box">
-        <strong>${s.squadName}</strong>
-        ${membersHTML}
-      </div>
-    `;
-  });
-}
-
-/* CREATE NEW SQUAD */
-function createNewSquad() {
-  const squads = loadSquads();
-  const id = "squad_" + (squads.length + 1);
-
-  squads.push({
-    squadId: id,
-    squadName: "Squad " + (squads.length + 1),
-    members: []
-  });
-
-  saveSquads(squads);
-  renderSquads();
-}
-
-/* SEND INVITE */
-function sendInvite() {
-  const name = inviteName.value.trim();
-  const email = inviteEmail.value.trim().toLowerCase();
-  const phone = invitePhone.value.trim();
-  const squadId = inviteSquadSelect.value;
-
-  if (!name || !email || !phone) {
-    alert("Fill all fields");
-    return;
+      squadList.innerHTML += `
+        <div class="squad-box">
+          <strong>${s.squadName}</strong>
+          ${membersHTML}
+        </div>
+      `;
+    });
   }
 
-  const inviteCode = "SQUAD-" + Math.floor(1000 + Math.random() * 9000);
 
-  const inviteObj = { name, email, phone, squadId, inviteCode, status: "pending" };
+  /* ======================================================
+       CREATE NEW SQUAD
+  ====================================================== */
+  window.createNewSquad = async function() {
+    const squadRef = doc(collection(db, "contractors", contractorId, "squads"));
+    const squadName = "Squad " + squadRef.id.substring(0, 5);
 
-  localStorage.setItem("invite_" + email, JSON.stringify(inviteObj));
+    await setDoc(squadRef, {
+      squadName: squadName,
+      members: []
+    });
 
-  alert(`Invite sent!\nInvite Code: ${inviteCode}`);
+    alert("Squad created: " + squadName);
+    loadSquads();
+  };
 
-  inviteName.value = "";
-  inviteEmail.value = "";
-  invitePhone.value = "";
-}
 
-/* REMOVE MEMBER */
-function removeMember(squadId, email) {
-  const squads = loadSquads();
-  const squad = squads.find(s => s.squadId === squadId);
-  squad.members = squad.members.filter(m => m !== email);
-  saveSquads(squads);
-  renderSquads();
-}
+  /* ======================================================
+       SEND INVITE (SAVE TO FIRESTORE)
+  ====================================================== */
+  window.sendInvite = async function () {
+    const name = inviteName.value.trim();
+    const email = inviteEmail.value.trim().toLowerCase();
+    const phone = invitePhone.value.trim();
+    const squadId = inviteSquadSelect.value;
 
-renderSquads();
+    if (!name || !email || !phone) {
+      alert("Fill all fields");
+      return;
+    }
+
+    const inviteRef = doc(db, "contractors", contractorId, "invites", email);
+
+    await setDoc(inviteRef, {
+      name, email, phone, squadId,
+      status: "pending",
+      invitedAt: new Date()
+    });
+
+    alert("Invite sent! Member will join using invite code.");
+
+    inviteName.value = "";
+    inviteEmail.value = "";
+    invitePhone.value = "";
+  };
+
+
+  /* ======================================================
+       REMOVE MEMBER
+  ====================================================== */
+  window.removeMember = async function (squadId, email) {
+
+    const squadRef = doc(db, "contractors", contractorId, "squads", squadId);
+
+    // Remove from members array
+    await updateDoc(squadRef, {
+      members: arrayRemove({ email })
+    });
+
+    alert("Member removed.");
+    loadSquads();
+  };
+
 </script>
 
 </body>
