@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/style.css" />
 
+  <!-- Load Firebase -->
+  <script type="module" src="./firebase.js"></script>
+
   <style>
     .dashboard-hero {
       background: linear-gradient(
@@ -59,28 +62,38 @@
 
 <body class="page" data-page="dashboard">
 
-<!-- LOGIN GUARD + LOGOUT FIX -->
-<script>
-  // Allow redirect to homepage if user intentionally logged out
-  if (!sessionStorage.getItem("loggedIn") && !sessionStorage.getItem("logout")) {
-    window.location.href = "contractor-login.html";
-  }
+<!-- FIREBASE AUTH + PROFILE LOADING -->
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Clear logout flag once we pass any redirects
-  sessionStorage.removeItem("logout");
+  // Protect page + load user
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "contractor-login.html";
+      return;
+    }
 
-  function logout(event) {
+    // User is logged in → load Firestore profile
+    const ref = doc(db, "contractors", user.uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const data = snap.data();
+
+      // Update dashboard hero with real name/company
+      document.getElementById("contractorName").textContent = data.full_name;
+      document.getElementById("companyName").textContent = data.company_name;
+    }
+  });
+
+  // Logout handler
+  window.logout = async function (event) {
     if (event) event.preventDefault();
-
-    // Mark this as an intentional logout
-    sessionStorage.setItem("logout", "true");
-
-    // Remove login flag
-    sessionStorage.removeItem("loggedIn");
-
-    // Redirect to home
-    window.location.href = "index.html";
-  }
+    await signOut(auth);
+    window.location.href = "contractor-login.html";
+  };
 </script>
 
 <!-- HEADER -->
@@ -111,11 +124,12 @@
 
 <main class="container">
 
-  <!-- PAGE HERO -->
+  <!-- PAGE HERO with dynamic Firebase profile -->
   <section class="dashboard-hero">
-    <h1 class="h1" style="font-size:32px;">Contractor Dashboard</h1>
+    <h1 class="h1" style="font-size:32px;">Welcome, <span id="contractorName">Loading...</span></h1>
     <p class="text-muted" style="font-size:16px;">
-      Review booking-off submissions, manage squads & pricing.
+      Company: <strong id="companyName">Loading...</strong><br>
+      Review booking submissions, manage squads & pricing.
     </p>
   </section>
 
