@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/style.css" />
 
-  <style>
-    /* Page-specific styling */
+  <!-- Load Firebase config -->
+  <script type="module" src="./firebase.js"></script>
 
+  <style>
     .review-squad-hero {
       background: linear-gradient(
         135deg,
@@ -48,7 +49,6 @@
       margin-bottom: 8px;
     }
 
-    /* Tabs */
     .tabs {
       display: flex;
       flex-wrap: wrap;
@@ -78,12 +78,10 @@
     .tab-panel {
       display: none;
     }
-
     .tab-panel.active {
       display: block;
     }
 
-    /* Plots / photos */
     .plot-card {
       margin-bottom: 18px;
       padding: 14px 12px;
@@ -119,6 +117,14 @@
       border: 1px solid var(--border-subtle);
     }
 
+    #contractorNote {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      resize: vertical;
+    }
+
     @media (max-width: 640px) {
       .review-squad-header {
         flex-direction: column;
@@ -136,14 +142,7 @@
 
 <body class="page" data-page="review-squad">
 
-<!-- LOGIN GUARD -->
-<script>
-  if (!sessionStorage.getItem("loggedIn")) {
-    window.location.href = "contractor-login.html";
-  }
-</script>
-
-<!-- GLOBAL HEADER (HOME / BOOKING / CONTRACTOR / SQUAD) -->
+<!-- HEADER -->
 <header class="site-header">
   <div class="header-inner">
     <div class="logo">BrickBook</div>
@@ -172,7 +171,7 @@
     <div class="review-squad-header">
       <div>
         <h1 class="h1" style="font-size:26px; margin-bottom:4px;">
-          Review submission – <span id="heroSquad">Squad</span>
+          Review submission – <span id="heroSquad">Loading...</span>
         </h1>
         <div class="text-muted" style="font-size:14px;">
           Inspect plots, photos and squad splits before approving.
@@ -181,9 +180,9 @@
       <div class="review-squad-meta">
         <div>
           Status:
-          <span id="heroStatus" class="status-pill status-pill--pending">pending</span>
+          <span id="heroStatus" class="status-pill status-pill--pending">loading</span>
         </div>
-        <div>Submitted: <span id="heroSubmitted">Today 14:02</span></div>
+        <div>Submitted: <span id="heroSubmitted">Loading...</span></div>
         <div>Grand total: £<span id="heroTotal">0.00</span></div>
       </div>
     </div>
@@ -203,7 +202,7 @@
     <!-- Overview -->
     <div class="tab-panel active" id="tab-overview">
       <div class="card-sub" id="overviewSummary">
-        <!-- Filled by JS -->
+        Loading…
       </div>
     </div>
 
@@ -247,7 +246,7 @@
         style="min-height:90px;"
       ></textarea>
 
-      <div class="row row-wrap" style="margin-top:8px;">
+      <div class="row row-wrap" style="margin-top:8px; gap:8px;">
         <button class="btn btn-primary" type="button" onclick="approveSubmission()">
           Approve booking
         </button>
@@ -269,53 +268,36 @@
 </footer>
 
 <script src="assets/main.js"></script>
-<script>
-  // TEMP DATA (same as your original – swap for real backend later)
-  let submission = {
-    squad: "Team A",
-    status: "pending",
-    submitted: "Today 14:02",
-    plots: [
-      {
-        plot: "44",
-        notes: "Good progress today.",
-        photos: ["https://picsum.photos/200?1", "https://picsum.photos/200?2"],
-        rows: [
-          { measurement: "Bricks", qty: 900, rate: 0.6 },
-          { measurement: "Trench", qty: 4, rate: 25 },
-          { measurement: "100mm", qty: 12, rate: 16 }
-        ]
-      },
-      {
-        plot: "45",
-        notes: "Rain slowed things down.",
-        photos: ["https://picsum.photos/200?3"],
-        rows: [
-          { measurement: "Bricks", qty: 600, rate: 0.6 },
-          { measurement: "Commons", qty: 150, rate: 0.35 },
-          { measurement: "Squad Hours", qty: 8, rate: 50 }
-        ]
-      }
-    ],
-    split: [
-      { name: "John", percent: 40 },
-      { name: "Ryan", percent: 30 },
-      { name: "Sam", percent: 30 }
-    ]
-  };
 
-  // TAB HANDLER
-  function showTab(tab, btn) {
+<!-- Core page logic (Firebase + rendering) -->
+<script type="module">
+  import { auth, db } from "./firebase.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  let submission = null;
+  let submissionRef = null;
+
+  // Read ?id=... from the URL
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  // Tab switcher (exposed globally)
+  window.showTab = function(tab, btn) {
     document.querySelectorAll(".tab-panel").forEach(p => {
       p.classList.toggle("active", p.id === "tab-" + tab);
     });
     document.querySelectorAll(".tab-btn").forEach(b => {
       b.classList.toggle("active", b === btn);
     });
-  }
+  };
 
-  // RENDER
-  function initSubmission() {
+  // Render submission into the DOM
+  function renderSubmission() {
+    if (!submission) return;
+
     const heroSquad = document.getElementById("heroSquad");
     const heroStatus = document.getElementById("heroStatus");
     const heroSubmitted = document.getElementById("heroSubmitted");
@@ -326,41 +308,56 @@
     const noPhotosText = document.getElementById("noPhotosText");
     const splitRows = document.getElementById("splitRows");
     const totalPaidEl = document.getElementById("totalPaid");
+    const noteBox = document.getElementById("contractorNote");
 
-    heroSquad.textContent = submission.squad;
-    heroSubmitted.textContent = submission.submitted;
+    heroSquad.textContent = submission.squad || "Unknown squad";
 
-    // status pill
-    heroStatus.textContent = submission.status;
+    // Submitted time
+    let submittedLabel = "";
+    if (submission.submittedAt && submission.submittedAt.toDate) {
+      const d = submission.submittedAt.toDate();
+      submittedLabel = d.toLocaleString();
+    } else if (submission.submitted) {
+      submittedLabel = submission.submitted;
+    } else {
+      submittedLabel = "Unknown";
+    }
+    heroSubmitted.textContent = submittedLabel;
+
+    // Status pill
+    const status = submission.status || "pending";
+    heroStatus.textContent = status;
     heroStatus.classList.remove("status-pill--pending","status-pill--approved","status-pill--rejected");
-    if (submission.status === "approved") {
+    if (status === "approved") {
       heroStatus.classList.add("status-pill--approved");
-    } else if (submission.status === "rejected") {
+    } else if (status === "rejected") {
       heroStatus.classList.add("status-pill--rejected");
     } else {
       heroStatus.classList.add("status-pill--pending");
     }
 
-    // compute totals & render plots
-    let grandTotal = 0;
-    let workerTotals = {};
+    // Contractor note if any
+    noteBox.value = submission.contractorNote || "";
 
+    // Compute totals & render plots
+    let grandTotal = 0;
     plotsContainer.innerHTML = "";
     photosContainer.innerHTML = "";
 
-    submission.plots.forEach(p => {
+    (submission.plots || []).forEach(p => {
       let plotTotal = 0;
-
-      // table rows for measurements
       let rowsHTML = "";
-      p.rows.forEach(r => {
-        const total = r.qty * r.rate;
+
+      (p.rows || []).forEach(r => {
+        const qty = Number(r.qty || 0);
+        const rate = Number(r.rate || 0);
+        const total = qty * rate;
         plotTotal += total;
         rowsHTML += `
           <tr>
-            <td>${r.measurement}</td>
-            <td>${r.qty}</td>
-            <td>£${r.rate}</td>
+            <td>${r.measurement || ""}</td>
+            <td>${qty}</td>
+            <td>£${rate}</td>
             <td><strong>£${total.toFixed(2)}</strong></td>
           </tr>
         `;
@@ -368,11 +365,10 @@
 
       grandTotal += plotTotal;
 
-      // plot card
       const plotCard = document.createElement("div");
       plotCard.className = "plot-card";
       plotCard.innerHTML = `
-        <div class="plot-title">Plot ${p.plot}</div>
+        <div class="plot-title">Plot ${p.plot || ""}</div>
         <table class="table">
           <thead>
             <tr>
@@ -384,7 +380,7 @@
           </thead>
           <tbody>${rowsHTML}</tbody>
         </table>
-        <div class="plot-notes"><strong>Notes:</strong> ${p.notes}</div>
+        <div class="plot-notes"><strong>Notes:</strong> ${p.notes || ""}</div>
         ${
           p.photos && p.photos.length
             ? `<div class="photo-grid">
@@ -398,7 +394,6 @@
       `;
       plotsContainer.appendChild(plotCard);
 
-      // photos tab grid
       if (p.photos && p.photos.length) {
         p.photos.forEach(src => {
           const img = document.createElement("img");
@@ -411,38 +406,42 @@
 
     heroTotal.textContent = grandTotal.toFixed(2);
 
-    // photos empty state
+    // Photos empty state
     if (!photosContainer.children.length) {
       noPhotosText.style.display = "block";
     } else {
       noPhotosText.style.display = "none";
     }
 
-    // overview summary text
+    // Overview text
+    const plotCount = (submission.plots || []).length;
+    const splitCount = (submission.split || []).length;
+
     overviewSummary.innerHTML = `
       <p>
-        <strong>${submission.squad}</strong> submitted
-        <strong>${submission.plots.length}</strong> plot${submission.plots.length !== 1 ? "s" : ""}
+        <strong>${submission.squad || "This squad"}</strong> submitted
+        <strong>${plotCount}</strong> plot${plotCount !== 1 ? "s" : ""}
         with a total of <strong>£${grandTotal.toFixed(2)}</strong>.
       </p>
-      <p class="mt-12">
-        ${submission.split.length} worker${submission.split.length !== 1 ? "s are" : " is"} on this squad split.
+      <p style="margin-top:12px;">
+        ${splitCount} worker${splitCount !== 1 ? "s are" : " is"} on this squad split.
       </p>
     `;
 
-    // squad split
-    let totalPaid = 0;
+    // Squad split table
     splitRows.innerHTML = "";
+    let totalPaid = 0;
 
-    submission.split.forEach(s => {
-      const wages = grandTotal * (s.percent / 100);
+    (submission.split || []).forEach(s => {
+      const percent = Number(s.percent || 0);
+      const wages = grandTotal * (percent / 100);
       const cis = wages * 0.8;
       totalPaid += cis;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${s.name}</td>
-        <td>${s.percent}%</td>
+        <td>${s.name || ""}</td>
+        <td>${percent}%</td>
         <td>£${wages.toFixed(2)}</td>
         <td>£${cis.toFixed(2)}</td>
       `;
@@ -452,24 +451,74 @@
     totalPaidEl.textContent = totalPaid.toFixed(2);
   }
 
-  function approveSubmission() {
-    submission.status = "approved";
-    alert("Booking approved!");
-    initSubmission();
-  }
+  // Approve submission
+  window.approveSubmission = async function () {
+    if (!submissionRef || !submission) return;
 
-  function rejectSubmission() {
+    const note = document.getElementById("contractorNote").value.trim();
+
+    await updateDoc(submissionRef, {
+      status: "approved",
+      contractorNote: note,
+      reviewedAt: serverTimestamp()
+    });
+
+    submission.status = "approved";
+    submission.contractorNote = note;
+
+    alert("Booking approved!");
+    renderSubmission();
+  };
+
+  // Reject submission
+  window.rejectSubmission = async function () {
+    if (!submissionRef || !submission) return;
+
     const note = document.getElementById("contractorNote").value.trim();
     if (note.length < 3) {
       alert("Please add a short reason for rejection.");
       return;
     }
-    submission.status = "rejected";
-    alert("Booking rejected.");
-    initSubmission();
-  }
 
-  initSubmission();
+    await updateDoc(submissionRef, {
+      status: "rejected",
+      contractorNote: note,
+      reviewedAt: serverTimestamp()
+    });
+
+    submission.status = "rejected";
+    submission.contractorNote = note;
+
+    alert("Booking rejected.");
+    renderSubmission();
+  };
+
+  // Auth guard + load submission
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "contractor-login.html";
+      return;
+    }
+
+    const submissionId = getQueryParam("id");
+    if (!submissionId) {
+      alert("No submission ID provided in the URL.");
+      window.location.href = "approvals.html";
+      return;
+    }
+
+    submissionRef = doc(db, "contractors", user.uid, "submissions", submissionId);
+    const snap = await getDoc(submissionRef);
+
+    if (!snap.exists()) {
+      alert("Submission not found.");
+      window.location.href = "approvals.html";
+      return;
+    }
+
+    submission = snap.data();
+    renderSubmission();
+  });
 </script>
 
 <script>
