@@ -8,9 +8,10 @@
   <!-- Global styles -->
   <link rel="stylesheet" href="assets/style.css" />
 
-  <style>
-    /* Page-specific helpers (built on top of assets/style.css) */
+  <!-- Firebase config (uses firebase.js you already have) -->
+  <script type="module" src="./firebase.js"></script>
 
+  <style>
     .plot-card-header {
       display: flex;
       justify-content: space-between;
@@ -74,7 +75,7 @@
 <body class="page" data-page="booking">
 
 <script>
-// --- LOGIN GUARD ---
+// --- LOGIN GUARD (squad, existing logic) ---
 let squadUser = sessionStorage.getItem("squadUser");
 if (!squadUser) {
   const backup = localStorage.getItem("lastSquadUser");
@@ -232,384 +233,450 @@ localStorage.setItem("lastSquadUser", squadUser);
 </footer>
 
 <script src="assets/main.js"></script>
-<script>
-// ---- HEADER / NAV ----
-function toggleMenu() {
-  document.getElementById("mobileMenu").classList.toggle("show");
-}
-function logout() {
-  sessionStorage.removeItem("squadUser");
-  window.location.href = "squad-login.html";
-}
 
-// ---- PRICING MANAGER DATA ----
-const PRICING_KEY = "brickbook_pricing_state";
-let pricing = { squads: [], sites: [], profiles: [] };
+<!-- ALL PAGE LOGIC (LOCAL + FIRESTORE) -->
+<script type="module">
+  import { db } from "./firebase.js";
+  import {
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-try {
-  const stored = localStorage.getItem(PRICING_KEY);
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    if (parsed && typeof parsed === "object") {
-      pricing = Object.assign(pricing, parsed);
-    }
-  }
-} catch (e) {
-  console.error("Error parsing pricing state", e);
-}
+  // For now, send all bookings to THIS contractor account.
+  // Later we can make this dynamic per-squad.
+  const CONTRACTOR_ID = "YXpFCmpxoXczJ6Krgi1ijeVrmX53";
 
-// populate squad/site selects
-const squadSelect = document.getElementById("select-squad");
-const siteSelect = document.getElementById("select-site");
+  // ---- HEADER / NAV ----
+  window.toggleMenu = function () {
+    document.getElementById("mobileMenu").classList.toggle("show");
+  };
 
-pricing.squads.forEach(name => {
-  const opt = document.createElement("option");
-  opt.value = name;
-  opt.textContent = name;
-  squadSelect.appendChild(opt);
-});
-pricing.sites.forEach(name => {
-  const opt = document.createElement("option");
-  opt.value = name;
-  opt.textContent = name;
-  siteSelect.appendChild(opt);
-});
+  window.logout = function () {
+    sessionStorage.removeItem("squadUser");
+    window.location.href = "squad-login.html";
+  };
 
-function getActiveProfileFields() {
-  const s = squadSelect.value;
-  const t = siteSelect.value;
-  if (!s || !t) return [];
-  const profile = pricing.profiles.find(p => p.squad === s && p.site === t);
-  return profile ? (profile.fields || []) : [];
-}
+  // ---- PRICING MANAGER DATA ----
+  const PRICING_KEY = "brickbook_pricing_state";
+  let pricing = { squads: [], sites: [], profiles: [] };
 
-// simple heuristic to decide what is a material
-function splitLabourAndMaterials(fields) {
-  const labour = [];
-  const materials = [];
-  fields.forEach(f => {
-    const name = (f.name || "").toLowerCase();
-    if (/brick|block|insulation|dpc|tie|lintel|sand|cement|mortar|stone/.test(name)) {
-      materials.push(f);
-    } else {
-      labour.push(f);
-    }
-  });
-  return { labour, materials };
-}
-
-// ---- PLOTS ----
-const plotsContainer = document.getElementById("plots-container");
-
-function addPlot() {
-  const allFields = getActiveProfileFields();
-  if (!allFields.length) {
-    alert("Pick a squad and site that has a pricing profile set up.");
-    return;
-  }
-
-  const { labour, materials } = splitLabourAndMaterials(allFields);
-
-  const plotId = "plot-" + Date.now();
-  const card = document.createElement("div");
-  card.className = "card plot-card";
-  card.dataset.plotId = plotId;
-
-  // Labour rows HTML
-  const labourRowsHtml = labour.map(f => `
-    <tr class="labour-row" data-name="${f.name || ""}">
-      <td>${f.name || ""}</td>
-      <td><input type="number" class="qty input-labour" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
-      <td><input type="number" class="rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
-      <td>£<span class="row-total-labour">0.00</span></td>
-    </tr>
-  `).join("");
-
-  // Materials rows HTML
-  const materialsRowsHtml = materials.map(f => `
-    <tr class="material-row" data-name="${f.name || ""}" data-unit="${f.unit || ""}">
-      <td>${f.name || ""}</td>
-      <td><input type="number" class="mat-qty" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
-      <td>${f.unit || ""}</td>
-      <td><input type="number" class="mat-rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
-      <td>£<span class="row-total-material">0.00</span></td>
-    </tr>
-  `).join("");
-
-  card.innerHTML = `
-    <div class="plot-card-header">
-      <div class="plot-label">
-        Plot
-        <input type="text" class="plot-number" placeholder="e.g. 24A" style="max-width:120px;">
-      </div>
-      <button class="btn btn-sm btn-danger" type="button" onclick="removePlot(this)">Remove</button>
-    </div>
-
-    <div class="card-sub" style="margin-bottom:8px;">
-      Fill in labour done and any materials used on this plot.
-    </div>
-
-    <div class="mt-8">
-      <div class="card-title" style="font-size:14px;">Labour</div>
-      <table class="table mt-8">
-        <thead>
-          <tr>
-            <th>Measurement</th>
-            <th style="width:90px;">Qty</th>
-            <th style="width:80px;">Rate (£)</th>
-            <th style="width:100px;">Total (£)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${labourRowsHtml || `
-            <tr><td colspan="4" class="text-muted" style="font-size:13px;">No labour fields for this profile.</td></tr>
-          `}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mt-16">
-      <div class="card-title" style="font-size:14px;">Materials</div>
-      <div class="card-sub">Tracked only – not added into wages.</div>
-      <table class="table mt-8">
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th style="width:90px;">Qty</th>
-            <th style="width:70px;">Unit</th>
-            <th style="width:80px;">Rate (£)</th>
-            <th style="width:100px;">Total (£)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${materialsRowsHtml || `
-            <tr><td colspan="5" class="text-muted" style="font-size:13px;">No materials set in pricing for this profile.</td></tr>
-          `}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="mt-12">
-      <label>Notes</label>
-      <textarea class="plot-notes" placeholder="Optional site notes for this plot..."></textarea>
-    </div>
-
-    <div class="plot-card-totals">
-      <div>Labour total: £<span class="value plot-labour-total">0.00</span></div>
-      <div>Materials total: £<span class="value plot-materials-total">0.00</span></div>
-    </div>
-  `;
-
-  plotsContainer.appendChild(card);
-}
-
-function removePlot(btn) {
-  const card = btn.closest(".plot-card");
-  card?.remove();
-  updateGrandTotals();
-  updateSplitTotals();
-}
-
-function updatePlotTotals(el) {
-  const card = el.closest(".plot-card");
-  if (!card) return;
-
-  // Labour
-  let labourTotal = 0;
-  card.querySelectorAll("tr.labour-row").forEach(tr => {
-    const qty = parseFloat(tr.querySelector(".qty")?.value) || 0;
-    const rate = parseFloat(tr.querySelector(".rate")?.value) || 0;
-    const rowTotal = qty * rate;
-    labourTotal += rowTotal;
-    const span = tr.querySelector(".row-total-labour");
-    if (span) span.textContent = rowTotal.toFixed(2);
-  });
-
-  // Materials
-  let materialsTotal = 0;
-  card.querySelectorAll("tr.material-row").forEach(tr => {
-    const qty = parseFloat(tr.querySelector(".mat-qty")?.value) || 0;
-    const rate = parseFloat(tr.querySelector(".mat-rate")?.value) || 0;
-    const rowTotal = qty * rate;
-    materialsTotal += rowTotal;
-    const span = tr.querySelector(".row-total-material");
-    if (span) span.textContent = rowTotal.toFixed(2);
-  });
-
-  const labourSpan = card.querySelector(".plot-labour-total");
-  const materialsSpan = card.querySelector(".plot-materials-total");
-  if (labourSpan) labourSpan.textContent = labourTotal.toFixed(2);
-  if (materialsSpan) materialsSpan.textContent = materialsTotal.toFixed(2);
-
-  updateGrandTotals();
-  updateSplitTotals();
-}
-
-function updateGrandTotals() {
-  let grandLabour = 0;
-  let grandMaterials = 0;
-  document.querySelectorAll(".plot-labour-total").forEach(s => {
-    grandLabour += parseFloat(s.textContent) || 0;
-  });
-  document.querySelectorAll(".plot-materials-total").forEach(s => {
-    grandMaterials += parseFloat(s.textContent) || 0;
-  });
-
-  document.getElementById("grand-labour-total").textContent = grandLabour.toFixed(2);
-  document.getElementById("grand-materials-total").textContent = grandMaterials.toFixed(2);
-}
-
-// ---- SQUAD SPLIT ----
-const splitContainer = document.getElementById("split-container");
-
-function addSplitRow() {
-  const row = document.createElement("div");
-  row.className = "split-row";
-  row.innerHTML = `
-    <input type="text" class="split-name" placeholder="Name">
-    <input type="number" class="split-percent" min="0" max="100" step="0.1" oninput="onSplitPercentChange(this)">
-    <input type="number" class="split-wages" step="0.01" oninput="onSplitWagesChange(this)">
-    <input type="number" class="split-aftercis" step="0.01" readonly>
-  `;
-  splitContainer.appendChild(row);
-}
-
-// start with 3 rows
-addSplitRow();
-addSplitRow();
-addSplitRow();
-
-function onSplitPercentChange(el) {
-  const row = el.closest(".split-row");
-  if (!row) return;
-
-  const pct = parseFloat(el.value) || 0;
-  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
-  const wages = grandLabour * (pct / 100);
-
-  row.querySelector(".split-wages").value = wages.toFixed(2);
-  row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
-
-  updateSplitTotals();
-}
-
-function onSplitWagesChange(el) {
-  const row = el.closest(".split-row");
-  if (!row) return;
-  const wages = parseFloat(el.value) || 0;
-  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
-
-  if (grandLabour > 0) {
-    const pct = (wages / grandLabour) * 100;
-    row.querySelector(".split-percent").value = pct.toFixed(1);
-  }
-  row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
-  updateSplitTotals();
-}
-
-function updateSplitTotals() {
-  let totalCIS = 0;
-  document.querySelectorAll(".split-aftercis").forEach(input => {
-    totalCIS += parseFloat(input.value) || 0;
-  });
-  document.getElementById("split-total-cis").textContent = totalCIS.toFixed(2);
-}
-
-// ---- SUBMIT BOOKING ----
-function submitBooking() {
-  const plots = document.querySelectorAll(".plot-card");
-  if (!plots.length) {
-    alert("Add at least one plot before submitting.");
-    return;
-  }
-
-  const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
-  if (grandLabour <= 0) {
-    alert("Enter some labour quantities so the total is above £0.00.");
-    return;
-  }
-
-  const key = "squad_" + squadUser;
-  let data;
   try {
-    data = JSON.parse(localStorage.getItem(key) || "{}");
+    const stored = localStorage.getItem(PRICING_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        pricing = Object.assign(pricing, parsed);
+      }
+    }
   } catch (e) {
-    data = {};
+    console.error("Error parsing pricing state", e);
   }
-  if (!data.bookings) data.bookings = [];
-  if (!data.earnings) data.earnings = [];
 
-  const today = new Date();
-  const dateStr = today.toISOString().slice(0,10); // YYYY-MM-DD
+  const squadSelect = document.getElementById("select-squad");
+  const siteSelect = document.getElementById("select-site");
 
-  // for each plot, create a booking entry
-  plots.forEach(card => {
-    const plotNumber = card.querySelector(".plot-number")?.value.trim() || "";
-    if (!plotNumber) return; // skip empty plot
+  pricing.squads.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    squadSelect.appendChild(opt);
+  });
+  pricing.sites.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    siteSelect.appendChild(opt);
+  });
 
-    const labourTotal = parseFloat(card.querySelector(".plot-labour-total")?.textContent) || 0;
-    const afterCIS = labourTotal * 0.8;
+  function getActiveProfileFields() {
+    const s = squadSelect.value;
+    const t = siteSelect.value;
+    if (!s || !t) return [];
+    const profile = pricing.profiles.find(p => p.squad === s && p.site === t);
+    return profile ? (profile.fields || []) : [];
+  }
 
-    // labour rows
-    const labourRows = [];
+  function splitLabourAndMaterials(fields) {
+    const labour = [];
+    const materials = [];
+    fields.forEach(f => {
+      const name = (f.name || "").toLowerCase();
+      if (/brick|block|insulation|dpc|tie|lintel|sand|cement|mortar|stone/.test(name)) {
+        materials.push(f);
+      } else {
+        labour.push(f);
+      }
+    });
+    return { labour, materials };
+  }
+
+  // ---- PLOTS ----
+  const plotsContainer = document.getElementById("plots-container");
+
+  window.addPlot = function () {
+    const allFields = getActiveProfileFields();
+    if (!allFields.length) {
+      alert("Pick a squad and site that has a pricing profile set up.");
+      return;
+    }
+
+    const { labour, materials } = splitLabourAndMaterials(allFields);
+
+    const plotId = "plot-" + Date.now();
+    const card = document.createElement("div");
+    card.className = "card plot-card";
+    card.dataset.plotId = plotId;
+
+    const labourRowsHtml = labour.map(f => `
+      <tr class="labour-row" data-name="${f.name || ""}">
+        <td>${f.name || ""}</td>
+        <td><input type="number" class="qty input-labour" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
+        <td><input type="number" class="rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
+        <td>£<span class="row-total-labour">0.00</span></td>
+      </tr>
+    `).join("");
+
+    const materialsRowsHtml = materials.map(f => `
+      <tr class="material-row" data-name="${f.name || ""}" data-unit="${f.unit || ""}">
+        <td>${f.name || ""}</td>
+        <td><input type="number" class="mat-qty" min="0" step="0.01" oninput="updatePlotTotals(this)"></td>
+        <td>${f.unit || ""}</td>
+        <td><input type="number" class="mat-rate" value="${f.rate ?? ""}" step="0.01" readonly></td>
+        <td>£<span class="row-total-material">0.00</span></td>
+      </tr>
+    `).join("");
+
+    card.innerHTML = `
+      <div class="plot-card-header">
+        <div class="plot-label">
+          Plot
+          <input type="text" class="plot-number" placeholder="e.g. 24A" style="max-width:120px;">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" onclick="removePlot(this)">Remove</button>
+      </div>
+
+      <div class="card-sub" style="margin-bottom:8px;">
+        Fill in labour done and any materials used on this plot.
+      </div>
+
+      <div class="mt-8">
+        <div class="card-title" style="font-size:14px;">Labour</div>
+        <table class="table mt-8">
+          <thead>
+            <tr>
+              <th>Measurement</th>
+              <th style="width:90px;">Qty</th>
+              <th style="width:80px;">Rate (£)</th>
+              <th style="width:100px;">Total (£)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${labourRowsHtml || `
+              <tr><td colspan="4" class="text-muted" style="font-size:13px;">No labour fields for this profile.</td></tr>
+            `}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-16">
+        <div class="card-title" style="font-size:14px;">Materials</div>
+        <div class="card-sub">Tracked only – not added into wages.</div>
+        <table class="table mt-8">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th style="width:90px;">Qty</th>
+              <th style="width:70px;">Unit</th>
+              <th style="width:80px;">Rate (£)</th>
+              <th style="width:100px;">Total (£)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${materialsRowsHtml || `
+              <tr><td colspan="5" class="text-muted" style="font-size:13px;">No materials set in pricing for this profile.</td></tr>
+            `}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-12">
+        <label>Notes</label>
+        <textarea class="plot-notes" placeholder="Optional site notes for this plot..."></textarea>
+      </div>
+
+      <div class="plot-card-totals">
+        <div>Labour total: £<span class="value plot-labour-total">0.00</span></div>
+        <div>Materials total: £<span class="value plot-materials-total">0.00</span></div>
+      </div>
+    `;
+
+    plotsContainer.appendChild(card);
+  };
+
+  window.removePlot = function (btn) {
+    const card = btn.closest(".plot-card");
+    card?.remove();
+    updateGrandTotals();
+    updateSplitTotals();
+  };
+
+  window.updatePlotTotals = function (el) {
+    const card = el.closest(".plot-card");
+    if (!card) return;
+
+    let labourTotal = 0;
     card.querySelectorAll("tr.labour-row").forEach(tr => {
-      const name = tr.dataset.name || "";
       const qty = parseFloat(tr.querySelector(".qty")?.value) || 0;
       const rate = parseFloat(tr.querySelector(".rate")?.value) || 0;
-      if (!qty) return;
-      labourRows.push({
-        measurement: name,
-        qty,
-        rate,
-        total: qty * rate
-      });
+      const rowTotal = qty * rate;
+      labourTotal += rowTotal;
+      const span = tr.querySelector(".row-total-labour");
+      if (span) span.textContent = rowTotal.toFixed(2);
     });
 
-    // materials rows
-    const materials = [];
+    let materialsTotal = 0;
     card.querySelectorAll("tr.material-row").forEach(tr => {
-      const name = tr.dataset.name || "";
-      const unit = tr.dataset.unit || "";
       const qty = parseFloat(tr.querySelector(".mat-qty")?.value) || 0;
       const rate = parseFloat(tr.querySelector(".mat-rate")?.value) || 0;
-      if (!qty) return;
-      materials.push({
-        name,
-        unit,
-        qty,
-        rate,
-        total: qty * rate
+      const rowTotal = qty * rate;
+      materialsTotal += rowTotal;
+      const span = tr.querySelector(".row-total-material");
+      if (span) span.textContent = rowTotal.toFixed(2);
+    });
+
+    const labourSpan = card.querySelector(".plot-labour-total");
+    const materialsSpan = card.querySelector(".plot-materials-total");
+    if (labourSpan) labourSpan.textContent = labourTotal.toFixed(2);
+    if (materialsSpan) materialsSpan.textContent = materialsTotal.toFixed(2);
+
+    updateGrandTotals();
+    updateSplitTotals();
+  };
+
+  function updateGrandTotals() {
+    let grandLabour = 0;
+    let grandMaterials = 0;
+    document.querySelectorAll(".plot-labour-total").forEach(s => {
+      grandLabour += parseFloat(s.textContent) || 0;
+    });
+    document.querySelectorAll(".plot-materials-total").forEach(s => {
+      grandMaterials += parseFloat(s.textContent) || 0;
+    });
+
+    document.getElementById("grand-labour-total").textContent = grandLabour.toFixed(2);
+    document.getElementById("grand-materials-total").textContent = grandMaterials.toFixed(2);
+  }
+
+  // ---- SQUAD SPLIT ----
+  const splitContainer = document.getElementById("split-container");
+
+  window.addSplitRow = function () {
+    const row = document.createElement("div");
+    row.className = "split-row";
+    row.innerHTML = `
+      <input type="text" class="split-name" placeholder="Name">
+      <input type="number" class="split-percent" min="0" max="100" step="0.1" oninput="onSplitPercentChange(this)">
+      <input type="number" class="split-wages" step="0.01" oninput="onSplitWagesChange(this)">
+      <input type="number" class="split-aftercis" step="0.01" readonly>
+    `;
+    splitContainer.appendChild(row);
+  };
+
+  // start with 3 default rows
+  addSplitRow();
+  addSplitRow();
+  addSplitRow();
+
+  window.onSplitPercentChange = function (el) {
+    const row = el.closest(".split-row");
+    if (!row) return;
+
+    const pct = parseFloat(el.value) || 0;
+    const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+    const wages = grandLabour * (pct / 100);
+
+    row.querySelector(".split-wages").value = wages.toFixed(2);
+    row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
+
+    updateSplitTotals();
+  };
+
+  window.onSplitWagesChange = function (el) {
+    const row = el.closest(".split-row");
+    if (!row) return;
+    const wages = parseFloat(el.value) || 0;
+    const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+
+    if (grandLabour > 0) {
+      const pct = (wages / grandLabour) * 100;
+      row.querySelector(".split-percent").value = pct.toFixed(1);
+    }
+    row.querySelector(".split-aftercis").value = (wages * 0.8).toFixed(2);
+    updateSplitTotals();
+  };
+
+  function updateSplitTotals() {
+    let totalCIS = 0;
+    document.querySelectorAll(".split-aftercis").forEach(input => {
+      totalCIS += parseFloat(input.value) || 0;
+    });
+    document.getElementById("split-total-cis").textContent = totalCIS.toFixed(2);
+  }
+
+  // ---- SUBMIT BOOKING (LOCAL + FIRESTORE) ----
+  window.submitBooking = async function () {
+    const plots = document.querySelectorAll(".plot-card");
+    if (!plots.length) {
+      alert("Add at least one plot before submitting.");
+      return;
+    }
+
+    const squadName = squadSelect.value;
+    const siteName = siteSelect.value;
+    if (!squadName || !siteName) {
+      alert("Select a Squad and Site first.");
+      return;
+    }
+
+    const grandLabour = parseFloat(document.getElementById("grand-labour-total").textContent) || 0;
+    const grandMaterials = parseFloat(document.getElementById("grand-materials-total").textContent) || 0;
+
+    if (grandLabour <= 0) {
+      alert("Enter some labour quantities so the total is above £0.00.");
+      return;
+    }
+
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10);
+
+    // Build plots array
+    const plotsData = [];
+    plots.forEach(card => {
+      const plotNumber = card.querySelector(".plot-number")?.value.trim() || "";
+      if (!plotNumber) return;
+
+      const labourTotal = parseFloat(card.querySelector(".plot-labour-total")?.textContent) || 0;
+
+      const labourRows = [];
+      card.querySelectorAll("tr.labour-row").forEach(tr => {
+        const name = tr.dataset.name || "";
+        const qty = parseFloat(tr.querySelector(".qty")?.value) || 0;
+        const rate = parseFloat(tr.querySelector(".rate")?.value) || 0;
+        if (!qty) return;
+        labourRows.push({
+          measurement: name,
+          qty,
+          rate
+        });
+      });
+
+      const materials = [];
+      card.querySelectorAll("tr.material-row").forEach(tr => {
+        const name = tr.dataset.name || "";
+        const unit = tr.dataset.unit || "";
+        const qty = parseFloat(tr.querySelector(".mat-qty")?.value) || 0;
+        const rate = parseFloat(tr.querySelector(".mat-rate")?.value) || 0;
+        if (!qty) return;
+        materials.push({
+          name,
+          unit,
+          qty,
+          rate
+        });
+      });
+
+      const notes = card.querySelector(".plot-notes")?.value.trim() || "";
+
+      plotsData.push({
+        plot: plotNumber,
+        notes,
+        rows: labourRows,
+        materials,
+        labourTotal
       });
     });
 
-    const notes = card.querySelector(".plot-notes")?.value.trim() || "";
+    if (!plotsData.length) {
+      alert("Please enter at least one plot with a plot number.");
+      return;
+    }
 
-    data.bookings.push({
-      date: dateStr,
-      plot: plotNumber,
-      wage: labourTotal,
-      afterCIS,
-      status: "Pending",
-      notes,
-      labourRows,
-      materials
-      // photos could be wired in later if you want to store base64/urls
+    // Build split array
+    const splitData = [];
+    document.querySelectorAll(".split-row").forEach(row => {
+      const name = row.querySelector(".split-name")?.value.trim();
+      const percent = parseFloat(row.querySelector(".split-percent")?.value) || 0;
+      if (name && percent > 0) {
+        splitData.push({ name, percent });
+      }
     });
-  });
 
-  // add earnings summary record for this booking session
-  if (grandLabour > 0) {
-    data.earnings.push({
-      date: dateStr,
-      afterCIS: grandLabour * 0.8
+    // --- EXISTING LOCAL STORAGE (for squad history) ---
+    const squadUserKey = "squad_" + (sessionStorage.getItem("squadUser") || "");
+    let localData;
+    try {
+      localData = JSON.parse(localStorage.getItem(squadUserKey) || "{}");
+    } catch (e) {
+      localData = {};
+    }
+    if (!localData.bookings) localData.bookings = [];
+    if (!localData.earnings) localData.earnings = [];
+
+    plotsData.forEach(p => {
+      const afterCIS = p.labourTotal * 0.8;
+      localData.bookings.push({
+        date: dateStr,
+        plot: p.plot,
+        wage: p.labourTotal,
+        afterCIS,
+        status: "Pending",
+        notes: p.notes,
+        labourRows: p.rows,
+        materials: p.materials
+      });
     });
-  }
 
-  localStorage.setItem(key, JSON.stringify(data));
+    if (grandLabour > 0) {
+      localData.earnings.push({
+        date: dateStr,
+        afterCIS: grandLabour * 0.8
+      });
+    }
 
-  alert("Booking-Off submitted. It will appear under Dashboard & History as Pending.");
-  window.location.href = "squad-dashboard.html";
-}
+    localStorage.setItem(squadUserKey, JSON.stringify(localData));
+
+    // --- FIRESTORE SUBMISSION (for contractor) ---
+    try {
+      const submission = {
+        squad: squadName,
+        site: siteName,
+        status: "pending",
+        submittedAt: serverTimestamp(),
+        plots: plotsData.map(p => ({
+          plot: p.plot,
+          notes: p.notes,
+          photos: [],    // you can wire photos later
+          rows: p.rows
+        })),
+        split: splitData,
+        grandTotal: grandLabour,
+        materialsTotal: grandMaterials,
+        createdBySquad: sessionStorage.getItem("squadUser") || null
+      };
+
+      await addDoc(
+        collection(db, "contractors", CONTRACTOR_ID, "submissions"),
+        submission
+      );
+    } catch (err) {
+      console.error("Error saving to Firestore:", err);
+      alert("Saved locally, but failed to send to contractor. Please let them know manually.");
+    }
+
+    alert("Booking-Off submitted. It will appear under Dashboard & History as Pending.");
+    window.location.href = "squad-dashboard.html";
+  };
 </script>
 
 </body>
