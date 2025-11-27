@@ -6,16 +6,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="assets/style.css">
 
-  <!-- Supabase client -->
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+ <script type="module">
+  import { auth } from "./firebase.js";
+  import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // ❗ Replace these with your new regenerated keys (do NOT reuse the old ones)
-    const SUPABASE_URL = "https://kokcedwrsxdfldnipzzn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtva2NlZHdyc3hkZmxkbmlwenpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4NTYzNjIsImV4cCI6MjA3OTQzMjM2Mn0.prA8B_WywgiydpAEm1JYxEafdAiWPnakNW6cM1Gro6A";
+  window.handleLogin = async function () {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-    export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  </script>
+    if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      // Success!
+      alert("Login successful!");
+      window.location.href = "contractor-dashboard.html";
+
+    } catch (error) {
+      if (error.code === "auth/invalid-credential") {
+        alert("Incorrect email or password.");
+      } else {
+        alert(error.message);
+      }
+    }
+  };
+</script>
 
 </head>
 
