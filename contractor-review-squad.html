@@ -4,527 +4,237 @@
   <meta charset="UTF-8" />
   <title>Review Submission – BrickBook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <link rel="stylesheet" href="assets/style.css" />
-
-  <!-- Load Firebase config -->
   <script type="module" src="./firebase.js"></script>
 
   <style>
-    .review-squad-hero {
-      background: linear-gradient(
-        135deg,
-        rgba(27,115,232,0.18),
-        rgba(27,115,232,0.04)
-      );
-      border-radius: 20px;
-      padding: 24px 22px;
-      box-shadow: var(--shadow-soft);
-      margin-top: 24px;
-      margin-bottom: 22px;
-    }
-
-    .review-squad-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .review-squad-meta {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-align: right;
-    }
-
-    .pill-link {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      font-size: 12px;
-      text-decoration: none;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 14px;
-    }
-
-    .tab-btn {
-      border: none;
-      background: transparent;
-      padding: 8px 12px;
-      border-radius: 999px 999px 0 0;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--text-muted);
-    }
-
-    .tab-btn.active {
-      background: #ffffff;
-      color: var(--blue);
-      border: 1px solid var(--border-subtle);
-      border-bottom-color: #ffffff;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-    .tab-panel.active {
-      display: block;
-    }
-
-    .plot-card {
-      margin-bottom: 18px;
-      padding: 14px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border-subtle);
-      background: #f9fbff;
-    }
-
-    .plot-title {
-      font-size: 15px;
+    .section-title {
+      font-size: 18px;
       font-weight: 700;
       margin-bottom: 6px;
     }
-
-    .plot-notes {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin: 8px 0 10px 0;
+    .plot-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      background: var(--card-bg);
     }
-
-    .photo-grid {
+    .plot-head {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .labour-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
     }
-
-    .photo-grid img {
-      width: 110px;
-      height: 110px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 1px solid var(--border-subtle);
+    .labour-row:last-child {
+      border-bottom: none;
     }
-
-    #contractorNote {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-      resize: vertical;
+    .grand-total-box {
+      font-size: 18px;
+      font-weight: 800;
+      text-align: right;
+      margin-top: 12px;
     }
-
-    @media (max-width: 640px) {
-      .review-squad-header {
-        flex-direction: column;
-      }
-      .review-squad-meta {
-        text-align: left;
-      }
-      .photo-grid img {
-        width: 90px;
-        height: 90px;
-      }
+    .status-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-pill--pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-pill--approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-pill--rejected {
+      background: #f8d7da;
+      color: #721c24;
     }
   </style>
 </head>
 
-<body class="page" data-page="review-squad">
+<body class="page">
 
-<!-- HEADER -->
 <header class="site-header">
   <div class="header-inner">
     <div class="logo">BrickBook</div>
     <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="booking.html">Booking</a>
-      <a href="contractor-login.html">Contractor</a>
-      <a href="squad-login.html">Squad</a>
+      <a href="contractor-dashboard.html">Dashboard</a>
+      <a href="pricing-table.html">Pricing</a>
+      <a href="approvals.html">Approvals</a>
+      <a href="contractor-review.html" class="active">Review</a>
+      <a href="#" onclick="logout(event)">Logout</a>
     </nav>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
   </div>
 </header>
 
-<div id="mobileMenu" class="mobile-nav">
-  <a href="index.html">Home</a>
-  <a href="booking.html">Booking</a>
-  <a href="contractor-login.html">Contractor Login</a>
-  <a href="squad-login.html">Squad Login</a>
-</div>
+<main class="container" style="padding-top:20px;">
 
-<main class="container">
+  <h1 class="h1">Submission Review</h1>
+  <p class="text-muted">Review full booking-off submission and approve or reject.</p>
 
-  <!-- HERO -->
-  <section class="review-squad-hero">
-    <a href="approvals.html" class="pill-link">← Back to approvals</a>
-    <div class="review-squad-header">
-      <div>
-        <h1 class="h1" style="font-size:26px; margin-bottom:4px;">
-          Review submission – <span id="heroSquad">Loading...</span>
-        </h1>
-        <div class="text-muted" style="font-size:14px;">
-          Inspect plots, photos and squad splits before approving.
-        </div>
+  <div id="loading">Loading submission...</div>
+  <div id="content" style="display:none;">
+
+    <!-- SUMMARY -->
+    <section class="card" style="margin-top:20px;">
+      <div class="section-title">Submission Summary</div>
+      <div><strong>Squad:</strong> <span id="summary-squad"></span></div>
+      <div><strong>Site:</strong> <span id="summary-site"></span></div>
+      <div><strong>Submitted:</strong> <span id="summary-date"></span></div>
+      <div><strong>Status:</strong> 
+        <span id="summary-status" class="status-pill"></span>
       </div>
-      <div class="review-squad-meta">
-        <div>
-          Status:
-          <span id="heroStatus" class="status-pill status-pill--pending">loading</span>
-        </div>
-        <div>Submitted: <span id="heroSubmitted">Loading...</span></div>
-        <div>Grand total: £<span id="heroTotal">0.00</span></div>
+    </section>
+
+    <!-- PLOTS -->
+    <section class="card" style="margin-top:20px;">
+      <div class="section-title">Plots</div>
+      <div id="plots-area"></div>
+    </section>
+
+    <!-- SPLIT -->
+    <section class="card" style="margin-top:20px;">
+      <div class="section-title">Squad Split</div>
+      <div id="split-area" class="text-muted">No split submitted.</div>
+    </section>
+
+    <!-- TOTALS -->
+    <section class="card" style="margin-top:20px;">
+      <div class="section-title">Totals</div>
+      <div class="grand-total-box">
+        Labour Total: £<span id="grand-total">0.00</span>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- TABS + PANELS -->
-  <section class="card">
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="overview" onclick="showTab('overview', this)">Overview</button>
-      <button class="tab-btn" data-tab="plots" onclick="showTab('plots', this)">Plots</button>
-      <button class="tab-btn" data-tab="photos" onclick="showTab('photos', this)">Photos</button>
-      <button class="tab-btn" data-tab="split" onclick="showTab('split', this)">Squad split</button>
-      <button class="tab-btn" data-tab="notes" onclick="showTab('notes', this)">Notes & actions</button>
-    </div>
+    <!-- ACTION BUTTONS -->
+    <section class="card" style="margin-top:20px;">
+      <button class="btn btn-primary" style="margin-right:10px;" onclick="approve()">Approve</button>
+      <button class="btn btn-danger" onclick="reject()">Reject</button>
+    </section>
 
-    <!-- Overview -->
-    <div class="tab-panel active" id="tab-overview">
-      <div class="card-sub" id="overviewSummary">
-        Loading…
-      </div>
-    </div>
-
-    <!-- Plots -->
-    <div class="tab-panel" id="tab-plots">
-      <div id="plotsContainer"></div>
-    </div>
-
-    <!-- Photos -->
-    <div class="tab-panel" id="tab-photos">
-      <div id="photosContainer" class="photo-grid"></div>
-      <div id="noPhotosText" class="card-sub" style="margin-top:8px; display:none;">
-        No photos attached for this submission.
-      </div>
-    </div>
-
-    <!-- Squad split -->
-    <div class="tab-panel" id="tab-split">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Worker</th>
-            <th>Split %</th>
-            <th>Wages (£)</th>
-            <th>After CIS (£)</th>
-          </tr>
-        </thead>
-        <tbody id="splitRows"></tbody>
-      </table>
-      <div style="text-align:right; font-weight:700; margin-top:10px;">
-        Total paid after CIS: £<span id="totalPaid">0.00</span>
-      </div>
-    </div>
-
-    <!-- Notes & actions -->
-    <div class="tab-panel" id="tab-notes">
-      <label for="contractorNote">Contractor note (optional)</label>
-      <textarea
-        id="contractorNote"
-        placeholder="Reason for rejection, feedback or additional site notes..."
-        style="min-height:90px;"
-      ></textarea>
-
-      <div class="row row-wrap" style="margin-top:8px; gap:8px;">
-        <button class="btn btn-primary" type="button" onclick="approveSubmission()">
-          Approve booking
-        </button>
-        <button class="btn btn-danger" type="button" onclick="rejectSubmission()">
-          Reject booking
-        </button>
-      </div>
-    </div>
-
-  </section>
+  </div>
 
 </main>
 
 <footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2025 BrickBook</span>
-    <span class="text-muted">Review submission</span>
-  </div>
+  <div class="footer-inner">© 2025 BrickBook</div>
 </footer>
 
-<script src="assets/main.js"></script>
-
-<!-- Core page logic (Firebase + rendering) -->
 <script type="module">
   import { auth, db } from "./firebase.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  let submission = null;
-  let submissionRef = null;
+  import {
+    doc,
+    getDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // Read ?id=... from the URL
-  function getQueryParam(name) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(name);
-  }
+  const params = new URLSearchParams(window.location.search);
+  const submissionId = params.get("id");
 
-  // Tab switcher (exposed globally)
-  window.showTab = function(tab, btn) {
-    document.querySelectorAll(".tab-panel").forEach(p => {
-      p.classList.toggle("active", p.id === "tab-" + tab);
-    });
-    document.querySelectorAll(".tab-btn").forEach(b => {
-      b.classList.toggle("active", b === btn);
-    });
-  };
+  let contractorId = null;
 
-  // Render submission into the DOM
-  function renderSubmission() {
-    if (!submission) return;
-
-    const heroSquad = document.getElementById("heroSquad");
-    const heroStatus = document.getElementById("heroStatus");
-    const heroSubmitted = document.getElementById("heroSubmitted");
-    const heroTotal = document.getElementById("heroTotal");
-    const overviewSummary = document.getElementById("overviewSummary");
-    const plotsContainer = document.getElementById("plotsContainer");
-    const photosContainer = document.getElementById("photosContainer");
-    const noPhotosText = document.getElementById("noPhotosText");
-    const splitRows = document.getElementById("splitRows");
-    const totalPaidEl = document.getElementById("totalPaid");
-    const noteBox = document.getElementById("contractorNote");
-
-    heroSquad.textContent = submission.squad || "Unknown squad";
-
-    // Submitted time
-    let submittedLabel = "";
-    if (submission.submittedAt && submission.submittedAt.toDate) {
-      const d = submission.submittedAt.toDate();
-      submittedLabel = d.toLocaleString();
-    } else if (submission.submitted) {
-      submittedLabel = submission.submitted;
-    } else {
-      submittedLabel = "Unknown";
-    }
-    heroSubmitted.textContent = submittedLabel;
-
-    // Status pill
-    const status = submission.status || "pending";
-    heroStatus.textContent = status;
-    heroStatus.classList.remove("status-pill--pending","status-pill--approved","status-pill--rejected");
-    if (status === "approved") {
-      heroStatus.classList.add("status-pill--approved");
-    } else if (status === "rejected") {
-      heroStatus.classList.add("status-pill--rejected");
-    } else {
-      heroStatus.classList.add("status-pill--pending");
-    }
-
-    // Contractor note if any
-    noteBox.value = submission.contractorNote || "";
-
-    // Compute totals & render plots
-    let grandTotal = 0;
-    plotsContainer.innerHTML = "";
-    photosContainer.innerHTML = "";
-
-    (submission.plots || []).forEach(p => {
-      let plotTotal = 0;
-      let rowsHTML = "";
-
-      (p.rows || []).forEach(r => {
-        const qty = Number(r.qty || 0);
-        const rate = Number(r.rate || 0);
-        const total = qty * rate;
-        plotTotal += total;
-        rowsHTML += `
-          <tr>
-            <td>${r.measurement || ""}</td>
-            <td>${qty}</td>
-            <td>£${rate}</td>
-            <td><strong>£${total.toFixed(2)}</strong></td>
-          </tr>
-        `;
-      });
-
-      grandTotal += plotTotal;
-
-      const plotCard = document.createElement("div");
-      plotCard.className = "plot-card";
-      plotCard.innerHTML = `
-        <div class="plot-title">Plot ${p.plot || ""}</div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Measurement</th>
-              <th>Qty</th>
-              <th>Rate (£)</th>
-              <th>Total (£)</th>
-            </tr>
-          </thead>
-          <tbody>${rowsHTML}</tbody>
-        </table>
-        <div class="plot-notes"><strong>Notes:</strong> ${p.notes || ""}</div>
-        ${
-          p.photos && p.photos.length
-            ? `<div class="photo-grid">
-                ${p.photos.map(src => `<img src="${src}" alt="Plot photo">`).join("")}
-               </div>`
-            : ""
-        }
-        <div style="text-align:right; margin-top:10px; font-weight:700;">
-          Plot total: £${plotTotal.toFixed(2)}
-        </div>
-      `;
-      plotsContainer.appendChild(plotCard);
-
-      if (p.photos && p.photos.length) {
-        p.photos.forEach(src => {
-          const img = document.createElement("img");
-          img.src = src;
-          img.alt = "Submission photo";
-          photosContainer.appendChild(img);
-        });
-      }
-    });
-
-    heroTotal.textContent = grandTotal.toFixed(2);
-
-    // Photos empty state
-    if (!photosContainer.children.length) {
-      noPhotosText.style.display = "block";
-    } else {
-      noPhotosText.style.display = "none";
-    }
-
-    // Overview text
-    const plotCount = (submission.plots || []).length;
-    const splitCount = (submission.split || []).length;
-
-    overviewSummary.innerHTML = `
-      <p>
-        <strong>${submission.squad || "This squad"}</strong> submitted
-        <strong>${plotCount}</strong> plot${plotCount !== 1 ? "s" : ""}
-        with a total of <strong>£${grandTotal.toFixed(2)}</strong>.
-      </p>
-      <p style="margin-top:12px;">
-        ${splitCount} worker${splitCount !== 1 ? "s are" : " is"} on this squad split.
-      </p>
-    `;
-
-    // Squad split table
-    splitRows.innerHTML = "";
-    let totalPaid = 0;
-
-    (submission.split || []).forEach(s => {
-      const percent = Number(s.percent || 0);
-      const wages = grandTotal * (percent / 100);
-      const cis = wages * 0.8;
-      totalPaid += cis;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${s.name || ""}</td>
-        <td>${percent}%</td>
-        <td>£${wages.toFixed(2)}</td>
-        <td>£${cis.toFixed(2)}</td>
-      `;
-      splitRows.appendChild(tr);
-    });
-
-    totalPaidEl.textContent = totalPaid.toFixed(2);
-  }
-
-  // Approve submission
-  window.approveSubmission = async function () {
-    if (!submissionRef || !submission) return;
-
-    const note = document.getElementById("contractorNote").value.trim();
-
-    await updateDoc(submissionRef, {
-      status: "approved",
-      contractorNote: note,
-      reviewedAt: serverTimestamp()
-    });
-
-    submission.status = "approved";
-    submission.contractorNote = note;
-
-    alert("Booking approved!");
-    renderSubmission();
-  };
-
-  // Reject submission
-  window.rejectSubmission = async function () {
-    if (!submissionRef || !submission) return;
-
-    const note = document.getElementById("contractorNote").value.trim();
-    if (note.length < 3) {
-      alert("Please add a short reason for rejection.");
-      return;
-    }
-
-    await updateDoc(submissionRef, {
-      status: "rejected",
-      contractorNote: note,
-      reviewedAt: serverTimestamp()
-    });
-
-    submission.status = "rejected";
-    submission.contractorNote = note;
-
-    alert("Booking rejected.");
-    renderSubmission();
-  };
-
-  // Auth guard + load submission
-  onAuthStateChanged(auth, async user => {
+  // Protect page
+  onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "contractor-login.html";
       return;
     }
+    contractorId = user.uid;
+    loadSubmission();
+  });
 
-    const submissionId = getQueryParam("id");
-    if (!submissionId) {
-      alert("No submission ID provided in the URL.");
-      window.location.href = "approvals.html";
-      return;
-    }
-
-    submissionRef = doc(db, "contractors", user.uid, "submissions", submissionId);
-    const snap = await getDoc(submissionRef);
+  async function loadSubmission() {
+    const ref = doc(db, `contractors/${contractorId}/submissions/${submissionId}`);
+    const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      alert("Submission not found.");
-      window.location.href = "approvals.html";
+      document.getElementById("loading").innerText = "Submission not found.";
       return;
     }
 
-    submission = snap.data();
-    renderSubmission();
-  });
-</script>
+    const data = snap.data();
 
-<script>
-function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('show');
-}
+    // Fill summary
+    document.getElementById("summary-squad").textContent = data.squad;
+    document.getElementById("summary-site").textContent = data.site;
+    document.getElementById("summary-date").textContent = data.submittedAt?.toDate().toLocaleString() || "—";
+
+    const statusEl = document.getElementById("summary-status");
+    statusEl.textContent = data.status;
+    statusEl.classList.add("status-pill--" + data.status);
+
+    // Fill plots
+    const plotsArea = document.getElementById("plots-area");
+    plotsArea.innerHTML = "";
+
+    data.plots.forEach(plot => {
+      const div = document.createElement("div");
+      div.className = "plot-card";
+      div.innerHTML = `
+        <div class="plot-head">Plot ${plot.plot}</div>
+        ${plot.rows.map(r => `
+          <div class="labour-row">
+            <span>${r.measurement}</span>
+            <span>${r.qty} × £${r.rate}</span>
+          </div>
+        `).join("")}
+        <div class="text-muted" style="margin-top:6px;">Notes: ${plot.notes || "—"}</div>
+      `;
+      plotsArea.appendChild(div);
+    });
+
+    // Split
+    const splitArea = document.getElementById("split-area");
+    if (data.split?.length) {
+      splitArea.innerHTML = data.split.map(s => `
+        <div>${s.name}: ${s.percent}%</div>
+      `).join("");
+    }
+
+    // Totals
+    document.getElementById("grand-total").textContent = data.grandTotal?.toFixed(2) || "0.00";
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("content").style.display = "block";
+  }
+
+  // Approve / Reject
+  window.approve = async function () {
+    const ref = doc(db, `contractors/${contractorId}/submissions/${submissionId}`);
+    await updateDoc(ref, { status: "approved" });
+    alert("Submission approved.");
+    window.location.href = "approvals.html";
+  };
+
+  window.reject = async function () {
+    const ref = doc(db, `contractors/${contractorId}/submissions/${submissionId}`);
+    await updateDoc(ref, { status: "rejected" });
+    alert("Submission rejected.");
+    window.location.href = "approvals.html";
+  };
+
+  window.logout = async function (e) {
+    if (e) e.preventDefault();
+    await signOut(auth);
+    window.location.href = "contractor-login.html";
+  };
 </script>
 
 </body>
