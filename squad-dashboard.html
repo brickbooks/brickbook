@@ -88,4 +88,273 @@
     </div>
 
     <div class="card">
-      <div class="card-title">Year
+      <div class="card-title">Year-to-date</div>
+      <div class="card-sub">Total for this calendar year (after CIS).</div>
+      <div style="font-size:24px; font-weight:800; margin-top:8px;">
+        £<span id="yearlyTotal">0.00</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Most recent booking</div>
+      <div class="card-sub">Status of your latest booking-off.</div>
+      <div id="recentStatusBox" style="margin-top:8px;">
+        <span class="text-muted" id="recentStatusText">No bookings yet</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT BOOKINGS TABLE -->
+  <section class="card mt-16">
+    <div class="card-header-row">
+      <div>
+        <div class="card-title">Recent booking-offs</div>
+        <div class="card-sub">Last 5 plots with your share and CIS amount.</div>
+      </div>
+      <a href="squad-history.html" class="btn btn-sm btn-ghost">View all</a>
+    </div>
+
+    <table class="table" style="margin-top:10px;">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Plot</th>
+          <th>Your share</th>
+          <th>After CIS</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="bookingTableBody"></tbody>
+    </table>
+  </section>
+
+  <!-- QUICK ACTIONS -->
+  <section class="card mt-16">
+    <div class="card-title">Quick actions</div>
+    <div class="card-sub">Jump straight to what you need.</div>
+
+    <div class="row row-wrap mt-12">
+      <a href="booking.html" class="btn btn-primary btn-md">New booking-off</a>
+      <a href="squad-history.html" class="btn btn-ghost btn-md">View full history</a>
+      <a href="squad-profile.html" class="btn btn-ghost btn-md">Squad profile</a>
+      <button class="btn btn-danger btn-md" type="button" onclick="logout()">Logout</button>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2025 BrickBook</span>
+    <span class="text-muted">Squad Dashboard</span>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+
+<!-- NON-MODULE UI HELPERS -->
+<script>
+function toggleMenu() {
+  document.getElementById("mobileMenu").classList.toggle("show");
+}
+
+function logout() {
+  sessionStorage.removeItem("squadUser");
+  window.location.href = "squad-login.html";
+}
+</script>
+
+<!-- FIREBASE SYNCED DASHBOARD LOGIC -->
+<script type="module">
+  import { db } from "./firebase.js";
+  import {
+    collection,
+    query,
+    where,
+    orderBy,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Same contractor ID used in booking.html
+  const CONTRACTOR_ID = "YXpFCmpxoXczJ6Krgi1ijeVrmX53";
+
+  // Read squad user again in module context
+  const squadUser =
+    sessionStorage.getItem("squadUser") ||
+    localStorage.getItem("lastSquadUser");
+
+  if (!squadUser) {
+    window.location.href = "squad-login.html";
+  }
+
+  // Display squad name
+  document.getElementById("squadNameText").textContent = squadUser;
+
+  const bookingTableBody = document.getElementById("bookingTableBody");
+  const weeklyEl = document.getElementById("weeklyTotal");
+  const monthlyEl = document.getElementById("monthlyTotal");
+  const yearlyEl = document.getElementById("yearlyTotal");
+  const recentStatusBox = document.getElementById("recentStatusBox");
+  const recentStatusText = document.getElementById("recentStatusText");
+
+  // Firestore query: all submissions for this squad (by string key)
+  const submissionsRef = collection(
+    db,
+    `contractors/${CONTRACTOR_ID}/submissions`
+  );
+
+  const q = query(
+    submissionsRef,
+    where("createdBySquad", "==", squadUser),
+    orderBy("submittedAt", "desc")
+  );
+
+  onSnapshot(q, (snap) => {
+    const submissions = snap.docs.map(doc => {
+      const d = doc.data();
+      return {
+        id: doc.id,
+        status: (d.status || "pending").toLowerCase(),
+        submittedAt: d.submittedAt?.toDate ? d.submittedAt.toDate() : null,
+        grandTotal: Number(d.grandTotal || 0),
+        plots: Array.isArray(d.plots) ? d.plots : []
+      };
+    });
+
+    renderDashboard(submissions);
+  });
+
+  function renderDashboard(submissions) {
+    renderTotals(submissions);
+    renderBookings(submissions);
+    renderRecentStatus(submissions);
+  }
+
+  // --- TOTALS (approved submissions only) ---
+  function renderTotals(submissions) {
+    let weekly = 0;
+    let monthly = 0;
+    let yearly = 0;
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+
+    submissions.forEach(sub => {
+      if (sub.status !== "approved") return;
+      const d = sub.submittedAt;
+      if (!(d instanceof Date) || isNaN(d)) return;
+
+      const afterCIS = sub.grandTotal * 0.8;
+
+      if (d >= weekStart) weekly += afterCIS;
+      if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
+        monthly += afterCIS;
+      }
+      if (d.getFullYear() === currentYear) {
+        yearly += afterCIS;
+      }
+    });
+
+    weeklyEl.textContent = weekly.toFixed(2);
+    monthlyEl.textContent = monthly.toFixed(2);
+    yearlyEl.textContent = yearly.toFixed(2);
+  }
+
+  // --- RECENT BOOKINGS TABLE (flatten plots) ---
+  function renderBookings(submissions) {
+    bookingTableBody.innerHTML = "";
+
+    const rows = [];
+
+    submissions.forEach(sub => {
+      const dateStr = sub.submittedAt
+        ? sub.submittedAt.toISOString().slice(0, 10)
+        : "-";
+
+      sub.plots.forEach(plot => {
+        const rowsArr = Array.isArray(plot.rows) ? plot.rows : [];
+        const labourTotal = rowsArr.reduce((sum, r) => {
+          const qty = Number(r.qty || 0);
+          const rate = Number(r.rate || 0);
+          return sum + qty * rate;
+        }, 0);
+
+        rows.push({
+          submissionId: sub.id,
+          date: dateStr,
+          plot: plot.plot || "-",
+          wage: labourTotal,
+          afterCIS: labourTotal * 0.8,
+          status: sub.status
+        });
+      });
+    });
+
+    // Sort by date descending (most recent first)
+    rows.sort((a, b) => {
+      const da = new Date(a.date).getTime() || 0;
+      const db = new Date(b.date).getTime() || 0;
+      return db - da;
+    });
+
+    const topRows = rows.slice(0, 5);
+
+    if (!topRows.length) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td colspan="6" style="font-size:13px; color:var(--text-muted); padding:12px;">
+          No bookings yet. Once you submit a booking-off, it’ll appear here.
+        </td>`;
+      bookingTableBody.appendChild(tr);
+      return;
+    }
+
+    topRows.forEach(row => {
+      let statusClass = "status-pill status-pill--pending";
+      if (row.status === "approved") statusClass = "status-pill status-pill--approved";
+      if (row.status === "rejected") statusClass = "status-pill status-pill--rejected";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.date}</td>
+        <td>${row.plot}</td>
+        <td>£${row.wage.toFixed(2)}</td>
+        <td>£${row.afterCIS.toFixed(2)}</td>
+        <td><span class="${statusClass}">${row.status}</span></td>
+        <td style="text-align:right;">
+          <a href="squad-booking-detail.html?id=${row.submissionId}" class="btn btn-sm btn-ghost">View</a>
+        </td>
+      `;
+      bookingTableBody.appendChild(tr);
+    });
+  }
+
+  // --- MOST RECENT STATUS (based on latest submission) ---
+  function renderRecentStatus(submissions) {
+    recentStatusBox.innerHTML = "";
+
+    if (!submissions.length) {
+      recentStatusText.textContent = "No bookings yet";
+      recentStatusBox.appendChild(recentStatusText);
+      return;
+    }
+
+    const latest = submissions[0];
+    let sClass = "status-pill status-pill--pending";
+    if (latest.status === "approved") sClass = "status-pill status-pill--approved";
+    if (latest.status === "rejected") sClass = "status-pill status-pill--rejected";
+
+    const span = document.createElement("span");
+    span.className = sClass;
+    span.textContent = latest.status;
+    recentStatusBox.appendChild(span);
+  }
+</script>
+
+</body>
+</html>
