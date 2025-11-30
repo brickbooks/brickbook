@@ -5,26 +5,30 @@
   <title>Squad Dashboard – BrickBook</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="assets/style.css" />
+
+  <!-- Firebase (shared config) -->
+  <script type="module" src="./firebase.js"></script>
 </head>
 
 <body class="page" data-page="squad-dashboard">
 
 <script>
-// --- AUTH GUARD ---
-let squadUser = sessionStorage.getItem("squadUser");
+  // --- AUTH GUARD (squad side, non-Firebase) ---
+  let squadUser = sessionStorage.getItem("squadUser");
 
-// try recover from lastSquadUser if session lost
-if (!squadUser) {
-  const backup = localStorage.getItem("lastSquadUser");
-  if (backup) {
-    sessionStorage.setItem("squadUser", backup);
-    squadUser = backup;
-  } else {
-    window.location.href = "squad-login.html";
+  // try recover from lastSquadUser if session lost
+  if (!squadUser) {
+    const backup = localStorage.getItem("lastSquadUser");
+    if (backup) {
+      sessionStorage.setItem("squadUser", backup);
+      squadUser = backup;
+    } else {
+      window.location.href = "squad-login.html";
+    }
   }
-}
-// remember last logged in user
-localStorage.setItem("lastSquadUser", squadUser);
+
+  // remember last logged in user
+  localStorage.setItem("lastSquadUser", squadUser);
 </script>
 
 <!-- HEADER -->
@@ -46,7 +50,6 @@ localStorage.setItem("lastSquadUser", squadUser);
   <a href="squad-dashboard.html">Dashboard</a>
   <a href="squad-history.html">History</a>
   <a href="squad-profile.html">Profile</a>
-  <a href="squad-booking-detail.html?entry=0">View</a>
   <a href="#" onclick="logout()">Logout</a>
 </div>
 
@@ -64,7 +67,9 @@ localStorage.setItem("lastSquadUser", squadUser);
         </p>
       </div>
       <div>
-        <div class="text-muted" style="font-size:13px; margin-bottom:2px;">Weekly earnings (after CIS)</div>
+        <div class="text-muted" style="font-size:13px; margin-bottom:2px;">
+          Weekly earnings (after CIS)
+        </div>
         <div style="font-size:30px; font-weight:800;">
           £<span id="weeklyTotal">0.00</span>
         </div>
@@ -83,194 +88,4 @@ localStorage.setItem("lastSquadUser", squadUser);
     </div>
 
     <div class="card">
-      <div class="card-title">Year-to-date</div>
-      <div class="card-sub">Total for this calendar year (after CIS).</div>
-      <div style="font-size:24px; font-weight:800; margin-top:8px;">
-        £<span id="yearlyTotal">0.00</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Most recent booking</div>
-      <div class="card-sub">Status of your latest booking-off.</div>
-      <div id="recentStatusBox" style="margin-top:8px;">
-        <span class="text-muted" id="recentStatusText">No bookings yet</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT BOOKINGS TABLE -->
-  <section class="card mt-16">
-    <div class="card-header-row">
-      <div>
-        <div class="card-title">Recent booking-offs</div>
-        <div class="card-sub">Last 5 submissions with your share and CIS amount.</div>
-      </div>
-      <a href="squad-history.html" class="btn btn-sm btn-ghost">View all</a>
-    </div>
-
-    <table class="table" style="margin-top:10px;">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Plot</th>
-          <th>Your share</th>
-          <th>After CIS</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="bookingTableBody"></tbody>
-    </table>
-  </section>
-
-  <!-- QUICK ACTIONS -->
-  <section class="card mt-16">
-    <div class="card-title">Quick actions</div>
-    <div class="card-sub">Jump straight to what you need.</div>
-
-    <div class="row row-wrap mt-12">
-      <a href="booking.html" class="btn btn-primary btn-md">New booking-off</a>
-      <a href="squad-history.html" class="btn btn-ghost btn-md">View full history</a>
-      <a href="squad-profile.html" class="btn btn-ghost btn-md">Squad profile</a>
-      <button class="btn btn-danger btn-md" type="button" onclick="logout()">Logout</button>
-    </div>
-  </section>
-
-</main>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2025 BrickBook</span>
-    <span class="text-muted">Squad Dashboard</span>
-  </div>
-</footer>
-
-<script src="assets/main.js"></script>
-<script>
-function toggleMenu() {
-  document.getElementById("mobileMenu").classList.toggle("show");
-}
-
-function logout() {
-  sessionStorage.removeItem("squadUser");
-  window.location.href = "squad-login.html";
-}
-
-// --- LOAD SQUAD DATA FROM LOCALSTORAGE ---
-let squadKey = "squad_" + squadUser;
-let squadData = JSON.parse(localStorage.getItem(squadKey) || "{}");
-
-// fallback structure
-if (!squadData.earnings) squadData.earnings = [];
-if (!squadData.bookings) squadData.bookings = [];
-if (!squadData.name) squadData.name = squadUser;
-
-// --- RENDER HEADER NAME ---
-document.getElementById("squadNameText").textContent = squadData.name || squadUser;
-
-// --- CALCULATE TOTALS ---
-function calculateTotals() {
-  let weekly = 0;
-  let monthly = 0;
-  let yearly = 0;
-
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
-
-  // start of week (Sunday)
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay());
-  weekStart.setHours(0,0,0,0);
-
-  squadData.earnings.forEach(e => {
-    if (!e.date || typeof e.afterCIS !== "number") return;
-    const d = new Date(e.date);
-    if (isNaN(d)) return;
-
-    if (d >= weekStart) {
-      weekly += e.afterCIS;
-    }
-    if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
-      monthly += e.afterCIS;
-    }
-    if (d.getFullYear() === currentYear) {
-      yearly += e.afterCIS;
-    }
-  });
-
-  document.getElementById("weeklyTotal").textContent = weekly.toFixed(2);
-  document.getElementById("monthlyTotal").textContent = monthly.toFixed(2);
-  document.getElementById("yearlyTotal").textContent = yearly.toFixed(2);
-}
-
-// --- RENDER BOOKINGS TABLE ---
-function renderBookings() {
-  const tbody = document.getElementById("bookingTableBody");
-  tbody.innerHTML = "";
-
-  const bookings = squadData.bookings.slice().sort((a,b) => {
-    const da = new Date(a.date || 0).getTime();
-    const db = new Date(b.date || 0).getTime();
-    return db - da;
-  }).slice(0, 5);
-
-  if (!bookings.length) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td colspan="6" style="font-size:13px; color:var(--text-muted); padding:12px;">
-        No bookings yet. Once you submit a booking-off, it’ll appear here.
-      </td>`;
-    tbody.appendChild(tr);
-
-    document.getElementById("recentStatusText").textContent = "No bookings yet";
-    return;
-  }
-
-  bookings.forEach((b, idx) => {
-    const wage = typeof b.wage === "number" ? b.wage : 0;
-    const afterCIS = typeof b.afterCIS === "number" ? b.afterCIS : wage * 0.8;
-    const status = b.status || "Pending";
-
-    let statusClass = "status-pill status-pill--pending";
-    if (status.toLowerCase() === "approved") statusClass = "status-pill status-pill--approved";
-    if (status.toLowerCase() === "rejected") statusClass = "status-pill status-pill--rejected";
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${b.date || "-"}</td>
-      <td>${b.plot || "-"}</td>
-      <td>£${wage.toFixed(2)}</td>
-      <td>£${afterCIS.toFixed(2)}</td>
-      <td><span class="${statusClass}">${status}</span></td>
-      <td style="text-align:right;">
-        <a href="squad-booking-detail.html?i=${idx}" class="btn btn-sm btn-ghost">View</a>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // most recent booking
-  const latest = bookings[0];
-  const recentStatusText = document.getElementById("recentStatusText");
-  const recentStatusBox = document.getElementById("recentStatusBox");
-  recentStatusBox.innerHTML = "";
-
-  let sClass = "status-pill status-pill--pending";
-  if (latest.status && latest.status.toLowerCase() === "approved") sClass = "status-pill status-pill--approved";
-  if (latest.status && latest.status.toLowerCase() === "rejected") sClass = "status-pill status-pill--rejected";
-
-  const span = document.createElement("span");
-  span.className = sClass;
-  span.textContent = latest.status || "Pending";
-  recentStatusBox.appendChild(span);
-}
-
-// --- INIT ---
-calculateTotals();
-renderBookings();
-</script>
-
-</body>
-</html>
+      <div class="card-title">Year
