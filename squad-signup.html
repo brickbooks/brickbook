@@ -6,128 +6,281 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="assets/style.css">
 
-<script type="module" src="./firebase.js"></script>
-
 <style>
-  body { font-family: "Inter", sans-serif; background:#F5F7FA; }
-  .wrapper { max-width:420px;margin:40px auto;padding:20px; }
-  .card { background:white;padding:26px;border-radius:16px;
-          border:1px solid #E5E7EB;box-shadow:0 8px 28px rgba(0,0,0,0.06); }
-  .card-title { font-size:24px;font-weight:800;margin-bottom:12px;text-align:center; }
-  input { width:100%;padding:14px;border-radius:10px;border:1px solid #E5E7EB;margin-bottom:14px; }
-  .btn-primary { width:100%;padding:14px;border-radius:12px;background:#1B73E8;color:white;
-                 font-weight:700;border:none;cursor:pointer;margin-top:10px; }
-  .info { background:#E9F1FF;padding:14px;border-left:4px solid #1B73E8;border-radius:6px;margin-bottom:18px; }
+:root {
+  --blue: #1B73E8;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+  --text-muted: #6B7280;
+  --shadow: 0 8px 28px rgba(0,0,0,0.06);
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+}
+
+header {
+  background: var(--card);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+header nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #000;
+}
+
+.wrapper {
+  max-width: 480px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  padding: 26px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--blue);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.invite-box {
+  padding: 12px;
+  background: #e9f1ff;
+  border-left: 4px solid var(--blue);
+  border-radius: 6px;
+  margin-bottom: 18px;
+}
 </style>
 </head>
 
 <body>
 
+<header>
+  <div class="logo">BrickBook</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="contractor-login.html">Contractor</a>
+    <a href="squad-login.html">Squad Login</a>
+  </nav>
+</header>
+
 <div class="wrapper">
   <div class="card">
+    <div class="card-title">Squad Sign Up</div>
 
-    <div class="card-title">Finish Squad Sign Up</div>
+    <div id="inviteInfo" class="invite-box" style="display:none;"></div>
 
-    <!-- invite message -->
-    <div id="inviteInfo" class="info" style="display:none;"></div>
+    <input id="fullName" type="text" placeholder="Full Name">
+    <input id="email" type="email" placeholder="Email Address">
+    <input id="password" type="password" placeholder="Create Password">
 
-    <!-- show after firebase signs user in -->
-    <div id="setupForm" style="display:none;">
-      <input type="text" id="fullName" placeholder="Full Name">
-      <input type="password" id="password" placeholder="Create Password">
-      <button class="btn-primary" id="finishBtn">Create Squad Account</button>
-    </div>
-
+    <button class="btn-primary" id="signupBtn">Create Account</button>
   </div>
 </div>
 
+
 <script type="module">
-  import { auth, db } from "./firebase.js";
+/* ------------------------------------------
+    IMPORT FIREBASE
+---------------------------------------------*/
+import { auth, db } from "./firebase.js";
 
-  import {
-    isSignInWithEmailLink,
-    signInWithEmailLink,
-    updatePassword
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updatePassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  import {
-    doc,
-    setDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  /* ======================================================
-        1. Detect Firebase email invite link
-  ====================================================== */
-  const url = window.location.href;
-  const inviteBox = document.getElementById("inviteInfo");
-  const setupForm = document.getElementById("setupForm");
 
-  if (isSignInWithEmailLink(auth, url)) {
+/* ------------------------------------------
+    READ EMAIL FROM URL (invite)
+---------------------------------------------*/
+const params = new URLSearchParams(window.location.search);
+const invitedEmail = params.get("email")?.toLowerCase();
 
-    // ask user to confirm email (Firebase required)
-    let email = window.localStorage.getItem("squadInviteEmail");
-    if (!email) email = prompt("Confirm your email address:");
+let inviteDocData = null;
 
-    // sign them in
-    const result = await signInWithEmailLink(auth, email, url);
+const inviteInfoBox = document.getElementById("inviteInfo");
+const nameInput = document.getElementById("fullName");
+const emailInput = document.getElementById("email");
 
-    inviteBox.style.display = "block";
-    inviteBox.innerHTML = `
-      <strong>Email verified!</strong><br>
-      Complete your squad account setup below.
-    `;
 
-    setupForm.style.display = "block";
-
-    /* ==============================================
-         2. Handle final squad setup
-    ============================================== */
-    document.getElementById("finishBtn").onclick = async () => {
-      const fullName = document.getElementById("fullName").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (!fullName || !password) {
-        alert("Enter your full name and create a password.");
-        return;
-      }
-
-      try {
-        // Set password on Firebase user
-        await updatePassword(auth.currentUser, password);
-
-        /* ============================================
-             3. Save squad in Firestore
-        ============================================ */
-        const squadId = auth.currentUser.uid;
-
-        await setDoc(
-          doc(db, "squads", squadId),
-          {
-            name: fullName,
-            email: auth.currentUser.email,
-            contractorId: "PENDING",  // contractor ID auto-filled later
-            createdAt: serverTimestamp(),
-            status: "active"
-          }
-        );
-
-        alert("Your squad account is ready!");
-        window.location.href = "squad-dashboard.html";
-
-      } catch (err) {
-        console.error(err);
-        alert("Error finishing setup: " + err.message);
-      }
-    };
-
-  } else {
-    inviteBox.style.display = "block";
-    inviteBox.innerHTML = `
-      <strong>Invalid invite.</strong><br>
-      Please use the link sent to your email.
-    `;
+/* ------------------------------------------
+    LOAD INVITE FROM FIRESTORE
+---------------------------------------------*/
+async function loadInvite() {
+  if (!invitedEmail) {
+    inviteInfoBox.style.display = "block";
+    inviteInfoBox.innerHTML = `<strong>No invite found.</strong><br>Ask contractor for a new invite.`;
+    return;
   }
+
+  // Search across ALL contractors
+  // Firestore rules allow this because we're only reading.
+  const contractorListRef = doc(db, "metadata", "contractors"); // optional if you store list
+  // But your invites are stored:
+  // contractors/{contractorId}/invites/{email}
+
+  // We must check all contractors; we do brute force:
+  // Better: store contractorId in invite link later.
+
+  // For now: try contractorId known?
+  // You can replace this with list if needed.
+
+  // Quick trick: your contractor login ID is stable for now:
+  const possibleContractors = [
+    "YXpFCmpxoXczJ6Krgi1ijeVrmX53" // your contractor test ID
+  ];
+
+  for (let contractorId of possibleContractors) {
+    const ref = doc(db, "contractors", contractorId, "invites", invitedEmail);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      inviteDocData = snap.data();
+      inviteDocData.contractorId = contractorId;
+      break;
+    }
+  }
+
+  if (!inviteDocData) {
+    inviteInfoBox.style.display = "block";
+    inviteInfoBox.innerHTML = `<strong>Invite not found.</strong><br>This email is not invited yet.`;
+    return;
+  }
+
+  // Show info
+  inviteInfoBox.style.display = "block";
+  inviteInfoBox.innerHTML = `
+      <strong>Invite Found</strong><br>
+      Contractor ID: <strong>${inviteDocData.contractorId}</strong><br>
+      Squad: <strong>${inviteDocData.squadId}</strong>
+  `;
+
+  // Autofill
+  emailInput.value = invitedEmail;
+  nameInput.value = inviteDocData.name || "";
+}
+
+loadInvite();
+
+
+/* ------------------------------------------
+     SIGN UP BUTTON
+---------------------------------------------*/
+document.getElementById("signupBtn").addEventListener("click", registerSquad);
+
+async function registerSquad() {
+  const fullName = nameInput.value.trim();
+  const email = emailInput.value.trim().toLowerCase();
+  const password = document.getElementById("password").value.trim();
+
+  if (!fullName || !email || !password) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  if (!inviteDocData) {
+    alert("Invite missing or invalid.");
+    return;
+  }
+
+  try {
+    // Create auth user
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+
+    const squadUid = user.uid;
+    const contractorId = inviteDocData.contractorId;
+    const squadId = inviteDocData.squadId;
+
+    /* ------------------------------------------
+         1️⃣ CREATE TOP-LEVEL SQUAD DOC
+    ---------------------------------------------*/
+    await setDoc(doc(db, "squads", squadUid), {
+      name: fullName,
+      email,
+      contractorId,
+      squadId,
+      createdAt: serverTimestamp(),
+      status: "active"
+    });
+
+    /* ------------------------------------------
+         2️⃣ ADD SQUAD TO CONTRACTOR COLLECTION
+    ---------------------------------------------*/
+    await setDoc(
+      doc(db, "contractors", contractorId, "squads", squadUid),
+      {
+        squadName: fullName,
+        email,
+        createdAt: serverTimestamp(),
+        status: "active",
+        members: []
+      }
+    );
+
+    /* ------------------------------------------
+         3️⃣ MARK INVITE AS ACCEPTED
+    ---------------------------------------------*/
+    await updateDoc(
+      doc(db, "contractors", contractorId, "invites", email),
+      {
+        status: "accepted",
+        acceptedAt: serverTimestamp()
+      }
+    );
+
+    alert("Your squad account is ready!");
+
+    window.location.href = "squad-dashboard.html";
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+}
 </script>
 
 </body>
