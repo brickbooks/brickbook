@@ -2,214 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Squad Sign Up – BrickBook</title>
+<title>Squad Login – BrickBook</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="assets/style.css">
 
+<script type="module" src="./firebase.js"></script>
+
 <style>
-:root {
-  --blue: #1B73E8;
-  --bg: #F5F7FA;
-  --card: #FFFFFF;
-  --border: #E5E7EB;
-  --text-muted: #6B7280;
-  --shadow: 0 8px 28px rgba(0,0,0,0.06);
-}
-
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background: var(--bg);
-}
-
-/* Header */
-header {
-  background: var(--card);
-  padding: 18px 24px;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-
-header nav a {
-  margin-left: 20px;
-  text-decoration: none;
-  font-weight: 600;
-  color: #000;
-}
-
-.wrapper {
-  max-width: 480px;
-  margin: 30px auto;
-  padding: 20px;
-}
-
-.card {
-  background: var(--card);
-  padding: 26px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-}
-
-.card-title {
-  font-size: 26px;
-  font-weight: 800;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  margin-bottom: 16px;
-}
-
-.btn-primary {
-  width: 100%;
-  background: var(--blue);
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}
-
-.invite-box {
-  padding: 12px;
-  background: #e9f1ff;
-  border-left: 4px solid var(--blue);
-  border-radius: 6px;
-  margin-bottom: 18px;
-}
+  body { margin:0; font-family:"Inter",sans-serif; background:#F5F7FA; }
+  .wrapper { max-width:420px; margin:40px auto; padding:20px; }
+  .card { background:white; padding:26px; border-radius:16px;
+          border:1px solid #E5E7EB; box-shadow:0 8px 28px rgba(0,0,0,0.06); }
+  .title { font-size:26px; font-weight:800; text-align:center; margin-bottom:8px; }
+  input { width:100%; padding:14px; border-radius:10px; border:1px solid #E5E7EB; margin-bottom:14px; }
+  .btn-primary { width:100%; background:#1B73E8; padding:14px; border-radius:10px;
+                 color:white; font-weight:700; border:none; cursor:pointer; }
+  .link { text-align:center; margin-top:10px; font-size:14px; }
+  .forgot-link { color:#1B73E8; text-decoration:none; cursor:pointer; }
+  .error-box { background:#ffe7e7; color:#b30000; padding:10px; border-radius:6px; margin-bottom:12px; display:none; }
+  .success-box { background:#e7ffe9; color:#008a1c; padding:10px; border-radius:6px; margin-bottom:12px; display:none; }
 </style>
 
 </head>
 <body>
 
-<header>
-  <div class="logo">BrickBook</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="contractor-login.html">Contractor</a>
-    <a href="squad-login.html">Squad Login</a>
-  </nav>
-</header>
-
 <div class="wrapper">
 
   <div class="card">
 
-    <div class="card-title">Squad Sign Up</div>
+    <div class="title">Squad Login</div>
+    <p style="text-align:center; color:#6B7280; margin-bottom:20px;">
+      Access your BrickBook squad dashboard
+    </p>
 
-    <div id="inviteInfo" class="invite-box" style="display:none;"></div>
+    <div id="errorBox" class="error-box"></div>
+    <div id="successBox" class="success-box"></div>
 
-    <input type="text" id="fullName" placeholder="Full Name">
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Create Password">
+    <input type="email" id="email" placeholder="Email address">
+    <input type="password" id="password" placeholder="Password">
 
-    <button class="btn-primary" onclick="registerSquad()">Create Account</button>
+    <button class="btn-primary" id="loginBtn">Login</button>
+
+    <div class="link">
+      <a class="forgot-link" id="forgotBtn">Forgot your password?</a>
+    </div>
+
+    <div class="link" style="margin-top:4px;">
+      <a href="contractor-login.html">Contractor Login</a>
+    </div>
 
   </div>
 
 </div>
 
-<script>
-/* ==========================
-   READ INVITE FROM URL
-========================== */
-const params = new URLSearchParams(window.location.search);
-const inviteCode = params.get("invite");
+<script type="module">
+  import { auth, db } from "./firebase.js";
 
-let inviteData = null;
+  import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* FIND invite by code */
-function loadInvite() {
-  if (!inviteCode) return;
+  import {
+    doc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  for (let key in localStorage) {
-    if (key.startsWith("invite_")) {
-      const data = JSON.parse(localStorage.getItem(key));
-      if (data.inviteCode === inviteCode) {
-        inviteData = data;
-        break;
+
+  const errorBox = document.getElementById("errorBox");
+  const successBox = document.getElementById("successBox");
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = "block";
+    successBox.style.display = "none";
+  }
+
+  function showSuccess(msg) {
+    successBox.textContent = msg;
+    successBox.style.display = "block";
+    errorBox.style.display = "none";
+  }
+
+  /* ======================================
+      LOGIN HANDLER
+  ====================================== */
+  document.getElementById("loginBtn").onclick = async () => {
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      showError("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+
+      // Fetch squad record
+      const squadRef = doc(db, "squads", user.uid);
+      const snap = await getDoc(squadRef);
+
+      if (!snap.exists()) {
+        // Prevent contractors using squad login
+        showError("This login is for squad members only.");
+        return;
+      }
+
+      // Store squad identity for dashboard
+      sessionStorage.setItem("squadUser", user.uid);
+      localStorage.setItem("lastSquadUser", user.uid);
+
+      window.location.href = "squad-dashboard.html";
+
+    } catch (err) {
+      if (err.code === "auth/invalid-credential") {
+        showError("Incorrect email or password.");
+      } else {
+        showError(err.message);
       }
     }
-  }
-
-  if (!inviteData) {
-    document.getElementById("inviteInfo").style.display = "block";
-    document.getElementById("inviteInfo").innerHTML =
-      `<strong>Invite not found.</strong><br>Please check your link.`;
-    return;
-  }
-
-  // Show invite info
-  const infoBox = document.getElementById("inviteInfo");
-  infoBox.style.display = "block";
-  infoBox.innerHTML = `
-    <strong>Invite Found</strong><br>
-    You are joining: <strong>${inviteData.squadId}</strong><br>
-    Contractor invited: <strong>${inviteData.name}</strong>
-  `;
-
-  // Autofill fields
-  document.getElementById("fullName").value = inviteData.name;
-  document.getElementById("email").value = inviteData.email;
-}
-
-/* ==========================
-   REGISTER SQUAD MEMBER
-========================== */
-function registerSquad() {
-  const name = fullName.value.trim();
-  const email = email.value.trim().toLowerCase();
-  const password = password.value.trim();
-
-  if (!name || !email || !password) {
-    alert("Please fill all fields.");
-    return;
-  }
-
-  if (!inviteData) {
-    alert("Invalid or missing invite code.");
-    return;
-  }
-
-  /* Save user to localStorage */
-  const userObj = {
-    name,
-    email,
-    password,
-    squadId: inviteData.squadId,
-    contractorId: inviteData.contractorId || "default",
-    bookings: [],
-    earnings: []
   };
 
-  localStorage.setItem("squad_user_" + email, JSON.stringify(userObj));
 
-  /* Mark invite used */
-  inviteData.status = "accepted";
-  localStorage.setItem("invite_" + email, JSON.stringify(inviteData));
+  /* ======================================
+      FORGOT PASSWORD
+  ====================================== */
+  document.getElementById("forgotBtn").onclick = async () => {
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    if (!email) {
+      showError("Enter your email first.");
+      return;
+    }
 
-  /* Add to squad group */
-  let squads = JSON.parse(localStorage.getItem("contractor_squads"));
-  const squad = squads.find(s => s.squadId === inviteData.squadId);
-  squad.members.push(email);
-  localStorage.setItem("contractor_squads", JSON.stringify(squads));
-
-  alert("Account created! You can now log in.");
-
-  window.location.href = "squad-login.html";
-}
-
-/* INIT */
-loadInvite();
-
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showSuccess("Reset link sent! Check your inbox.");
+    } catch (err) {
+      showError(err.message);
+    }
+  };
 </script>
 
 </body>
